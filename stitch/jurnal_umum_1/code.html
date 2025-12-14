@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Jurnal Umum - Sistem Keuangan Desa</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e27b",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#112117",
+                        "card-dark": "#1a2c23",
+                        "input-dark": "#254632",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #112117; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #254632; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #36e27b; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display min-h-screen flex flex-col overflow-x-hidden">
+<div class="border-b border-solid border-b-[#254632] bg-background-dark w-full">
+<div class="layout-container flex justify-center w-full">
+<div class="layout-content-container flex flex-col max-w-[1200px] w-full px-4 sm:px-6 lg:px-8">
+<header class="flex items-center justify-between whitespace-nowrap py-4">
+<div class="flex items-center gap-4 text-white">
+<div class="size-10 flex items-center justify-center rounded-lg bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-3xl">account_balance</span>
+</div>
+<h2 class="text-white text-xl font-bold leading-tight tracking-[-0.015em]">Sistem Keuangan Desa</h2>
+</div>
+<div class="flex items-center gap-8">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-gray-300 hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Dashboard</a>
+<a class="text-white text-sm font-bold leading-normal" href="#">Keuangan</a>
+<a class="text-gray-300 hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Laporan</a>
+<a class="text-gray-300 hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Pengaturan</a>
+</nav>
+<div class="flex items-center gap-3">
+<button class="text-gray-300 hover:text-white">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-[#254632]" data-alt="Profile picture of the current user" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBscKMNJEcLiXsS4u4DkXgryjwDA6EvaAOAi5wWpy8m4_Z5I0Xy_oFOUBq6-iNWZXq1qi0cJXw9mOtvTZOTXrSelndWfJuXz-xYedW-y0_FRyGexdH00JNmmLsVF3lkpoX4kpdrsX0LrunK5i5WwesBK5KBuWJzh5Y02Q6U82KA5P8s9zAGhEMPdAeTlh3jtTViz0-X46qQ7s8LZF5zjUTciT9YzO4-o4kP_iQuosze9oagFr9gOOyKm3wp1uObmaq-HB5nK7Dh_zM");'></div>
+</div>
+</div>
+</header>
+</div>
+</div>
+</div>
+<div class="layout-container flex grow flex-col items-center w-full py-8">
+<div class="layout-content-container flex flex-col max-w-[1200px] w-full px-4 sm:px-6 lg:px-8 gap-8">
+<div class="flex flex-wrap gap-2 items-center">
+<a class="text-primary/80 hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Dashboard</a>
+<span class="text-gray-500 text-sm font-medium leading-normal">/</span>
+<a class="text-primary/80 hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Keuangan</a>
+<span class="text-gray-500 text-sm font-medium leading-normal">/</span>
+<span class="text-white text-sm font-medium leading-normal">Jurnal Umum</span>
+</div>
+<div class="flex flex-wrap justify-between items-end gap-6">
+<div class="flex flex-col gap-2">
+<h1 class="text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Jurnal Umum</h1>
+<p class="text-gray-400 text-base font-normal leading-normal max-w-2xl">Modul pencatatan transaksi harian dan jurnal penyesuaian sesuai SAK Entitas Publik.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-[#254632] hover:bg-[#2f553d] text-white text-sm font-bold rounded-lg transition-colors border border-[#3a614a]">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+<span>Filter</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-[#254632] hover:bg-[#2f553d] text-white text-sm font-bold rounded-lg transition-colors border border-[#3a614a]">
+<span class="material-symbols-outlined text-[20px]">download</span>
+<span>Export Data</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="flex flex-col gap-3 rounded-xl p-6 bg-card-dark border border-[#254632] shadow-sm">
+<div class="flex items-center gap-3">
+<div class="p-2 rounded-full bg-[#254632] text-primary">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<p class="text-gray-300 text-sm font-medium">Total Debit Hari Ini</p>
+</div>
+<p class="text-white text-2xl font-bold tabular-nums tracking-tight">Rp 45.000.000</p>
+</div>
+<div class="flex flex-col gap-3 rounded-xl p-6 bg-card-dark border border-[#254632] shadow-sm">
+<div class="flex items-center gap-3">
+<div class="p-2 rounded-full bg-[#254632] text-red-400">
+<span class="material-symbols-outlined">trending_down</span>
+</div>
+<p class="text-gray-300 text-sm font-medium">Total Kredit Hari Ini</p>
+</div>
+<p class="text-white text-2xl font-bold tabular-nums tracking-tight">Rp 45.000.000</p>
+</div>
+<div class="flex flex-col gap-3 rounded-xl p-6 bg-card-dark border border-[#254632] shadow-sm">
+<div class="flex items-center gap-3">
+<div class="p-2 rounded-full bg-[#254632] text-primary">
+<span class="material-symbols-outlined">balance</span>
+</div>
+<p class="text-gray-300 text-sm font-medium">Status Neraca</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">check_circle</span>
+<p class="text-primary text-xl font-bold tracking-tight">Seimbang</p>
+</div>
+</div>
+</div>
+<div class="bg-card-dark rounded-xl border border-[#254632] shadow-lg overflow-hidden">
+<div class="p-6 border-b border-[#254632] flex justify-between items-center bg-[#1e2e26]">
+<h3 class="text-white text-lg font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">edit_note</span>
+                    Entri Jurnal Baru
+                </h3>
+<span class="text-xs font-mono text-gray-400 bg-[#112117] px-2 py-1 rounded">Ref: AUTO-2023-10-001</span>
+</div>
+<div class="p-6 flex flex-col gap-6">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<div class="md:col-span-3 flex flex-col gap-2">
+<label class="text-gray-300 text-sm font-medium">Tanggal Transaksi</label>
+<input class="bg-[#112117] border border-[#254632] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 h-10 placeholder-gray-500" type="date" value="2023-10-24"/>
+</div>
+<div class="md:col-span-3 flex flex-col gap-2">
+<label class="text-gray-300 text-sm font-medium">No. Bukti / Referensi</label>
+<input class="bg-[#112117] border border-[#254632] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 h-10 placeholder-gray-500" placeholder="Contoh: BKK-001/X/2023" type="text"/>
+</div>
+<div class="md:col-span-6 flex flex-col gap-2">
+<label class="text-gray-300 text-sm font-medium">Uraian Transaksi</label>
+<input class="bg-[#112117] border border-[#254632] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 h-10 placeholder-gray-500" placeholder="Deskripsi singkat transaksi..." type="text"/>
+</div>
+</div>
+<div class="w-full overflow-x-auto rounded-lg border border-[#254632]">
+<table class="w-full text-sm text-left text-gray-400">
+<thead class="text-xs text-gray-200 uppercase bg-[#254632]">
+<tr>
+<th class="px-4 py-3 w-[40%]" scope="col">Akun (Kode &amp; Nama)</th>
+<th class="px-4 py-3 w-[25%] text-right" scope="col">Debit (Rp)</th>
+<th class="px-4 py-3 w-[25%] text-right" scope="col">Kredit (Rp)</th>
+<th class="px-4 py-3 w-[10%] text-center" scope="col">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#254632] bg-[#1a2c23]">
+<tr class="hover:bg-[#1e2e26] transition-colors group">
+<td class="px-4 py-2">
+<div class="relative">
+<select class="bg-[#112117] border border-[#254632] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 appearance-none">
+<option selected="">1.1.1.01 - Kas di Bendahara Desa</option>
+<option>1.1.1.02 - Rekening Kas Desa</option>
+<option>5.1.2.01 - Belanja Alat Tulis Kantor</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+</div>
+</td>
+<td class="px-4 py-2">
+<input class="bg-[#112117] border border-[#254632] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 text-right font-mono tabular-nums" type="text" value="1.500.000"/>
+</td>
+<td class="px-4 py-2">
+<input class="bg-[#112117] border border-[#254632] text-gray-500 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 text-right font-mono tabular-nums" disabled="" type="text" value="0"/>
+</td>
+<td class="px-4 py-2 text-center">
+<button class="text-gray-500 hover:text-red-400 transition-colors p-1 rounded hover:bg-[#254632]">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-[#1e2e26] transition-colors group">
+<td class="px-4 py-2">
+<div class="relative">
+<select class="bg-[#112117] border border-[#254632] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 appearance-none">
+<option>1.1.1.01 - Kas di Bendahara Desa</option>
+<option selected="">4.1.2.01 - Pendapatan Hasil Usaha</option>
+<option>5.1.2.01 - Belanja Alat Tulis Kantor</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+</div>
+</td>
+<td class="px-4 py-2">
+<input class="bg-[#112117] border border-[#254632] text-gray-500 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 text-right font-mono tabular-nums" disabled="" type="text" value="0"/>
+</td>
+<td class="px-4 py-2">
+<input class="bg-[#112117] border border-[#254632] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 text-right font-mono tabular-nums" type="text" value="1.200.000"/>
+</td>
+<td class="px-4 py-2 text-center">
+<button class="text-gray-500 hover:text-red-400 transition-colors p-1 rounded hover:bg-[#254632]">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+<button class="w-full py-2 flex items-center justify-center gap-2 text-primary hover:text-white hover:bg-[#254632] transition-colors text-sm font-medium border-t border-[#254632]">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Tambah Baris Baru
+                    </button>
+</div>
+<div class="flex items-start gap-3 p-4 rounded-lg bg-red-900/20 border border-red-500/20 text-red-200 animate-pulse">
+<span class="material-symbols-outlined text-red-400 mt-0.5">error</span>
+<div class="flex flex-col gap-1 flex-1">
+<h4 class="text-sm font-bold text-red-400">Jurnal Tidak Seimbang</h4>
+<p class="text-sm text-red-200/80">Total debit dan kredit memiliki selisih sebesar <span class="font-mono font-bold text-red-100">Rp 300.000</span>. Mohon periksa kembali input angka Anda sebelum menyimpan.</p>
+</div>
+<div class="hidden sm:block">
+<span class="text-xs bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-1 rounded font-mono">Status: Invalid</span>
+</div>
+</div>
+<div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-6 pt-4 border-t border-[#254632]">
+<div class="flex gap-8 text-right md:text-left">
+<div class="flex flex-col">
+<span class="text-xs text-gray-400 uppercase font-bold tracking-wider">Total Debit</span>
+<span class="text-lg font-bold text-white font-mono">Rp 1.500.000</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs text-gray-400 uppercase font-bold tracking-wider">Total Kredit</span>
+<span class="text-lg font-bold text-white font-mono">Rp 1.200.000</span>
+</div>
+<div class="flex flex-col border-l border-[#254632] pl-6">
+<span class="text-xs text-gray-400 uppercase font-bold tracking-wider">Selisih</span>
+<span class="text-lg font-bold text-red-400 font-mono flex items-center gap-1">
+                                    Rp 300.000
+                                    <span class="material-symbols-outlined text-sm">warning</span>
+</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2.5 border border-[#3a614a] text-gray-300 hover:text-white hover:bg-[#254632] rounded-lg text-sm font-bold transition-colors">
+                            Reset
+                        </button>
+<button class="px-6 py-2.5 bg-[#254632] text-gray-500 rounded-lg text-sm font-bold cursor-not-allowed opacity-60 flex items-center gap-2 border border-transparent" disabled="">
+<span class="material-symbols-outlined text-[20px]">save</span>
+                            Simpan Jurnal
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h2 class="text-white text-xl font-bold leading-tight">Riwayat Jurnal</h2>
+<div class="relative">
+<input class="pl-10 pr-4 py-2 bg-[#112117] border border-[#254632] rounded-lg text-sm text-white placeholder-gray-500 focus:ring-primary focus:border-primary w-64 md:w-80" placeholder="Cari nomor bukti atau uraian..." type="text"/>
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+<span class="material-symbols-outlined text-gray-500 text-[20px]">search</span>
+</div>
+</div>
+</div>
+<div class="overflow-hidden rounded-xl border border-[#254632] bg-card-dark shadow-sm">
+<table class="w-full text-sm text-left text-gray-400">
+<thead class="text-xs text-gray-300 uppercase bg-[#254632] border-b border-[#254632]">
+<tr>
+<th class="px-6 py-3 font-bold" scope="col">Tanggal</th>
+<th class="px-6 py-3 font-bold" scope="col">No. Ref</th>
+<th class="px-6 py-3 font-bold" scope="col">Uraian / Akun</th>
+<th class="px-6 py-3 text-right font-bold text-primary/90" scope="col">Debit</th>
+<th class="px-6 py-3 text-right font-bold text-red-400/90" scope="col">Kredit</th>
+<th class="px-6 py-3 text-center font-bold" scope="col">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#254632]">
+<tr class="hover:bg-[#1e2e26] transition-colors">
+<td class="px-6 py-4 font-medium text-white whitespace-nowrap align-top">24 Okt 2023</td>
+<td class="px-6 py-4 text-primary font-mono text-xs align-top">BKK-001/X/2023</td>
+<td class="px-6 py-4 align-top">
+<div class="font-medium text-white mb-1">Penerimaan Dana Desa Tahap II</div>
+<div class="flex flex-col gap-1 text-xs">
+<div class="flex justify-between w-full max-w-xs text-gray-400">
+<span>1.1.1.02 Rekening Kas Desa</span>
+</div>
+<div class="flex justify-between w-full max-w-xs text-gray-500 pl-4">
+<span>4.2.1.01 Dana Desa</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-mono text-white align-top tabular-nums">
+<div class="mb-1">Rp 150.000.000</div>
+</td>
+<td class="px-6 py-4 text-right font-mono text-white align-top tabular-nums">
+<div class="mb-1 opacity-0">-</div>
+<div class="text-gray-300">Rp 150.000.000</div>
+</td>
+<td class="px-6 py-4 text-center align-top">
+<div class="flex items-center justify-center gap-2">
+<button class="text-gray-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="text-gray-400 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-[#1e2e26] transition-colors bg-[#17261e]">
+<td class="px-6 py-4 font-medium text-white whitespace-nowrap align-top">23 Okt 2023</td>
+<td class="px-6 py-4 text-primary font-mono text-xs align-top">SPP-005/X/2023</td>
+<td class="px-6 py-4 align-top">
+<div class="font-medium text-white mb-1">Belanja ATK Kantor Desa</div>
+<div class="flex flex-col gap-1 text-xs">
+<div class="flex justify-between w-full max-w-xs text-gray-400">
+<span>5.1.2.01 Belanja ATK</span>
+</div>
+<div class="flex justify-between w-full max-w-xs text-gray-500 pl-4">
+<span>1.1.1.01 Kas Bendahara</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-mono text-white align-top tabular-nums">
+<div class="mb-1">Rp 2.500.000</div>
+</td>
+<td class="px-6 py-4 text-right font-mono text-white align-top tabular-nums">
+<div class="mb-1 opacity-0">-</div>
+<div class="text-gray-300">Rp 2.500.000</div>
+</td>
+<td class="px-6 py-4 text-center align-top">
+<div class="flex items-center justify-center gap-2">
+<button class="text-gray-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="text-gray-400 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-[#1e2e26] transition-colors">
+<td class="px-6 py-4 font-medium text-white whitespace-nowrap align-top">22 Okt 2023</td>
+<td class="px-6 py-4 text-primary font-mono text-xs align-top">TBP-012/X/2023</td>
+<td class="px-6 py-4 align-top">
+<div class="font-medium text-white mb-1">Penerimaan Retribusi Pasar</div>
+<div class="flex flex-col gap-1 text-xs">
+<div class="flex justify-between w-full max-w-xs text-gray-400">
+<span>1.1.1.01 Kas Bendahara</span>
+</div>
+<div class="flex justify-between w-full max-w-xs text-gray-500 pl-4">
+<span>4.1.2.01 Retribusi Daerah</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-mono text-white align-top tabular-nums">
+<div class="mb-1">Rp 450.000</div>
+</td>
+<td class="px-6 py-4 text-right font-mono text-white align-top tabular-nums">
+<div class="mb-1 opacity-0">-</div>
+<div class="text-gray-300">Rp 450.000</div>
+</td>
+<td class="px-6 py-4 text-center align-top">
+<div class="flex items-center justify-center gap-2">
+<button class="text-gray-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="text-gray-400 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="flex items-center justify-between p-4 border-t border-[#254632] bg-[#1a2c23]">
+<span class="text-sm text-gray-400">Menampilkan <span class="font-semibold text-white">1-3</span> dari <span class="font-semibold text-white">128</span> entri</span>
+<div class="flex gap-2">
+<button class="px-3 py-1 rounded bg-[#254632] text-gray-300 hover:text-white hover:bg-[#2f553d] disabled:opacity-50 text-sm">Prev</button>
+<button class="px-3 py-1 rounded bg-primary text-[#112117] font-bold text-sm">1</button>
+<button class="px-3 py-1 rounded bg-[#254632] text-gray-300 hover:text-white hover:bg-[#2f553d] text-sm">2</button>
+<button class="px-3 py-1 rounded bg-[#254632] text-gray-300 hover:text-white hover:bg-[#2f553d] text-sm">3</button>
+<span class="px-2 py-1 text-gray-500">...</span>
+<button class="px-3 py-1 rounded bg-[#254632] text-gray-300 hover:text-white hover:bg-[#2f553d] text-sm">Next</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

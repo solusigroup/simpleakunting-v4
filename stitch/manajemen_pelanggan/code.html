@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manajemen Pelanggan - BUMDesa Finance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e27b",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#112117",
+                        "secondary-dark": "#1a2c23", // A slightly lighter dark for cards
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2c23",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#0e1b13] dark:text-gray-100 transition-colors duration-200">
+<div class="flex h-screen w-full overflow-hidden">
+<!-- Side Navigation -->
+<aside class="flex w-64 flex-col border-r border-[#e8f3ec] dark:border-gray-800 bg-surface-light dark:bg-surface-dark transition-colors duration-200 hidden md:flex">
+<div class="flex flex-col h-full p-4">
+<!-- Logo / Brand -->
+<div class="flex items-center gap-3 mb-8 px-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shadow-sm" data-alt="BUMDesa Finance Logo showing abstract leaf and coin" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAQjyNvOHkpT4VPYaZa-Lm7rTFs_mZb9xWgBNIuc7tCo7QgEtrrFeu8jCJKuwHEiichvL03A0DmZHZTH-KVl3Q0uv3o2DbeLbHSM771azwJg1Qsc9R-jNXGn7_NdFqmO_--172w5TxYE97KJhAwR6r8ldPHPns26RypNcVJ_TV2hk3Ym-YAHGl_0Y-VpWpJTIxfJZwsKl4YP-tCulraa3WbSN0i3XbIOmrHs_STrzFAyW-Ows1qK_4SIF2zxUrcM8xMrflMjxI4YcQ");'></div>
+<h1 class="text-lg font-bold leading-normal dark:text-white">BUMDesa Finance</h1>
+</div>
+<!-- Navigation Links -->
+<nav class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-[#e8f3ec] dark:hover:bg-gray-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-gray-500 group-hover:text-[#0e1b13] dark:group-hover:text-white">dashboard</span>
+<p class="text-sm font-medium leading-normal group-hover:text-[#0e1b13] dark:group-hover:text-white">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-[#e8f3ec] dark:hover:bg-gray-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-gray-500 group-hover:text-[#0e1b13] dark:group-hover:text-white">description</span>
+<p class="text-sm font-medium leading-normal group-hover:text-[#0e1b13] dark:group-hover:text-white">Laporan Keuangan</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-[#e8f3ec] dark:hover:bg-gray-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-gray-500 group-hover:text-[#0e1b13] dark:group-hover:text-white">book</span>
+<p class="text-sm font-medium leading-normal group-hover:text-[#0e1b13] dark:group-hover:text-white">Jurnal</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-[#e8f3ec] dark:hover:bg-gray-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-gray-500 group-hover:text-[#0e1b13] dark:group-hover:text-white">account_balance</span>
+<p class="text-sm font-medium leading-normal group-hover:text-[#0e1b13] dark:group-hover:text-white">Aset</p>
+</a>
+<!-- Active Link -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/20 dark:bg-primary/10 text-[#0e1b13] dark:text-primary" href="#">
+<span class="material-symbols-outlined text-primary">groups</span>
+<p class="text-sm font-bold leading-normal">Pelanggan</p>
+</a>
+<div class="my-2 border-t border-gray-100 dark:border-gray-800"></div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-[#e8f3ec] dark:hover:bg-gray-700 transition-colors group" href="#">
+<span class="material-symbols-outlined text-gray-500 group-hover:text-[#0e1b13] dark:group-hover:text-white">settings</span>
+<p class="text-sm font-medium leading-normal group-hover:text-[#0e1b13] dark:group-hover:text-white">Pengaturan</p>
+</a>
+</nav>
+<!-- User Profile -->
+<div class="mt-auto pt-4 flex items-center gap-3 border-t border-gray-100 dark:border-gray-800">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10" data-alt="User avatar image" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBqqJkt81SVbvGS4XqIlxG90FBDbofpQ1z4gNehGSEj58bH36rqgeCwv0UnbUAgmNgywDv_hpDM1aWMfe2z2UidTx6jm9lfKaGReMfwg0Dny6W5QpzAApMbmvzpb_5IOTdxmgroPXMwnIXC9T6no7vj-d45AITHdwbe0R4N9qFjYWkU0DunVCDvjDPgOyd3ecmi97KtglXHs3SAe7iPA0Bs1Bm9JGtAUEHEHh8-47s5_kqLnzTWeMOorHeeFoxtF1MUr2nRwzPajBI");'></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold dark:text-white">Admin Desa</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">admin@bumdesa.id</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto h-full relative">
+<div class="container mx-auto max-w-[1200px] p-4 md:p-8 flex flex-col gap-6">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap gap-2 items-center text-sm">
+<a class="text-primary hover:text-primary/80 font-medium transition-colors" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-gray-400 text-[16px]">chevron_right</span>
+<span class="text-gray-600 dark:text-gray-300 font-medium">Pelanggan</span>
+</div>
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex flex-col gap-1">
+<h2 class="text-3xl font-black tracking-tight dark:text-white">Manajemen Pelanggan</h2>
+<p class="text-gray-500 dark:text-gray-400">Kelola data pelanggan dan pantau riwayat transaksi sesuai standar SAK.</p>
+</div>
+<div>
+<button class="group flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-primary hover:bg-primary/90 text-[#0e1b13] font-bold shadow-md shadow-primary/20 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[20px] font-bold group-hover:scale-110 transition-transform">add</span>
+<span>Tambah Pelanggan</span>
+</button>
+</div>
+</div>
+<!-- Statistics Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Stat Card 1 -->
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-700 shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Pelanggan</p>
+<span class="material-symbols-outlined text-primary p-2 bg-primary/10 rounded-full">group</span>
+</div>
+<div class="flex items-baseline gap-2">
+<p class="text-2xl font-bold dark:text-white">1,250</p>
+<div class="flex items-center gap-1 text-green-600 text-xs font-bold bg-green-50 px-2 py-0.5 rounded-full dark:bg-green-900/30 dark:text-green-400">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span>+5%</span>
+</div>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-700 shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Pelanggan Baru (Bulan Ini)</p>
+<span class="material-symbols-outlined text-primary p-2 bg-primary/10 rounded-full">person_add</span>
+</div>
+<div class="flex items-baseline gap-2">
+<p class="text-2xl font-bold dark:text-white">45</p>
+<div class="flex items-center gap-1 text-green-600 text-xs font-bold bg-green-50 px-2 py-0.5 rounded-full dark:bg-green-900/30 dark:text-green-400">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span>+12%</span>
+</div>
+</div>
+</div>
+<!-- Stat Card 3 -->
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-700 shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Pelanggan Aktif</p>
+<span class="material-symbols-outlined text-primary p-2 bg-primary/10 rounded-full">verified_user</span>
+</div>
+<div class="flex items-baseline gap-2">
+<p class="text-2xl font-bold dark:text-white">980</p>
+<div class="flex items-center gap-1 text-gray-500 text-xs font-medium dark:text-gray-400">
+<span>dari 1,250 total</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Table Section -->
+<div class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+<!-- Toolbar -->
+<div class="p-4 border-b border-gray-100 dark:border-gray-800 flex flex-col md:flex-row gap-4 justify-between items-center">
+<!-- Search -->
+<div class="relative w-full md:w-96">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-gray-400 text-[20px]">search</span>
+</div>
+<input class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-black/20 text-sm focus:ring-2 focus:ring-primary focus:border-transparent dark:text-white placeholder-gray-400" placeholder="Cari nama, ID, atau no HP..." type="text"/>
+</div>
+<!-- Filters & Actions -->
+<div class="flex gap-2 w-full md:w-auto overflow-x-auto">
+<select class="px-4 py-2.5 bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
+<option>Semua Status</option>
+<option>Aktif</option>
+<option>Tidak Aktif</option>
+</select>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                                Filter
+                            </button>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300 ml-auto md:ml-0">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                                Export
+                            </button>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-gray-50 dark:bg-black/20 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold border-b border-gray-100 dark:border-gray-800">
+<th class="px-6 py-4">ID Pelanggan</th>
+<th class="px-6 py-4">Nama Pelanggan</th>
+<th class="px-6 py-4">Kontak</th>
+<th class="px-6 py-4">Total Transaksi</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4 text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
+<!-- Row 1 -->
+<tr class="group hover:bg-primary/5 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white">CUST-00125</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-xs">BS</div>
+<div>
+<div class="font-medium text-gray-900 dark:text-white">Budi Santoso</div>
+<div class="text-xs text-gray-500">Toko Kelontong Berkah</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-gray-600 dark:text-gray-400">
+<div class="flex flex-col">
+<span>0812-3456-7890</span>
+<span class="text-xs text-gray-400">budi.s@gmail.com</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono text-gray-900 dark:text-white">Rp 15.450.000</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600 dark:bg-green-400"></span>
+                                            Aktif
+                                        </span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-end gap-2">
+<button class="p-1.5 text-gray-500 hover:text-primary hover:bg-primary/10 rounded transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+<button class="p-1.5 text-gray-500 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors" title="View Details">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-primary/5 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white">CUST-00126</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 font-bold text-xs">SA</div>
+<div>
+<div class="font-medium text-gray-900 dark:text-white">Siti Aminah</div>
+<div class="text-xs text-gray-500">Warung Makan Ibu Siti</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-gray-600 dark:text-gray-400">
+<div class="flex flex-col">
+<span>0819-8888-9999</span>
+<span class="text-xs text-gray-400">-</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono text-gray-900 dark:text-white">Rp 8.200.000</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600 dark:bg-green-400"></span>
+                                            Aktif
+                                        </span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-end gap-2">
+<button class="p-1.5 text-gray-500 hover:text-primary hover:bg-primary/10 rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+<button class="p-1.5 text-gray-500 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-primary/5 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white">CUST-00127</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 font-bold text-xs">AH</div>
+<div>
+<div class="font-medium text-gray-900 dark:text-white">Ahmad Hidayat</div>
+<div class="text-xs text-gray-500">Personal</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-gray-600 dark:text-gray-400">
+<div class="flex flex-col">
+<span>0857-1234-5678</span>
+<span class="text-xs text-gray-400">ahmad.h@yahoo.com</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono text-gray-900 dark:text-white">Rp 2.150.000</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+<span class="w-1.5 h-1.5 rounded-full bg-gray-500"></span>
+                                            Tidak Aktif
+                                        </span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-end gap-2">
+<button class="p-1.5 text-gray-500 hover:text-primary hover:bg-primary/10 rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+<button class="p-1.5 text-gray-500 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="group hover:bg-primary/5 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium text-gray-900 dark:text-white">CUST-00128</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold text-xs">RK</div>
+<div>
+<div class="font-medium text-gray-900 dark:text-white">Rina Kartika</div>
+<div class="text-xs text-gray-500">Salon Cantik</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-gray-600 dark:text-gray-400">
+<div class="flex flex-col">
+<span>0813-5555-4444</span>
+<span class="text-xs text-gray-400">rina.k@gmail.com</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono text-gray-900 dark:text-white">Rp 5.750.000</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600 dark:bg-green-400"></span>
+                                            Aktif
+                                        </span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center justify-end gap-2">
+<button class="p-1.5 text-gray-500 hover:text-primary hover:bg-primary/10 rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+<button class="p-1.5 text-gray-500 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
+<p class="text-sm text-gray-500 dark:text-gray-400">Menampilkan <span class="font-bold text-gray-900 dark:text-white">1-10</span> dari <span class="font-bold text-gray-900 dark:text-white">1,250</span> data</p>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-[#0e1b13] font-bold text-sm">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium text-sm">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium text-sm">3</button>
+<span class="w-8 text-center text-gray-400">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium text-sm">12</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

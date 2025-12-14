@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detail Laporan Arus Kas - BUMDesa Maju Jaya</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#36e27b",
+              "background-light": "#f6f8f7",
+              "background-dark": "#112117",
+              "card-light": "#ffffff",
+              "card-dark": "#1a2c22",
+              "text-main-light": "#0e1b13",
+              "text-main-dark": "#f0fdf4",
+              "text-sub-light": "#50956c",
+              "text-sub-dark": "#8fbfa3",
+              "border-light": "#e8f3ec",
+              "border-dark": "#2a4034",
+            },
+            fontFamily: {
+              "display": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark overflow-hidden">
+<div class="flex h-screen w-full">
+<aside class="hidden w-72 flex-col border-r border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark md:flex">
+<div class="flex flex-col gap-4 p-6 h-full">
+<div class="flex gap-3 mb-6">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12 shadow-sm" data-alt="BUMDesa Logo abstract green gradient" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC5-mpqa1yS0-bxplpXb90lY_w11FxZTUsyAVzcU4f2Wc6yEdjHUgUDCuR2NcwFwb7bLo-9dccJZEsjy7Fl8F6RYlzBgXz8HvUc5oaE73eEzVFozamUv85T1nZN5mAQFgz2jtAXYcInt3FD-8LFBg6pad8lTdehOu0MMNz-pBJxQ5BZz4kJqcGbP7tkkQHKDnTZNZqeVUv5cEL2FircB6aqroE_bW2TfsyTMMCchsacB8AXU-mxe-hyp0ec6Kq3F0wcQfpg89p7C7U");'></div>
+<div class="flex flex-col justify-center">
+<h1 class="text-text-main-light dark:text-text-main-dark text-base font-bold leading-tight">BUMDesa Maju Jaya</h1>
+<p class="text-text-sub-light dark:text-text-sub-dark text-xs font-normal">Administrator</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2 flex-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-border-light dark:hover:bg-border-dark transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">dashboard</span>
+<p class="text-text-main-light dark:text-text-main-dark text-sm font-medium">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-border-light dark:hover:bg-border-dark transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">bar_chart</span>
+<p class="text-text-main-light dark:text-text-main-dark text-sm font-medium">Laporan Laba Rugi</p>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-border-light dark:hover:bg-border-dark transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">balance</span>
+<p class="text-text-main-light dark:text-text-main-dark text-sm font-medium">Neraca</p>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/20 dark:bg-primary/10 border-l-4 border-primary" href="#">
+<span class="material-symbols-outlined text-text-main-light dark:text-primary">payments</span>
+<p class="text-text-main-light dark:text-white text-sm font-bold">Arus Kas</p>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-border-light dark:hover:bg-border-dark transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">description</span>
+<p class="text-text-main-light dark:text-text-main-dark text-sm font-medium">Catatan Atas Laporan</p>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-border-light dark:border-border-dark">
+<a class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 group transition-colors" href="#">
+<span class="material-symbols-outlined text-red-500">logout</span>
+<p class="text-red-500 text-sm font-medium">Keluar</p>
+</a>
+</div>
+</div>
+</aside>
+<main class="flex flex-1 flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark relative">
+<header class="flex items-center justify-between border-b border-border-light dark:border-border-dark px-6 py-4 bg-background-light dark:bg-background-dark shrink-0 z-20">
+<div class="flex items-center gap-4">
+<button class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="text-xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark hidden sm:block">Sistem Keuangan Desa</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg size-10 bg-white dark:bg-card-dark border border-border-light dark:border-border-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg size-10 bg-white dark:bg-card-dark border border-border-light dark:border-border-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl">settings</span>
+</button>
+</div>
+<div class="h-8 w-px bg-border-light dark:bg-border-dark mx-1"></div>
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white dark:border-gray-700 shadow-sm" data-alt="User avatar profile picture generic" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAnFk12N7G1plzlcNZSWPeLTE31DeTrrYROz0NzQqnJXLByo8m2au7YY-ignM0YXo8xgr9HqDAgcWEPYcarAd5lfSanrEjcYVnsoJo0XU3_tocEw5vU8BZsMcJe9ZIoSzHMqfGwEDNr-risjwx6mIHe2gpBlbCA4s5jbwUh30tNkFVNJe_olYSCv3ppTRqTvnisrAzsdi0LfzW152PE4YflmHGrqoMTX6EDYr7sgrqSvdWoGgLN8YwPxfZB-aV0B0rf20isIPI_PVo");'></div>
+<div class="hidden md:block">
+<p class="text-sm font-bold text-text-main-light dark:text-text-main-dark">Budi Santoso</p>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark">Kepala Urusan Keuangan</p>
+</div>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide">
+<div class="max-w-7xl mx-auto flex flex-col gap-6 pb-12">
+<div class="flex items-center gap-2 text-sm">
+<a class="text-text-sub-light dark:text-text-sub-dark hover:text-primary transition-colors" href="#">Keuangan</a>
+<span class="text-text-sub-light dark:text-text-sub-dark">/</span>
+<a class="text-text-sub-light dark:text-text-sub-dark hover:text-primary transition-colors" href="#">Laporan</a>
+<span class="text-text-sub-light dark:text-text-sub-dark">/</span>
+<span class="text-text-main-light dark:text-text-main-dark font-semibold">Detail Arus Kas</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div class="flex flex-col gap-1">
+<h1 class="text-3xl md:text-4xl font-black tracking-tight text-text-main-light dark:text-text-main-dark">Detail Laporan Arus Kas</h1>
+<p class="text-text-sub-light dark:text-text-sub-dark font-medium">Sesuai SAK Entitas Publik &amp; Kepmendes No 136 Tahun 2022</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-card-dark text-text-main-light dark:text-text-main-dark font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-lg">picture_as_pdf</span>
+                            Unduh PDF
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-card-dark text-text-main-light dark:text-text-main-dark font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-lg">table_view</span>
+                            Unduh Excel
+                        </button>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-xl border border-primary/20 shadow-sm overflow-hidden">
+<div class="p-5 flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="flex gap-4 items-start md:items-center">
+<div class="flex-shrink-0 size-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl">database</span>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="font-bold text-base text-text-main-light dark:text-text-main-dark flex items-center gap-2">
+                                    Generator Otomatis Data Buku Besar
+                                    <span class="px-2 py-0.5 rounded-full bg-primary text-background-dark text-[10px] font-black uppercase tracking-wider">Baru</span>
+</h3>
+<p class="text-sm text-text-sub-light dark:text-text-sub-dark">
+                                    Kompilasi laporan arus kas berdasarkan transaksi dari Buku Besar secara otomatis.
+                                </p>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+<div class="flex items-center gap-2 bg-background-light dark:bg-background-dark px-3 py-2 rounded-lg border border-border-light dark:border-border-dark w-full md:w-auto">
+<span class="material-symbols-outlined text-text-sub-light dark:text-text-sub-dark text-lg">calendar_month</span>
+<select class="bg-transparent border-none text-sm font-semibold text-text-main-light dark:text-text-main-dark focus:ring-0 p-0 cursor-pointer w-full">
+<option>Januari 2024</option>
+<option>Februari 2024</option>
+<option>Maret 2024</option>
+</select>
+</div>
+<button class="group flex items-center justify-center gap-2 bg-primary text-background-dark hover:bg-primary/90 px-5 py-2 rounded-lg font-bold text-sm transition-all shadow-lg shadow-primary/20 whitespace-nowrap">
+<span class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-500">sync</span>
+                                Proses Data Buku Besar
+                             </button>
+</div>
+</div>
+<div class="bg-primary/5 dark:bg-primary/5 px-5 py-3 flex items-start md:items-center gap-3 border-t border-primary/10">
+<div class="p-1 rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 flex-1">
+<p class="text-xs font-bold text-text-main-light dark:text-text-main-dark">Laporan Berhasil Dibuat</p>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark md:border-l md:border-border-light dark:md:border-border-dark md:pl-4">
+                                Data berhasil dikompilasi dari 148 transaksi Buku Besar (Baru saja).
+                            </p>
+</div>
+<button class="text-text-sub-light dark:text-text-sub-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-base">close</span>
+</button>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm border border-border-light dark:border-border-dark flex flex-col md:flex-row gap-4 items-center justify-between">
+<div class="flex flex-col md:flex-row gap-4 w-full md:w-auto items-center">
+<div class="flex items-center gap-2 w-full md:w-auto bg-background-light dark:bg-background-dark px-3 py-2 rounded-lg border border-border-light dark:border-border-dark">
+<span class="material-symbols-outlined text-text-sub-light dark:text-text-sub-dark">date_range</span>
+<span class="text-sm font-medium text-text-sub-light whitespace-nowrap">Tampilkan Periode:</span>
+<select class="bg-transparent border-none text-sm font-bold text-text-main-light dark:text-text-main-dark focus:ring-0 p-0 cursor-pointer">
+<option>Januari 2024</option>
+<option>Februari 2024</option>
+<option>Maret 2024</option>
+<option>Kuartal 1 2024</option>
+</select>
+</div>
+<div class="flex items-center gap-2">
+<label class="inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+<span class="ms-3 text-sm font-medium text-text-main-light dark:text-text-main-dark">Bandingkan Periode Lalu</span>
+</label>
+</div>
+</div>
+<button class="w-full md:w-auto px-6 py-2 bg-text-main-light dark:bg-white text-white dark:text-background-dark rounded-lg font-bold text-sm hover:opacity-90 transition-opacity">
+                        Terapkan Filter
+                    </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="flex flex-col p-5 rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">arrow_downward</span>
+</div>
+<p class="text-text-sub-light dark:text-text-sub-dark text-sm font-medium mb-1">Total Arus Kas Masuk</p>
+<div class="flex items-end gap-2">
+<p class="text-2xl font-bold text-text-main-light dark:text-text-main-dark">Rp 150.000.000</p>
+<span class="text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded mb-1">+12%</span>
+</div>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-2">Vs. Periode Lalu (Rp 134.000.000)</p>
+</div>
+<div class="flex flex-col p-5 rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-red-500">arrow_upward</span>
+</div>
+<p class="text-text-sub-light dark:text-text-sub-dark text-sm font-medium mb-1">Total Arus Kas Keluar</p>
+<div class="flex items-end gap-2">
+<p class="text-2xl font-bold text-text-main-light dark:text-text-main-dark">(Rp 50.000.000)</p>
+<span class="text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded mb-1">+5%</span>
+</div>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-2">Vs. Periode Lalu (Rp 47.500.000)</p>
+</div>
+<div class="flex flex-col p-5 rounded-xl border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark shadow-sm relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">account_balance_wallet</span>
+</div>
+<p class="text-text-sub-light dark:text-text-sub-dark text-sm font-medium mb-1">Saldo Akhir Kas</p>
+<div class="flex items-end gap-2">
+<p class="text-2xl font-bold text-primary">Rp 100.000.000</p>
+<span class="text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded mb-1">+7%</span>
+</div>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-2">Termasuk Kas di Bank &amp; Tunai</p>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-background-light dark:bg-background-dark border-b border-border-light dark:border-border-dark">
+<th class="py-4 pl-6 pr-4 text-xs font-bold text-text-sub-light dark:text-text-sub-dark uppercase tracking-wider w-1/3 min-w-[300px]">Uraian</th>
+<th class="py-4 px-4 text-xs font-bold text-text-sub-light dark:text-text-sub-dark uppercase tracking-wider w-24">Ref</th>
+<th class="py-4 px-4 text-right text-xs font-bold text-text-sub-light dark:text-text-sub-dark uppercase tracking-wider min-w-[150px]">
+<div class="flex items-center justify-end gap-1 cursor-pointer hover:text-primary">
+                                        Periode Ini
+                                        <span class="material-symbols-outlined text-base">unfold_more</span>
+</div>
+</th>
+<th class="py-4 px-4 text-right text-xs font-bold text-text-sub-light dark:text-text-sub-dark uppercase tracking-wider min-w-[150px]">
+<div class="flex items-center justify-end gap-1 cursor-pointer hover:text-primary">
+                                        Periode Lalu
+                                        <span class="material-symbols-outlined text-base">unfold_more</span>
+</div>
+</th>
+<th class="py-4 px-4 text-right text-xs font-bold text-text-sub-light dark:text-text-sub-dark uppercase tracking-wider w-32">Selisih</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light dark:divide-border-dark text-sm">
+<tr class="bg-background-light/50 dark:bg-background-dark/50">
+<td class="py-3 pl-6 pr-4 font-bold text-text-main-light dark:text-text-main-dark" colspan="5">1. Arus Kas dari Aktivitas Operasi</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<td class="py-3 pl-10 pr-4 text-text-main-light dark:text-text-main-dark font-medium">Penerimaan kas dari pelanggan</td>
+<td class="py-3 px-4 text-text-sub-light dark:text-text-sub-dark text-xs">4.1.1</td>
+<td class="py-3 px-4 text-right font-medium tabular-nums text-text-main-light dark:text-text-main-dark">150.000.000</td>
+<td class="py-3 px-4 text-right tabular-nums text-text-sub-light dark:text-text-sub-dark">130.000.000</td>
+<td class="py-3 px-4 text-right font-bold text-primary tabular-nums">+15.3%</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<td class="py-3 pl-10 pr-4 text-text-main-light dark:text-text-main-dark font-medium">Penerimaan kas lain-lain</td>
+<td class="py-3 px-4 text-text-sub-light dark:text-text-sub-dark text-xs">4.1.2</td>
+<td class="py-3 px-4 text-right font-medium tabular-nums text-text-main-light dark:text-text-main-dark">5.000.000</td>
+<td class="py-3 px-4 text-right tabular-nums text-text-sub-light dark:text-text-sub-dark">4.000.000</td>
+<td class="py-3 px-4 text-right font-bold text-primary tabular-nums">+25.0%</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<td class="py-3 pl-10 pr-4 text-text-main-light dark:text-text-main-dark font-medium">Pembayaran kepada pemasok</td>
+<td class="py-3 px-4 text-text-sub-light dark:text-text-sub-dark text-xs">5.1.1</td>
+<td class="py-3 px-4 text-right font-medium text-red-500 tabular-nums">(40.000.000)</td>
+<td class="py-3 px-4 text-right text-red-400 tabular-nums">(35.000.000)</td>
+<td class="py-3 px-4 text-right font-bold text-red-500 tabular-nums">+14.2%</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<td class="py-3 pl-10 pr-4 text-text-main-light dark:text-text-main-dark font-medium">Pembayaran gaji dan tunjangan</td>
+<td class="py-3 px-4 text-text-sub-light dark:text-text-sub-dark text-xs">5.1.2</td>
+<td class="py-3 px-4 text-right font-medium text-red-500 tabular-nums">(10.000.000)</td>
+<td class="py-3 px-4 text-right text-red-400 tabular-nums">(10.000.000)</td>
+<td class="py-3 px-4 text-right font-bold text-text-sub-light dark:text-text-sub-dark tabular-nums">0.0%</td>
+</tr>
+<tr class="bg-primary/5 dark:bg-primary/10 font-bold border-t border-b border-primary/20">
+<td class="py-3 pl-6 pr-4 text-text-main-light dark:text-text-main-dark">Arus Kas Bersih dari Aktivitas Operasi</td>
+<td class="py-3 px-4"></td>
+<td class="py-3 px-4 text-right text-text-main-light dark:text-text-main-dark tabular-nums">105.000.000</td>
+<td class="py-3 px-4 text-right text-text-sub-light dark:text-text-sub-dark tabular-nums">89.000.000</td>
+<td class="py-3 px-4 text-right text-primary tabular-nums">+17.9%</td>
+</tr>
+<tr class="bg-background-light/50 dark:bg-background-dark/50">
+<td class="py-3 pl-6 pr-4 font-bold text-text-main-light dark:text-text-main-dark pt-6" colspan="5">2. Arus Kas dari Aktivitas Investasi</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<td class="py-3 pl-10 pr-4 text-text-main-light dark:text-text-main-dark font-medium">Pembelian aset tetap</td>
+<td class="py-3 px-4 text-text-sub-light dark:text-text-sub-dark text-xs">1.3.2</td>
+<td class="py-3 px-4 text-right font-medium text-red-500 tabular-nums">(50.000.000)</td>
+<td class="py-3 px-4 text-right text-red-400 tabular-nums">(20.000.000)</td>
+<td class="py-3 px-4 text-right font-bold text-red-500 tabular-nums">+150%</td>
+</tr>
+<tr class="bg-primary/5 dark:bg-primary/10 font-bold border-t border-b border-primary/20">
+<td class="py-3 pl-6 pr-4 text-text-main-light dark:text-text-main-dark">Arus Kas Bersih dari Aktivitas Investasi</td>
+<td class="py-3 px-4"></td>
+<td class="py-3 px-4 text-right text-red-500 tabular-nums">(50.000.000)</td>
+<td class="py-3 px-4 text-right text-red-400 tabular-nums">(20.000.000)</td>
+<td class="py-3 px-4 text-right text-red-500 tabular-nums">+150%</td>
+</tr>
+<tr class="bg-background-light/50 dark:bg-background-dark/50">
+<td class="py-3 pl-6 pr-4 font-bold text-text-main-light dark:text-text-main-dark pt-6" colspan="5">3. Arus Kas dari Aktivitas Pendanaan</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<td class="py-3 pl-10 pr-4 text-text-main-light dark:text-text-main-dark font-medium">Penyertaan Modal Desa</td>
+<td class="py-3 px-4 text-text-sub-light dark:text-text-sub-dark text-xs">3.1.1</td>
+<td class="py-3 px-4 text-right font-medium tabular-nums text-text-main-light dark:text-text-main-dark">45.000.000</td>
+<td class="py-3 px-4 text-right tabular-nums text-text-sub-light dark:text-text-sub-dark">0</td>
+<td class="py-3 px-4 text-right font-bold text-primary tabular-nums">100%</td>
+</tr>
+<tr class="bg-primary/5 dark:bg-primary/10 font-bold border-t border-b border-primary/20">
+<td class="py-3 pl-6 pr-4 text-text-main-light dark:text-text-main-dark">Arus Kas Bersih dari Aktivitas Pendanaan</td>
+<td class="py-3 px-4"></td>
+<td class="py-3 px-4 text-right text-text-main-light dark:text-text-main-dark tabular-nums">45.000.000</td>
+<td class="py-3 px-4 text-right text-text-sub-light dark:text-text-sub-dark tabular-nums">0</td>
+<td class="py-3 px-4 text-right text-primary tabular-nums">100%</td>
+</tr>
+<tr class="bg-text-main-light dark:bg-card-dark text-white border-t-2 border-primary mt-4">
+<td class="py-5 pl-6 pr-4 font-black text-base uppercase tracking-wider" colspan="2">Kenaikan (Penurunan) Bersih Kas</td>
+<td class="py-5 px-4 text-right font-black text-lg tabular-nums text-primary">100.000.000</td>
+<td class="py-5 px-4 text-right font-medium text-white/70 tabular-nums">69.000.000</td>
+<td class="py-5 px-4 text-right font-bold text-primary tabular-nums">+44.9%</td>
+</tr>
+<tr class="bg-gray-100 dark:bg-white/5 text-text-main-light dark:text-text-main-dark">
+<td class="py-3 pl-6 pr-4 font-bold text-sm" colspan="2">Saldo Kas Awal Periode</td>
+<td class="py-3 px-4 text-right font-bold tabular-nums">50.000.000</td>
+<td class="py-3 px-4 text-right tabular-nums text-text-sub-light dark:text-text-sub-dark">30.000.000</td>
+<td class="py-3 px-4"></td>
+</tr>
+<tr class="bg-gray-200 dark:bg-white/10 text-text-main-light dark:text-text-main-dark">
+<td class="py-3 pl-6 pr-4 font-bold text-sm" colspan="2">Saldo Kas Akhir Periode</td>
+<td class="py-3 px-4 text-right font-black tabular-nums">150.000.000</td>
+<td class="py-3 px-4 text-right tabular-nums text-text-sub-light dark:text-text-sub-dark">99.000.000</td>
+<td class="py-3 px-4"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-border-light dark:border-border-dark flex items-center justify-between bg-background-light dark:bg-background-dark/50">
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark">Menampilkan 1-12 dari 12 akun</p>
+<div class="flex gap-2">
+<button class="p-2 rounded hover:bg-border-light dark:hover:bg-border-dark disabled:opacity-50 text-text-sub-light dark:text-text-sub-dark" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="p-2 rounded hover:bg-border-light dark:hover:bg-border-dark disabled:opacity-50 text-text-sub-light dark:text-text-sub-dark" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<div class="text-center md:text-left text-xs text-text-sub-light dark:text-text-sub-dark mt-4">
+<p>Laporan ini disusun secara otomatis berdasarkan data transaksi yang telah diverifikasi.</p>
+<p>© 2024 Sistem Keuangan Desa BUMDesa Maju Jaya.</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

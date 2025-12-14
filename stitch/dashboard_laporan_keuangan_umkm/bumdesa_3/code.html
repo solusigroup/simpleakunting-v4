@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manajemen Penjualan - UMKM/BUMDesa</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e27b",
+                        "primary-dark": "#254632",
+                        "accent-green": "#0bda43",
+                        "accent-red": "#fa5538",
+                        "text-muted": "#95c6a9",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122118",
+                        "surface-dark": "#1a2e22",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased text-gray-900 dark:text-white">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden group/design-root">
+<header class="sticky top-0 z-50 bg-background-dark/95 backdrop-blur border-b border-[#254632]">
+<div class="layout-container flex justify-center w-full">
+<div class="flex w-full max-w-[1440px] items-center justify-between px-6 py-4 lg:px-10">
+<div class="flex items-center gap-4 text-white">
+<div class="size-8 text-primary">
+<svg class="h-full w-full" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-white text-xl font-bold leading-tight tracking-[-0.015em]">Keuangan BUMDesa</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8 items-center">
+<nav class="flex items-center gap-6">
+<a class="text-text-muted hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Dashboard</a>
+<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Penjualan</a>
+<a class="text-text-muted hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Laporan</a>
+<a class="text-text-muted hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Stok</a>
+</nav>
+<div class="flex gap-3 items-center">
+<button class="group flex size-10 items-center justify-center rounded-full bg-primary-dark hover:bg-primary/20 transition-all text-white">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">notifications</span>
+</button>
+<button class="group flex size-10 items-center justify-center rounded-full bg-primary-dark hover:bg-primary/20 transition-all text-white">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">help</span>
+</button>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-primary-dark cursor-pointer" data-alt="User profile avatar showing a smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAyGQPes46NbRpQAWCh4wMTyZhWqBstiwvBRASdjrXXo7gWCugk-ZQOHjlsg5k4IFiMX5IrCiVBGpT3-nM3MqT3w4Nfend0AWo0VEdcrGqk4QkyReOAa1_J8SqrXWdkGJb9Xu7ZZnS-xLyjhHA6xHFHxESJI4K3eh88Ra48qXzkrGFyFmWObIoLgxopnET6y5WKNS6QLyRhPYmOppzHqeWAO9UjuEuimzfp1IuHX-isx2ixRW4FyIleMp0yvKi-HoQAA6KH6a0--3Y");'>
+</div>
+</div>
+</div>
+<button class="md:hidden flex items-center justify-center text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</header>
+<div class="layout-container flex h-full grow flex-col items-center">
+<div class="layout-content-container flex flex-col w-full max-w-[1440px] px-6 lg:px-10 py-8 gap-8">
+<div class="flex flex-col md:flex-row flex-wrap justify-between gap-6 pb-2">
+<div class="flex flex-col gap-2">
+<h1 class="text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Manajemen Penjualan</h1>
+<div class="flex items-center gap-2 text-text-muted text-sm md:text-base font-normal">
+<span class="material-symbols-outlined text-sm">storefront</span>
+<p>Kelola transaksi, faktur, dan pembayaran pelanggan</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex h-10 items-center justify-center gap-2 rounded-full border border-primary-dark px-4 text-text-muted hover:bg-primary-dark hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">print</span>
+<span class="text-sm font-bold">Cetak Laporan</span>
+</button>
+<button class="flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-5 text-background-dark hover:bg-white transition-colors shadow-[0_0_15px_rgba(54,226,123,0.3)]">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span class="text-sm font-bold">Buat Penjualan</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="flex flex-col gap-3 rounded-2xl p-6 border border-[#366348] bg-[#1a2e22]/50 hover:bg-[#1a2e22] transition-colors relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 bg-primary/5 size-24 rounded-full group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-center justify-between z-10">
+<p class="text-text-muted text-sm font-medium uppercase tracking-wider">Total Penjualan</p>
+<span class="material-symbols-outlined text-primary">shopping_cart</span>
+</div>
+<div class="flex flex-col gap-1 z-10">
+<p class="text-white tracking-tight text-2xl font-bold">Rp 85.250.000</p>
+<div class="flex items-center gap-1">
+<span class="bg-accent-green/20 text-accent-green text-xs font-bold px-2 py-0.5 rounded flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">trending_up</span> 15.2%
+                            </span>
+<span class="text-text-muted text-xs">bulan ini</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3 rounded-2xl p-6 border border-[#366348] bg-[#1a2e22]/50 hover:bg-[#1a2e22] transition-colors relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 bg-primary/5 size-24 rounded-full group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-center justify-between z-10">
+<p class="text-text-muted text-sm font-medium uppercase tracking-wider">Jumlah Transaksi</p>
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+</div>
+<div class="flex flex-col gap-1 z-10">
+<p class="text-white tracking-tight text-2xl font-bold">342</p>
+<div class="flex items-center gap-1">
+<span class="bg-accent-green/20 text-accent-green text-xs font-bold px-2 py-0.5 rounded flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">trending_up</span> 28 Transaksi
+                            </span>
+<span class="text-text-muted text-xs">hari ini</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3 rounded-2xl p-6 border border-[#366348] bg-[#1a2e22]/50 hover:bg-[#1a2e22] transition-colors relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 bg-primary/5 size-24 rounded-full group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-center justify-between z-10">
+<p class="text-text-muted text-sm font-medium uppercase tracking-wider">Tagihan Belum Lunas</p>
+<span class="material-symbols-outlined text-primary">pending_actions</span>
+</div>
+<div class="flex flex-col gap-1 z-10">
+<p class="text-white tracking-tight text-2xl font-bold">Rp 4.500.000</p>
+<div class="flex items-center gap-1">
+<span class="bg-orange-500/20 text-orange-400 text-xs font-bold px-2 py-0.5 rounded flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">info</span> 5 Faktur
+                            </span>
+<span class="text-text-muted text-xs">Jatuh tempo</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3 rounded-2xl p-6 border border-[#366348] bg-[#1a2e22]/50 hover:bg-[#1a2e22] transition-colors relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 bg-primary/5 size-24 rounded-full group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-center justify-between z-10">
+<p class="text-text-muted text-sm font-medium uppercase tracking-wider">Rata-rata Order</p>
+<span class="material-symbols-outlined text-primary">analytics</span>
+</div>
+<div class="flex flex-col gap-1 z-10">
+<p class="text-white tracking-tight text-2xl font-bold">Rp 248.000</p>
+<div class="flex items-center gap-1">
+<span class="bg-accent-green/20 text-accent-green text-xs font-bold px-2 py-0.5 rounded flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">trending_up</span> 2.5%
+                            </span>
+<span class="text-text-muted text-xs">vs bulan lalu</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex flex-col lg:flex-row justify-between lg:items-center gap-4">
+<h3 class="text-white text-xl font-bold">Daftar Penjualan</h3>
+<div class="flex flex-col sm:flex-row gap-3">
+<div class="relative w-full sm:w-64 lg:w-80">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">search</span>
+<input class="w-full bg-surface-dark border border-[#366348] text-white text-sm rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-text-muted/60 transition-all" placeholder="Cari pelanggan, barang, no ref..." type="text"/>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0">
+<button class="flex items-center gap-2 px-4 py-2 bg-primary-dark rounded-full text-white text-sm hover:bg-primary/20 transition-colors whitespace-nowrap border border-transparent hover:border-primary/50">
+<span class="material-symbols-outlined text-[18px]">filter_list</span> Filter
+                            </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-dark rounded-full text-text-muted text-sm hover:text-white hover:bg-surface-dark/80 transition-colors whitespace-nowrap border border-[#366348]">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span> Bulan Ini
+                            </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-dark rounded-full text-text-muted text-sm hover:text-white hover:bg-surface-dark/80 transition-colors whitespace-nowrap border border-[#366348]">
+                                Status: Semua
+                            </button>
+</div>
+</div>
+</div>
+<div class="rounded-2xl border border-[#366348] overflow-hidden bg-[#1a2e22]/30">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-[#366348] bg-[#1a2e22]">
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Tanggal</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Pelanggan</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Barang / Jasa</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-center">Kuantitas</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-right">Harga Satuan</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-right">Total</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-center">Status</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-center">Aksi</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="border-b border-[#366348]/50 hover:bg-[#254632]/50 transition-colors group">
+<td class="p-4 text-white font-medium whitespace-nowrap">
+                                        24 Okt 2023
+                                        <div class="text-[11px] text-text-muted font-normal">INV-2023-089</div>
+</td>
+<td class="p-4 text-white font-bold">
+                                        Budi Santoso
+                                        <div class="text-xs text-text-muted font-normal">Umum</div>
+</td>
+<td class="p-4 text-white">
+<div class="flex flex-col">
+<span>Paket Wisata Alam</span>
+<span class="text-xs text-text-muted">Jasa Pariwisata</span>
+</div>
+</td>
+<td class="p-4 text-white text-center">4 Pax</td>
+<td class="p-4 text-text-muted text-right">Rp 150.000</td>
+<td class="p-4 text-primary font-bold text-right">Rp 600.000</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-medium border border-green-500/20">
+                                            Lunas
+                                        </span>
+</td>
+<td class="p-4 text-center">
+<button class="text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#366348]/50 hover:bg-[#254632]/50 transition-colors group">
+<td class="p-4 text-white font-medium whitespace-nowrap">
+                                        24 Okt 2023
+                                        <div class="text-[11px] text-text-muted font-normal">INV-2023-088</div>
+</td>
+<td class="p-4 text-white font-bold">
+                                        Toko Makmur
+                                        <div class="text-xs text-text-muted font-normal">Mitra Usaha</div>
+</td>
+<td class="p-4 text-white">
+<div class="flex flex-col">
+<span>Kripik Pisang Manis</span>
+<span class="text-xs text-text-muted">Produk Olahan</span>
+</div>
+</td>
+<td class="p-4 text-white text-center">50 Pcs</td>
+<td class="p-4 text-text-muted text-right">Rp 15.000</td>
+<td class="p-4 text-primary font-bold text-right">Rp 750.000</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-500/10 text-orange-400 text-xs font-medium border border-orange-500/20">
+                                            Menunggu
+                                        </span>
+</td>
+<td class="p-4 text-center">
+<button class="text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#366348]/50 hover:bg-[#254632]/50 transition-colors group">
+<td class="p-4 text-white font-medium whitespace-nowrap">
+                                        23 Okt 2023
+                                        <div class="text-[11px] text-text-muted font-normal">INV-2023-087</div>
+</td>
+<td class="p-4 text-white font-bold">
+                                        CV. Maju Jaya
+                                        <div class="text-xs text-text-muted font-normal">Corporate</div>
+</td>
+<td class="p-4 text-white">
+<div class="flex flex-col">
+<span>Sewa Gedung Serbaguna</span>
+<span class="text-xs text-text-muted">Penyewaan Aset</span>
+</div>
+</td>
+<td class="p-4 text-white text-center">1 Hari</td>
+<td class="p-4 text-text-muted text-right">Rp 2.500.000</td>
+<td class="p-4 text-primary font-bold text-right">Rp 2.500.000</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-medium border border-green-500/20">
+                                            Lunas
+                                        </span>
+</td>
+<td class="p-4 text-center">
+<button class="text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-[#366348]/50 hover:bg-[#254632]/50 transition-colors group">
+<td class="p-4 text-white font-medium whitespace-nowrap">
+                                        23 Okt 2023
+                                        <div class="text-[11px] text-text-muted font-normal">INV-2023-086</div>
+</td>
+<td class="p-4 text-white font-bold">
+                                        Siti Aminah
+                                        <div class="text-xs text-text-muted font-normal">Umum</div>
+</td>
+<td class="p-4 text-white">
+<div class="flex flex-col">
+<span>Kerajinan Tas Anyaman</span>
+<span class="text-xs text-text-muted">Produk Kerajinan</span>
+</div>
+</td>
+<td class="p-4 text-white text-center">2 Pcs</td>
+<td class="p-4 text-text-muted text-right">Rp 75.000</td>
+<td class="p-4 text-primary font-bold text-right">Rp 150.000</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-medium border border-green-500/20">
+                                            Lunas
+                                        </span>
+</td>
+<td class="p-4 text-center">
+<button class="text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-[#254632]/50 transition-colors group">
+<td class="p-4 text-white font-medium whitespace-nowrap">
+                                        22 Okt 2023
+                                        <div class="text-[11px] text-text-muted font-normal">INV-2023-085</div>
+</td>
+<td class="p-4 text-white font-bold">
+                                        Warung Bu Tien
+                                        <div class="text-xs text-text-muted font-normal">Mitra Usaha</div>
+</td>
+<td class="p-4 text-white">
+<div class="flex flex-col">
+<span>Beras Organik 5kg</span>
+<span class="text-xs text-text-muted">Hasil Tani</span>
+</div>
+</td>
+<td class="p-4 text-white text-center">10 Sak</td>
+<td class="p-4 text-text-muted text-right">Rp 65.000</td>
+<td class="p-4 text-primary font-bold text-right">Rp 650.000</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-medium border border-red-500/20">
+                                            Batal
+                                        </span>
+</td>
+<td class="p-4 text-center">
+<button class="text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-[#366348] flex justify-between items-center bg-[#1a2e22]">
+<p class="text-sm text-text-muted">Menampilkan 1-5 dari 128 transaksi</p>
+<div class="flex gap-2">
+<button class="size-8 flex items-center justify-center rounded-lg border border-[#366348] text-text-muted hover:bg-primary-dark hover:text-white disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded-lg bg-primary text-background-dark font-bold text-sm">1</button>
+<button class="size-8 flex items-center justify-center rounded-lg border border-[#366348] text-text-muted hover:bg-primary-dark hover:text-white">2</button>
+<button class="size-8 flex items-center justify-center rounded-lg border border-[#366348] text-text-muted hover:bg-primary-dark hover:text-white">3</button>
+<button class="size-8 flex items-center justify-center rounded-lg border border-[#366348] text-text-muted hover:bg-primary-dark hover:text-white">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="py-6 border-t border-[#254632] mt-4">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 text-text-muted text-sm">
+<p>© 2023 Sistem Keuangan BUMDesa. Hak Cipta Dilindungi.</p>
+<div class="flex items-center gap-6">
+<a class="hover:text-white transition-colors" href="#">Bantuan</a>
+<a class="hover:text-white transition-colors" href="#">Kebijakan Privasi</a>
+<div class="flex items-center gap-2 text-xs bg-[#254632] px-3 py-1 rounded-full text-white">
+<span class="material-symbols-outlined text-[14px]">shield</span>
+                            SAK EP Compliant
+                        </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

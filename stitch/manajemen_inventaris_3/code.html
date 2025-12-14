@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manajemen Persediaan - BUMDesa Makmur</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e27b",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#112117",
+                        "surface-dark": "#1b3224",
+                        "border-dark": "#366348",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.375rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>.custom-scrollbar::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1b3224; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #366348; 
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<aside class="w-64 flex-shrink-0 flex flex-col bg-background-dark border-r border-border-dark hidden lg:flex">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat bg-cover rounded-full h-10 w-10 border border-primary/30" data-alt="Bumdesa Logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC_IomJ6U4Z0YktU0ZfKayDFePgx2SHbykUMCK0uABnMSDiT1U8rjpAG76TXrNmnueK_VQXLrA6TVYUA8u9ygZTGVfAndwvyS9LVNixLL727tB-IJtq-YjNEfUhT97e8xIlV_t9BqPYTeYW5f5tkWFxAdQZkxfawIwh1KyzfSnNYGGTbJW_hQq3PCTendiINsGvQEGXMlYN1JpjRzHblHo-CMhP5GgYsy_WpGoM1dk7Ra5X684zaMPiHhjjOWVluyaZ09lZ4DTkiks");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-semibold leading-tight">BUMDesa Makmur</h1>
+<p class="text-primary/70 text-xs font-normal">Admin Keuangan</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2 px-3">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-surface-dark hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-surface-dark hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">description</span>
+<span class="text-sm font-medium">Laporan Keuangan</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-surface-dark text-white shadow-sm border border-border-dark/50" href="#">
+<span class="material-symbols-outlined text-primary fill-1">inventory_2</span>
+<span class="text-sm font-medium">Persediaan</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-surface-dark hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">swap_horiz</span>
+<span class="text-sm font-medium">Transfer Stok</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-surface-dark hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">settings</span>
+<span class="text-sm font-medium">Pengaturan</span>
+</a>
+</nav>
+<div class="p-4 border-t border-border-dark">
+<div class="flex items-center gap-3 px-3 py-2 cursor-pointer rounded-lg hover:bg-surface-dark transition-colors">
+<span class="material-symbols-outlined text-slate-400">logout</span>
+<span class="text-slate-300 text-sm font-medium">Keluar</span>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full min-w-0 overflow-hidden bg-background-light dark:bg-background-dark relative">
+<div class="flex-shrink-0 border-b border-border-dark bg-background-dark z-10">
+<div class="max-w-[1400px] mx-auto px-6 py-6 flex flex-col gap-6">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div>
+<h1 class="text-white text-3xl font-bold tracking-tight">Manajemen Persediaan</h1>
+<p class="text-slate-400 text-sm mt-1">Lacak stok produk jadi dan komponen secara real-time untuk efisiensi operasional.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-dark border border-border-dark text-white text-sm font-medium hover:bg-surface-dark/80 transition-colors">
+<span class="material-symbols-outlined text-[20px]">file_download</span>
+<span>Unduh Laporan</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-background-dark text-sm font-bold hover:bg-primary/90 transition-colors shadow-[0_0_15px_rgba(54,226,123,0.3)]">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>Tambah Barang</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="bg-surface-dark rounded-xl p-5 border border-border-dark flex flex-col gap-1 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">paid</span>
+</div>
+<span class="text-slate-400 text-sm font-medium">Total Nilai Aset</span>
+<div class="flex items-end gap-2">
+<span class="text-white text-2xl font-bold">Rp 150.000.000</span>
+</div>
+<span class="text-primary text-xs font-medium flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                                +5.2% bulan ini
+                            </span>
+</div>
+<div class="bg-surface-dark rounded-xl p-5 border border-border-dark flex flex-col gap-1 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-[#fa5538]">warning</span>
+</div>
+<span class="text-slate-400 text-sm font-medium">Stok Menipis</span>
+<div class="flex items-end gap-2">
+<span class="text-white text-2xl font-bold">3 Item</span>
+</div>
+<span class="text-[#fa5538] text-xs font-medium flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-sm">priority_high</span>
+                                Perlu restock segera
+                            </span>
+</div>
+<div class="bg-surface-dark rounded-xl p-5 border border-border-dark flex flex-col gap-1 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-blue-400">inventory</span>
+</div>
+<span class="text-slate-400 text-sm font-medium">Total SKU</span>
+<div class="flex items-end gap-2">
+<span class="text-white text-2xl font-bold">124 SKU</span>
+</div>
+<span class="text-slate-400 text-xs font-medium mt-1">
+                                48 Bahan Baku, 76 Produk Jadi
+                            </span>
+</div>
+<div class="bg-surface-dark rounded-xl p-5 border border-border-dark flex flex-col gap-1 relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-purple-400">swap_vert</span>
+</div>
+<span class="text-slate-400 text-sm font-medium">Pergerakan (7 Hari)</span>
+<div class="flex items-end gap-2">
+<span class="text-white text-2xl font-bold">450 Unit</span>
+</div>
+<span class="text-primary text-xs font-medium flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                                +12% aktivitas
+                            </span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 bg-background-dark pt-2 pb-4 px-6 border-b border-border-dark z-10">
+<div class="max-w-[1400px] mx-auto flex flex-col sm:flex-row gap-4 justify-between items-end sm:items-center">
+<div class="flex flex-1 gap-3 w-full sm:w-auto">
+<div class="relative flex-1 max-w-md group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-500 group-focus-within:text-primary transition-colors">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2.5 bg-surface-dark border border-border-dark rounded-lg leading-5 text-white placeholder-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary sm:text-sm transition-all" placeholder="Cari barang (SKU, Nama)..." type="text"/>
+</div>
+<div class="relative w-48 hidden md:block">
+<select class="block w-full pl-3 pr-10 py-2.5 bg-surface-dark border border-border-dark rounded-lg text-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer">
+<option>Semua Kategori</option>
+<option>Bahan Baku</option>
+<option>Barang Jadi</option>
+<option>Aset Tetap</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+<span class="material-symbols-outlined text-slate-400">expand_more</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2.5 text-slate-400 hover:text-white rounded-lg hover:bg-surface-dark border border-transparent hover:border-border-dark transition-all" title="Filter">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2.5 text-slate-400 hover:text-white rounded-lg hover:bg-surface-dark border border-transparent hover:border-border-dark transition-all" title="Pengaturan Kolom">
+<span class="material-symbols-outlined">view_column</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-auto custom-scrollbar bg-background-dark px-6 py-4">
+<div class="max-w-[1400px] mx-auto">
+<div class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden shadow-sm">
+<table class="w-full text-left text-sm text-slate-400">
+<thead class="bg-[#162a1e] text-xs uppercase font-medium text-slate-300">
+<tr>
+<th class="px-6 py-4 tracking-wider" scope="col">Info Barang</th>
+<th class="px-6 py-4 tracking-wider" scope="col">Kategori</th>
+<th class="px-6 py-4 tracking-wider text-right" scope="col">Stok</th>
+<th class="px-6 py-4 tracking-wider text-right" scope="col">Nilai Satuan</th>
+<th class="px-6 py-4 tracking-wider text-right" scope="col">Total Nilai</th>
+<th class="px-6 py-4 tracking-wider" scope="col">Lokasi</th>
+<th class="px-6 py-4 tracking-wider text-center" scope="col">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-dark">
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 rounded-lg bg-center bg-cover border border-border-dark flex-shrink-0" data-alt="Kopi Robusta Package" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBZha_RnzNR8e_umq5j8TfocjXC3cJdG5Ab4fqj3SmcGoQD3SELpX98jg8QtIq-yDzj-KBjZFOGwXJYAIRsoam_-DjNz8VFqaE_xMNu1mlClQhP2NE9_WqdpH_hKrIgfbV8EfRrYGacn0BG984Z6Hb_G0lpEDfgKpv9XEQT0tibyV-Rzs6uCDZA-r7NgutEXxxaSQ1SQ9JOPB3ggpRYEAnKnADwB7GPAi0vggCymxnx9C55ZvMbQrjSFP_g7quv4j6zfiAQG01ImPg');"></div>
+<div>
+<div class="text-white font-medium text-base">Kopi Bubuk Robusta 250g</div>
+<div class="text-xs text-slate-500">SKU-001 • Updated 2h ago</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                            Barang Jadi
+                                        </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<div class="text-white font-medium">50 Pcs</div>
+<div class="text-xs text-primary">Aman</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-slate-300">
+                                        Rp 50.000
+                                    </td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-white">
+                                        Rp 2.500.000
+                                    </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-slate-500 text-lg">warehouse</span>
+<span class="text-slate-300">Gudang A</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<button class="text-slate-400 hover:text-white p-2 hover:bg-white/10 rounded transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="bg-[#fa5538]/5 hover:bg-[#fa5538]/10 transition-colors group">
+<td class="px-6 py-4 whitespace-nowrap relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-[#fa5538]"></div>
+<div class="flex items-center gap-4 pl-1">
+<div class="h-10 w-10 rounded-lg bg-center bg-cover border border-[#fa5538]/30 flex-shrink-0" data-alt="Foil Packaging" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAy1pdvAmagwTuuVXbPkAEfNAa3HlhuEJiUlGdKDNiFxTegn0GdQj8Y36SkED6hpY7duH2XIIhEVQdg_m6nDZT1VTEYHZwN1dt1MNbim4CqRqFrBh32yaN-DCq6HMQrY9qFSZYZc8xWoHMGgQCPKew6eanhhvWXLNirMdJ3CT-hXjatwEZsiMVj-wRKJSU1OGx7aMjwvqcDuNHx_P6AHgL0SdH-NItHODjlrQtoAeYbiLG4gs1oPc1OcmjiiCp4QtbculU_EEXY0UI');"></div>
+<div>
+<div class="text-white font-medium text-base">Kemasan Foil 250g</div>
+<div class="text-xs text-[#fa5538]/80">SKU-002 • Alert: Low Stock</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                            Bahan Baku
+                                        </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<div class="text-white font-medium">12 Pcs</div>
+<div class="text-xs text-[#fa5538] font-bold flex justify-end items-center gap-1">
+<span class="material-symbols-outlined text-xs">warning</span>
+                                            Menipis
+                                        </div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-slate-300">
+                                        Rp 5.000
+                                    </td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-white">
+                                        Rp 60.000
+                                    </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-slate-500 text-lg">warehouse</span>
+<span class="text-slate-300">Gudang B</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<button class="text-slate-400 hover:text-white p-2 hover:bg-white/10 rounded transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 rounded-lg bg-center bg-cover border border-border-dark flex-shrink-0" data-alt="Brown Sugar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuADLU_m07MsG9sxbl1JR7WOjbOXmTt_22uA8lAZmVwdtp5URj1UEofXx99DyFwHGkZDw64oBZ_CYO9GrAYzBNjm7O5GW2lwebqO4AVb8stmWKMxpaXAekcWBUnuBBDrh0WSVv2UWtzJ4WkMrMmERFgkn9NtA54khy7f3ZcivVNROEY3zEtDlQ34HkinqKZcC6TBsrrSCSgf00JDLk0xLgcUJAWKuzX2UxAqWhrEiBI4ZuFSuEYMLSxqP9QxKuaNA_qcUbDijkPgSv4');"></div>
+<div>
+<div class="text-white font-medium text-base">Gula Aren Cair 1L</div>
+<div class="text-xs text-slate-500">SKU-003 • Updated 1d ago</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                            Barang Jadi
+                                        </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<div class="text-white font-medium">120 Btl</div>
+<div class="text-xs text-primary">Aman</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-slate-300">
+                                        Rp 35.000
+                                    </td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-white">
+                                        Rp 4.200.000
+                                    </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-slate-500 text-lg">storefront</span>
+<span class="text-slate-300">Toko Desa</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<button class="text-slate-400 hover:text-white p-2 hover:bg-white/10 rounded transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 rounded-lg bg-center bg-cover border border-border-dark flex-shrink-0" data-alt="Paper Cups" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDSq9kNz6iNw6h8wudu3TBEaQjP6zgA6tuRw-9SJxXrxfO_Rm4DQLl7jEBz3OtWGpV9dCYZIAoBZJV8Bn76S29W-9yg4L3eBaoSwJzfS_-eug0TbgAzRiNaluPFGRIgPv9OBWC8U_dNLxUo0nuVebClFtRTGEzRTMx6Zm7W9r9Wu-J_KvFjogwT535wtpnchpZoZRswciAnpn6YqMN4s_Sh7-IbUUDGjbo0MJqAdxfsIgonX8cYXoS7WsILY8lZrFjN7D5hHXoof8w');"></div>
+<div>
+<div class="text-white font-medium text-base">Paper Cup 8oz</div>
+<div class="text-xs text-slate-500">SKU-004 • Updated 3d ago</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                            Bahan Baku
+                                        </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<div class="text-white font-medium">2000 Pcs</div>
+<div class="text-xs text-primary">Aman</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-slate-300">
+                                        Rp 800
+                                    </td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-white">
+                                        Rp 1.600.000
+                                    </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-slate-500 text-lg">warehouse</span>
+<span class="text-slate-300">Gudang B</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<button class="text-slate-400 hover:text-white p-2 hover:bg-white/10 rounded transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 rounded-lg bg-center bg-cover border border-border-dark flex-shrink-0" data-alt="Coffee Machine" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuATUFOx5kBXwatlkTioRjFCx5PkjfvDCnUMG149nYK38OSRtyADJw_PEd2Z2epcqxSt2WopCLdcdt7NissCiyxm63d-vR0RXLlpkFnIZJS1bNGjDmsLcwAvRGSvNdC7EdQBesmOTgzki4xU4KG8g7KMTLWzhe1b6-AM0HGGX2CchLE6knqh8rccH60f2Cj0netsu3H35JCuhjUo4OPIwK1GZRCWKJHl7mQcinfHS9XilLOLctl2uOHxCnBQbfY3hsRFiQiAKlIl63k');"></div>
+<div>
+<div class="text-white font-medium text-base">Mesin Espresso 1 Group</div>
+<div class="text-xs text-slate-500">SKU-105 • Aset Tetap</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                                            Aset Tetap
+                                        </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<div class="text-white font-medium">1 Unit</div>
+<div class="text-xs text-slate-500">-</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-slate-300">
+                                        Rp 15.000.000
+                                    </td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-white">
+                                        Rp 15.000.000
+                                    </td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-slate-500 text-lg">storefront</span>
+<span class="text-slate-300">Toko Desa</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<button class="text-slate-400 hover:text-white p-2 hover:bg-white/10 rounded transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex items-center justify-between mt-4 text-sm text-slate-400">
+<div>Menampilkan 1-5 dari 124 Item</div>
+<div class="flex gap-2">
+<button class="px-3 py-1 rounded bg-surface-dark border border-border-dark hover:bg-white/5 hover:text-white transition-colors disabled:opacity-50">Sebelumnya</button>
+<button class="px-3 py-1 rounded bg-surface-dark border border-border-dark hover:bg-white/5 hover:text-white transition-colors">Berikutnya</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

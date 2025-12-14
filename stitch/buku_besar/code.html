@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Buku Besar - BUMDesa Sejahtera</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e27b",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#112117",
+                        "surface-dark": "#1e2f24", 
+                        "surface-green": "#254632",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for tables */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #112117; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #254632; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #36e27b; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display min-h-screen flex flex-col overflow-x-hidden">
+<!-- Main Layout -->
+<div class="layout-container flex h-full grow flex-col">
+<!-- Center Content Wrapper -->
+<div class="flex flex-1 justify-center py-5 px-4 md:px-10 lg:px-20">
+<div class="layout-content-container flex flex-col max-w-[1200px] flex-1 w-full gap-6">
+<!-- 1. Breadcrumbs -->
+<div class="flex flex-wrap gap-2 px-4">
+<a class="text-[#95c6a9] text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Dashboard</a>
+<span class="text-[#95c6a9] text-sm font-medium leading-normal">/</span>
+<a class="text-[#95c6a9] text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Laporan</a>
+<span class="text-[#95c6a9] text-sm font-medium leading-normal">/</span>
+<span class="text-white text-sm font-medium leading-normal">Buku Besar</span>
+</div>
+<!-- 2. Page Header & Actions -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-4">
+<div class="flex flex-col gap-1">
+<h1 class="text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Buku Besar</h1>
+<p class="text-[#95c6a9] text-sm md:text-base font-normal leading-normal">BUMDesa Sejahtera • SAK Entitas Publik</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 h-10 px-4 bg-[#254632] hover:bg-[#2f573f] text-white text-sm font-bold rounded-lg transition-colors border border-[#366348]">
+<span class="material-symbols-outlined text-[20px]">print</span>
+<span class="hidden sm:inline">Cetak</span>
+</button>
+<button class="flex items-center gap-2 h-10 px-4 bg-primary hover:bg-green-400 text-background-dark text-sm font-bold rounded-lg transition-colors shadow-lg shadow-green-900/20">
+<span class="material-symbols-outlined text-[20px]">download</span>
+<span>Unduh Laporan</span>
+</button>
+</div>
+</div>
+<!-- 3. Filter Section -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 px-4 items-end">
+<!-- Date Range -->
+<label class="col-span-1 md:col-span-3 flex flex-col gap-2">
+<span class="text-white text-sm font-medium">Dari Tanggal</span>
+<div class="relative">
+<input class="w-full bg-[#1b3224] border border-[#366348] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 placeholder-[#95c6a9] h-12" type="date" value="2024-01-01"/>
+</div>
+</label>
+<label class="col-span-1 md:col-span-3 flex flex-col gap-2">
+<span class="text-white text-sm font-medium">Sampai Tanggal</span>
+<div class="relative">
+<input class="w-full bg-[#1b3224] border border-[#366348] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 placeholder-[#95c6a9] h-12" type="date" value="2024-01-31"/>
+</div>
+</label>
+<!-- Account Select -->
+<label class="col-span-1 md:col-span-4 flex flex-col gap-2">
+<span class="text-white text-sm font-medium">Akun Perkiraan</span>
+<div class="relative">
+<select class="w-full bg-[#1b3224] border border-[#366348] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 h-12 appearance-none">
+<option value="all">Semua Akun</option>
+<option value="1110">1110 - Kas di Bendahara Desa</option>
+<option value="1120">1120 - Rekening Bank Desa</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3 text-[#95c6a9] pointer-events-none">expand_more</span>
+</div>
+</label>
+<!-- Apply Button -->
+<div class="col-span-1 md:col-span-2">
+<button class="w-full h-12 flex items-center justify-center gap-2 bg-[#254632] hover:bg-[#366348] border border-[#366348] text-white font-bold rounded-lg transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+                            Terapkan
+                        </button>
+</div>
+</div>
+<!-- 4. Stats Summary -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 px-4">
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-[#254632] border border-[#366348] shadow-lg">
+<div class="flex items-center gap-2 mb-1">
+<div class="p-2 rounded-full bg-white/10">
+<span class="material-symbols-outlined text-[#95c6a9] text-xl">arrow_downward</span>
+</div>
+<p class="text-[#95c6a9] text-sm font-medium">Total Debit</p>
+</div>
+<p class="text-white text-2xl font-bold leading-tight">Rp 150.000.000</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-[#254632] border border-[#366348] shadow-lg">
+<div class="flex items-center gap-2 mb-1">
+<div class="p-2 rounded-full bg-white/10">
+<span class="material-symbols-outlined text-[#95c6a9] text-xl">arrow_upward</span>
+</div>
+<p class="text-[#95c6a9] text-sm font-medium">Total Kredit</p>
+</div>
+<p class="text-white text-2xl font-bold leading-tight">Rp 45.000.000</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-gradient-to-br from-[#1b3224] to-[#254632] border border-primary/30 shadow-lg relative overflow-hidden group">
+<div class="absolute right-0 top-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+<div class="flex items-center gap-2 mb-1 z-10">
+<div class="p-2 rounded-full bg-primary/20">
+<span class="material-symbols-outlined text-primary text-xl">account_balance_wallet</span>
+</div>
+<p class="text-primary text-sm font-medium">Saldo Akhir</p>
+</div>
+<p class="text-white text-2xl font-bold leading-tight z-10">Rp 105.000.000</p>
+</div>
+</div>
+<!-- 5. Ledger Tables (Grouped by Account) -->
+<!-- Account Group 1 -->
+<div class="flex flex-col gap-0 px-4 mt-4">
+<!-- Group Header -->
+<div class="flex flex-wrap items-center justify-between bg-[#1b3224] border border-[#366348] border-b-0 rounded-t-xl p-4 gap-4">
+<div class="flex items-center gap-3">
+<div class="w-1 h-6 bg-primary rounded-full"></div>
+<h3 class="text-white text-lg font-bold">1110 - Kas di Bendahara Desa</h3>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
+<span class="text-[#95c6a9] text-xs font-medium uppercase tracking-wider">Saldo Awal</span>
+<span class="text-white text-sm font-bold font-mono">Rp 50.000.000</span>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto custom-scrollbar rounded-b-xl border border-[#366348] bg-[#122118]">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#254632]/50 text-[#95c6a9] text-xs uppercase tracking-wider border-b border-[#366348]">
+<th class="p-4 font-semibold min-w-[100px]">Tanggal</th>
+<th class="p-4 font-semibold min-w-[120px]">No. Bukti</th>
+<th class="p-4 font-semibold min-w-[200px]">Uraian Transaksi</th>
+<th class="p-4 font-semibold w-[80px]">Ref</th>
+<th class="p-4 font-semibold text-right min-w-[140px]">Debit</th>
+<th class="p-4 font-semibold text-right min-w-[140px]">Kredit</th>
+<th class="p-4 font-semibold text-right min-w-[140px]">Saldo</th>
+</tr>
+</thead>
+<tbody class="text-sm text-white divide-y divide-[#366348]/30">
+<!-- Row 1 -->
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="p-4 whitespace-nowrap text-[#95c6a9]">05 Jan 2024</td>
+<td class="p-4 font-mono text-xs">BKK/24/001</td>
+<td class="p-4 font-medium text-white">Pembelian ATK Kantor Desa</td>
+<td class="p-4 text-[#95c6a9]">JU</td>
+<td class="p-4 text-right font-mono text-[#95c6a9]">-</td>
+<td class="p-4 text-right font-mono font-medium">500.000</td>
+<td class="p-4 text-right font-mono font-bold text-white bg-white/5">49.500.000</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="p-4 whitespace-nowrap text-[#95c6a9]">10 Jan 2024</td>
+<td class="p-4 font-mono text-xs">BKM/24/002</td>
+<td class="p-4 font-medium text-white">Penerimaan Hasil Usaha Wisata</td>
+<td class="p-4 text-[#95c6a9]">JU</td>
+<td class="p-4 text-right font-mono font-medium text-primary">2.000.000</td>
+<td class="p-4 text-right font-mono text-[#95c6a9]">-</td>
+<td class="p-4 text-right font-mono font-bold text-white bg-white/5">51.500.000</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="p-4 whitespace-nowrap text-[#95c6a9]">15 Jan 2024</td>
+<td class="p-4 font-mono text-xs">BKK/24/003</td>
+<td class="p-4 font-medium text-white">Honorarium Pengelola BUMDes</td>
+<td class="p-4 text-[#95c6a9]">JU</td>
+<td class="p-4 text-right font-mono text-[#95c6a9]">-</td>
+<td class="p-4 text-right font-mono font-medium">1.500.000</td>
+<td class="p-4 text-right font-mono font-bold text-white bg-white/5">50.000.000</td>
+</tr>
+</tbody>
+<!-- Footer Total per Account -->
+<tfoot class="bg-[#254632]/30 border-t border-[#366348]">
+<tr>
+<td class="p-4 text-right text-sm font-bold text-[#95c6a9] uppercase tracking-wide" colspan="4">Total Pergerakan</td>
+<td class="p-4 text-right font-mono font-bold text-white">2.000.000</td>
+<td class="p-4 text-right font-mono font-bold text-white">2.000.000</td>
+<td class="p-4 bg-[#254632]/50"></td> <!-- Empty for Balance column in footer -->
+</tr>
+</tfoot>
+</table>
+</div>
+</div>
+<!-- Account Group 2 -->
+<div class="flex flex-col gap-0 px-4 mb-8">
+<!-- Group Header -->
+<div class="flex flex-wrap items-center justify-between bg-[#1b3224] border border-[#366348] border-b-0 rounded-t-xl p-4 gap-4">
+<div class="flex items-center gap-3">
+<div class="w-1 h-6 bg-primary rounded-full"></div>
+<h3 class="text-white text-lg font-bold">1120 - Rekening Bank BRI</h3>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
+<span class="text-[#95c6a9] text-xs font-medium uppercase tracking-wider">Saldo Awal</span>
+<span class="text-white text-sm font-bold font-mono">Rp 120.000.000</span>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto custom-scrollbar rounded-b-xl border border-[#366348] bg-[#122118]">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#254632]/50 text-[#95c6a9] text-xs uppercase tracking-wider border-b border-[#366348]">
+<th class="p-4 font-semibold min-w-[100px]">Tanggal</th>
+<th class="p-4 font-semibold min-w-[120px]">No. Bukti</th>
+<th class="p-4 font-semibold min-w-[200px]">Uraian Transaksi</th>
+<th class="p-4 font-semibold w-[80px]">Ref</th>
+<th class="p-4 font-semibold text-right min-w-[140px]">Debit</th>
+<th class="p-4 font-semibold text-right min-w-[140px]">Kredit</th>
+<th class="p-4 font-semibold text-right min-w-[140px]">Saldo</th>
+</tr>
+</thead>
+<tbody class="text-sm text-white divide-y divide-[#366348]/30">
+<!-- Row 1 -->
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="p-4 whitespace-nowrap text-[#95c6a9]">20 Jan 2024</td>
+<td class="p-4 font-mono text-xs">BKM/24/005</td>
+<td class="p-4 font-medium text-white">Transfer Masuk Dana Desa</td>
+<td class="p-4 text-[#95c6a9]">JU</td>
+<td class="p-4 text-right font-mono font-medium text-primary">50.000.000</td>
+<td class="p-4 text-right font-mono text-[#95c6a9]">-</td>
+<td class="p-4 text-right font-mono font-bold text-white bg-white/5">170.000.000</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="p-4 whitespace-nowrap text-[#95c6a9]">25 Jan 2024</td>
+<td class="p-4 font-mono text-xs">BKK/24/006</td>
+<td class="p-4 font-medium text-white">Penarikan Tunai untuk Kas</td>
+<td class="p-4 text-[#95c6a9]">JU</td>
+<td class="p-4 text-right font-mono text-[#95c6a9]">-</td>
+<td class="p-4 text-right font-mono font-medium">10.000.000</td>
+<td class="p-4 text-right font-mono font-bold text-white bg-white/5">160.000.000</td>
+</tr>
+</tbody>
+<tfoot class="bg-[#254632]/30 border-t border-[#366348]">
+<tr>
+<td class="p-4 text-right text-sm font-bold text-[#95c6a9] uppercase tracking-wide" colspan="4">Total Pergerakan</td>
+<td class="p-4 text-right font-mono font-bold text-white">50.000.000</td>
+<td class="p-4 text-right font-mono font-bold text-white">10.000.000</td>
+<td class="p-4 bg-[#254632]/50"></td>
+</tr>
+</tfoot>
+</table>
+</div>
+</div>
+<!-- Pagination -->
+<div class="flex justify-between items-center px-4 pb-10">
+<p class="text-[#95c6a9] text-sm">Menampilkan 2 Akun dari total 24 Akun</p>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg bg-[#254632] text-white hover:bg-[#366348] disabled:opacity-50 border border-[#366348]" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="px-4 py-2 rounded-lg bg-primary text-background-dark font-bold text-sm">1</button>
+<button class="px-4 py-2 rounded-lg bg-[#254632] text-white hover:bg-[#366348] border border-[#366348] text-sm">2</button>
+<button class="px-4 py-2 rounded-lg bg-[#254632] text-white hover:bg-[#366348] border border-[#366348] text-sm">3</button>
+<button class="p-2 rounded-lg bg-[#254632] text-white hover:bg-[#366348] border border-[#366348]">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

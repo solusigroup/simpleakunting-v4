@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard Laporan Keuangan UMKM/BUMDesa</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e27b",
+                        "primary-dark": "#254632",
+                        "accent-green": "#0bda43",
+                        "accent-red": "#fa5538",
+                        "text-muted": "#95c6a9",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#122118", // Matches the provided component background
+                        "surface-dark": "#1a2e22",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased text-gray-900 dark:text-white">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden group/design-root">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-background-dark/95 backdrop-blur border-b border-[#254632]">
+<div class="layout-container flex justify-center w-full">
+<div class="flex w-full max-w-[1440px] items-center justify-between px-6 py-4 lg:px-10">
+<div class="flex items-center gap-4 text-white">
+<div class="size-8 text-primary">
+<svg class="h-full w-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-white text-xl font-bold leading-tight tracking-[-0.015em]">Keuangan BUMDesa</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8 items-center">
+<nav class="flex items-center gap-6">
+<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-text-muted hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Laporan Detail</a>
+<a class="text-text-muted hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Anggaran</a>
+<a class="text-text-muted hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Pengaturan</a>
+</nav>
+<div class="flex gap-3 items-center">
+<button class="group flex size-10 items-center justify-center rounded-full bg-primary-dark hover:bg-primary/20 transition-all text-white">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">notifications</span>
+</button>
+<button class="group flex size-10 items-center justify-center rounded-full bg-primary-dark hover:bg-primary/20 transition-all text-white">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">help</span>
+</button>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-primary-dark cursor-pointer" data-alt="User profile avatar showing a smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAyGQPes46NbRpQAWCh4wMTyZhWqBstiwvBRASdjrXXo7gWCugk-ZQOHjlsg5k4IFiMX5IrCiVBGpT3-nM3MqT3w4Nfend0AWo0VEdcrGqk4QkyReOAa1_J8SqrXWdkGJb9Xu7ZZnS-xLyjhHA6xHFHxESJI4K3eh88Ra48qXzkrGFyFmWObIoLgxopnET6y5WKNS6QLyRhPYmOppzHqeWAO9UjuEuimzfp1IuHX-isx2ixRW4FyIleMp0yvKi-HoQAA6KH6a0--3Y");'>
+</div>
+</div>
+</div>
+<!-- Mobile Menu Button -->
+<button class="md:hidden flex items-center justify-center text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</header>
+<div class="layout-container flex h-full grow flex-col items-center">
+<div class="layout-content-container flex flex-col w-full max-w-[1440px] px-6 lg:px-10 py-8 gap-8">
+<!-- Page Heading & Actions -->
+<div class="flex flex-col md:flex-row flex-wrap justify-between gap-6 pb-2">
+<div class="flex flex-col gap-2">
+<h1 class="text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Ringkasan Eksekutif</h1>
+<div class="flex items-center gap-2 text-text-muted text-sm md:text-base font-normal">
+<span class="material-symbols-outlined text-sm">verified</span>
+<p>Laporan keuangan sesuai SAK EP &amp; Kepmendes 136/2022</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex h-10 items-center justify-center gap-2 rounded-full border border-primary-dark px-4 text-text-muted hover:bg-primary-dark hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span class="text-sm font-bold">Input Transaksi</span>
+</button>
+<button class="flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-5 text-background-dark hover:bg-white transition-colors shadow-[0_0_15px_rgba(54,226,123,0.3)]">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span class="text-sm font-bold">Export PDF</span>
+</button>
+</div>
+</div>
+<!-- Filters (Chips) -->
+<div class="flex gap-3 flex-wrap items-center">
+<div class="flex items-center gap-2 text-white mr-2">
+<span class="material-symbols-outlined text-primary">filter_list</span>
+<span class="text-sm font-bold">Filter:</span>
+</div>
+<button class="group flex h-9 items-center gap-x-2 rounded-full bg-primary-dark hover:bg-primary hover:text-background-dark transition-all pl-4 pr-3 border border-transparent hover:border-primary">
+<p class="text-white group-hover:text-background-dark text-sm font-medium">Periode: Bulan Ini</p>
+<span class="material-symbols-outlined text-white group-hover:text-background-dark text-[20px]">expand_more</span>
+</button>
+<button class="group flex h-9 items-center gap-x-2 rounded-full bg-primary-dark hover:bg-primary hover:text-background-dark transition-all pl-4 pr-3 border border-transparent hover:border-primary">
+<p class="text-white group-hover:text-background-dark text-sm font-medium">Entitas: Semua Unit</p>
+<span class="material-symbols-outlined text-white group-hover:text-background-dark text-[20px]">expand_more</span>
+</button>
+<button class="group flex h-9 items-center gap-x-2 rounded-full bg-primary-dark hover:bg-primary hover:text-background-dark transition-all pl-4 pr-3 border border-transparent hover:border-primary">
+<p class="text-white group-hover:text-background-dark text-sm font-medium">Status: Valid</p>
+<span class="material-symbols-outlined text-white group-hover:text-background-dark text-[20px]">expand_more</span>
+</button>
+<button class="group flex h-9 items-center gap-x-2 rounded-full bg-primary-dark hover:bg-primary hover:text-background-dark transition-all pl-4 pr-3 border border-transparent hover:border-primary">
+<p class="text-white group-hover:text-background-dark text-sm font-medium">Tahun: 2023</p>
+<span class="material-symbols-outlined text-white group-hover:text-background-dark text-[20px]">expand_more</span>
+</button>
+</div>
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Card 1 -->
+<div class="flex flex-col gap-3 rounded-2xl p-6 border border-[#366348] bg-[#1a2e22]/50 hover:bg-[#1a2e22] transition-colors relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 bg-primary/5 size-24 rounded-full group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-center justify-between z-10">
+<p class="text-text-muted text-sm font-medium uppercase tracking-wider">Total Aset</p>
+<span class="material-symbols-outlined text-primary">account_balance</span>
+</div>
+<div class="flex flex-col gap-1 z-10">
+<p class="text-white tracking-tight text-2xl font-bold">Rp 1.250.000.000</p>
+<div class="flex items-center gap-1">
+<span class="bg-accent-green/20 text-accent-green text-xs font-bold px-2 py-0.5 rounded flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">trending_up</span> 5.2%
+                                </span>
+<span class="text-text-muted text-xs">vs bulan lalu</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="flex flex-col gap-3 rounded-2xl p-6 border border-[#366348] bg-[#1a2e22]/50 hover:bg-[#1a2e22] transition-colors relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 bg-primary/5 size-24 rounded-full group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-center justify-between z-10">
+<p class="text-text-muted text-sm font-medium uppercase tracking-wider">Pendapatan Bersih</p>
+<span class="material-symbols-outlined text-primary">payments</span>
+</div>
+<div class="flex flex-col gap-1 z-10">
+<p class="text-white tracking-tight text-2xl font-bold">Rp 150.000.000</p>
+<div class="flex items-center gap-1">
+<span class="bg-accent-green/20 text-accent-green text-xs font-bold px-2 py-0.5 rounded flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">trending_up</span> 12.5%
+                                </span>
+<span class="text-text-muted text-xs">vs bulan lalu</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="flex flex-col gap-3 rounded-2xl p-6 border border-[#366348] bg-[#1a2e22]/50 hover:bg-[#1a2e22] transition-colors relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 bg-primary/5 size-24 rounded-full group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-center justify-between z-10">
+<p class="text-text-muted text-sm font-medium uppercase tracking-wider">Laba (Rugi)</p>
+<span class="material-symbols-outlined text-primary">monitoring</span>
+</div>
+<div class="flex flex-col gap-1 z-10">
+<p class="text-white tracking-tight text-2xl font-bold">Rp 45.000.000</p>
+<div class="flex items-center gap-1">
+<span class="bg-accent-green/20 text-accent-green text-xs font-bold px-2 py-0.5 rounded flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">trending_up</span> 2.1%
+                                </span>
+<span class="text-text-muted text-xs">vs bulan lalu</span>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="flex flex-col gap-3 rounded-2xl p-6 border border-[#366348] bg-[#1a2e22]/50 hover:bg-[#1a2e22] transition-colors relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 bg-primary/5 size-24 rounded-full group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-center justify-between z-10">
+<p class="text-text-muted text-sm font-medium uppercase tracking-wider">Saldo Kas Akhir</p>
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+</div>
+<div class="flex flex-col gap-1 z-10">
+<p class="text-white tracking-tight text-2xl font-bold">Rp 85.000.000</p>
+<div class="flex items-center gap-1">
+<span class="bg-accent-red/20 text-accent-red text-xs font-bold px-2 py-0.5 rounded flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">trending_down</span> 1.5%
+                                </span>
+<span class="text-text-muted text-xs">vs bulan lalu</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Line Chart -->
+<div class="lg:col-span-2 flex flex-col gap-4 rounded-2xl p-6 border border-[#366348] bg-[#1a2e22]/30">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<p class="text-white text-lg font-bold leading-normal">Tren Pendapatan &amp; Beban (12 Bulan)</p>
+<p class="text-text-muted text-sm font-normal">Analisis kinerja keuangan tahun berjalan</p>
+</div>
+<div class="flex items-end flex-col">
+<p class="text-white tracking-light text-2xl font-bold leading-tight">Rp 450M</p>
+<p class="text-accent-green text-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+                                    10% YTD
+                                </p>
+</div>
+</div>
+<div class="flex flex-col flex-1 gap-4 py-4 min-h-[250px] relative">
+<!-- Custom Chart Visualization using pure CSS/SVG -->
+<svg class="w-full h-full text-primary overflow-visible" fill="none" preserveaspectratio="none" viewbox="0 0 478 150">
+<defs>
+<lineargradient id="gradient-fill" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#36e27b" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#36e27b" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0 109C18 109 18 21 36 21C54 21 54 41 72 41C90 41 90 93 108 93C127 93 127 33 145 33C163 33 163 101 181 101C199 101 199 61 217 61C236 61 236 45 254 45C272 45 272 121 290 121C308 121 308 149 326 149C344 149 344 1 363 1C381 1 381 81 399 81C417 81 417 129 435 129C453 129 453 25 472 25V150H0V109Z" fill="url(#gradient-fill)"></path>
+<path d="M0 109C18 109 18 21 36 21C54 21 54 41 72 41C90 41 90 93 108 93C127 93 127 33 145 33C163 33 163 101 181 101C199 101 199 61 217 61C236 61 236 45 254 45C272 45 272 121 290 121C308 121 308 149 326 149C344 149 344 1 363 1C381 1 381 81 399 81C417 81 417 129 435 129C453 129 453 25 472 25" stroke="currentColor" stroke-linecap="round" stroke-width="3"></path>
+<!-- Dashed line for Expenses -->
+<path d="M0 130C18 130 18 100 36 100C54 100 54 110 72 110C90 110 90 125 108 125C127 125 127 90 145 90C163 90 163 120 181 120C199 120 199 100 217 100C236 100 236 95 254 95C272 95 272 135 290 135C308 135 308 145 326 145C344 145 344 80 363 80C381 80 381 110 399 110C417 110 417 135 435 135C453 135 453 85 472 85" stroke="#95c6a9" stroke-dasharray="5 5" stroke-linecap="round" stroke-width="2"></path>
+</svg>
+<div class="flex justify-between px-2 pt-2 border-t border-[#366348]">
+<p class="text-text-muted text-[13px] font-bold">Jan</p>
+<p class="text-text-muted text-[13px] font-bold">Mar</p>
+<p class="text-text-muted text-[13px] font-bold">Mei</p>
+<p class="text-text-muted text-[13px] font-bold">Jul</p>
+<p class="text-text-muted text-[13px] font-bold">Sep</p>
+<p class="text-text-muted text-[13px] font-bold">Nov</p>
+</div>
+<!-- Legend -->
+<div class="flex gap-4 justify-center mt-2">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="text-text-muted text-xs">Pendapatan</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-text-muted opacity-50 border border-text-muted"></div>
+<span class="text-text-muted text-xs">Beban</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Stacked/Bar Chart -->
+<div class="flex flex-col gap-4 rounded-2xl p-6 border border-[#366348] bg-[#1a2e22]/30">
+<div class="flex flex-col gap-1">
+<p class="text-white text-lg font-bold leading-normal">Komposisi Aset &amp; Liabilitas</p>
+<p class="text-white tracking-light text-2xl font-bold leading-tight">Rp 1.2M <span class="text-base font-normal text-text-muted">Total Aset</span></p>
+</div>
+<div class="flex-1 flex items-end justify-center py-4">
+<div class="grid grid-cols-4 gap-4 w-full h-[200px] items-end">
+<!-- Bar 1 -->
+<div class="flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+<div class="relative w-full bg-primary-dark rounded-t-lg overflow-hidden h-[90%] transition-all group-hover:opacity-80">
+<div class="absolute bottom-0 left-0 w-full h-[60%] bg-primary"></div>
+</div>
+<p class="text-text-muted text-[11px] font-bold text-center leading-tight">Aset<br/>Lancar</p>
+</div>
+<!-- Bar 2 -->
+<div class="flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+<div class="relative w-full bg-primary-dark rounded-t-lg overflow-hidden h-[75%] transition-all group-hover:opacity-80">
+<div class="absolute bottom-0 left-0 w-full h-[100%] bg-primary/60"></div>
+</div>
+<p class="text-text-muted text-[11px] font-bold text-center leading-tight">Aset<br/>Tetap</p>
+</div>
+<!-- Bar 3 -->
+<div class="flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+<div class="relative w-full bg-primary-dark rounded-t-lg overflow-hidden h-[45%] transition-all group-hover:opacity-80">
+<div class="absolute bottom-0 left-0 w-full h-[100%] bg-accent-red/60"></div>
+</div>
+<p class="text-text-muted text-[11px] font-bold text-center leading-tight">Liabilitas</p>
+</div>
+<!-- Bar 4 -->
+<div class="flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+<div class="relative w-full bg-primary-dark rounded-t-lg overflow-hidden h-[65%] transition-all group-hover:opacity-80">
+<div class="absolute bottom-0 left-0 w-full h-[100%] bg-blue-500/60"></div>
+</div>
+<p class="text-text-muted text-[11px] font-bold text-center leading-tight">Ekuitas</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Transactions Table -->
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-end">
+<p class="text-white text-xl font-bold">Transaksi Terakhir</p>
+<a class="text-primary text-sm font-bold hover:underline" href="#">Lihat Semua</a>
+</div>
+<div class="rounded-2xl border border-[#366348] overflow-hidden bg-[#1a2e22]/30">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-[#366348] bg-[#1a2e22]">
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Tanggal</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Deskripsi</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Ref</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Unit Usaha</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-right">Nominal</th>
+<th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-center">Status</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="border-b border-[#366348]/50 hover:bg-[#254632]/50 transition-colors">
+<td class="p-4 text-white font-medium">24 Okt 2023</td>
+<td class="p-4 text-white">Pendapatan Jasa Wisata</td>
+<td class="p-4 text-text-muted">BM-2023-089</td>
+<td class="p-4 text-white">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium border border-blue-500/20">
+                                                Pariwisata
+                                            </span>
+</td>
+<td class="p-4 text-primary font-bold text-right">+ Rp 2.500.000</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center justify-center size-6 rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</span>
+</td>
+</tr>
+<tr class="border-b border-[#366348]/50 hover:bg-[#254632]/50 transition-colors">
+<td class="p-4 text-white font-medium">23 Okt 2023</td>
+<td class="p-4 text-white">Belanja Alat Tulis Kantor</td>
+<td class="p-4 text-text-muted">BK-2023-042</td>
+<td class="p-4 text-white">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-500/10 text-orange-400 text-xs font-medium border border-orange-500/20">
+                                                Operasional
+                                            </span>
+</td>
+<td class="p-4 text-white font-bold text-right">(Rp 450.000)</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center justify-center size-6 rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</span>
+</td>
+</tr>
+<tr class="border-b border-[#366348]/50 hover:bg-[#254632]/50 transition-colors">
+<td class="p-4 text-white font-medium">22 Okt 2023</td>
+<td class="p-4 text-white">Pembayaran Sewa Kios</td>
+<td class="p-4 text-text-muted">BM-2023-088</td>
+<td class="p-4 text-white">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 text-xs font-medium border border-purple-500/20">
+                                                Perdagangan
+                                            </span>
+</td>
+<td class="p-4 text-primary font-bold text-right">+ Rp 1.200.000</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center justify-center size-6 rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</span>
+</td>
+</tr>
+<tr class="hover:bg-[#254632]/50 transition-colors">
+<td class="p-4 text-white font-medium">21 Okt 2023</td>
+<td class="p-4 text-white">Perawatan Mesin Produksi</td>
+<td class="p-4 text-text-muted">BK-2023-041</td>
+<td class="p-4 text-white">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-green-500/10 text-green-400 text-xs font-medium border border-green-500/20">
+                                                Manufaktur
+                                            </span>
+</td>
+<td class="p-4 text-white font-bold text-right">(Rp 1.500.000)</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center justify-center size-6 rounded-full bg-yellow-500/20 text-yellow-500">
+<span class="material-symbols-outlined text-[16px]">hourglass_empty</span>
+</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Footer / Compliance Note -->
+<div class="py-6 border-t border-[#254632] mt-4">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 text-text-muted text-sm">
+<p>© 2023 Sistem Keuangan BUMDesa. Hak Cipta Dilindungi.</p>
+<div class="flex items-center gap-6">
+<a class="hover:text-white transition-colors" href="#">Bantuan</a>
+<a class="hover:text-white transition-colors" href="#">Kebijakan Privasi</a>
+<div class="flex items-center gap-2 text-xs bg-[#254632] px-3 py-1 rounded-full text-white">
+<span class="material-symbols-outlined text-[14px]">shield</span>
+                                SAK EP Compliant
+                            </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

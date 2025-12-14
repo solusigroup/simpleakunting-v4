@@ -1,0 +1,132 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-white font-display">Penjualan</h2>
+                <p class="text-text-muted text-sm mt-1">Kelola invoice penjualan ke pelanggan</p>
+            </div>
+            <x-btn type="primary" onclick="window.location.href='{{ route('sales.index') }}/create'">
+                <span class="material-symbols-outlined text-xl">add</span>
+                Invoice Baru
+            </x-btn>
+        </div>
+    </x-slot>
+
+    <!-- Filters -->
+    <div class="flex items-center gap-4 mb-6">
+        <div class="flex items-center gap-2 px-4 py-2 rounded-full border border-border-dark bg-surface-dark/30">
+            <span class="material-symbols-outlined text-text-muted">calendar_today</span>
+            <input type="date" id="dateStart" class="bg-transparent border-0 text-white text-sm focus:ring-0">
+            <span class="text-text-muted">-</span>
+            <input type="date" id="dateEnd" class="bg-transparent border-0 text-white text-sm focus:ring-0">
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 rounded-full border border-border-dark bg-surface-dark/30 ml-auto">
+            <span class="material-symbols-outlined text-text-muted">search</span>
+            <input type="text" id="searchInput" placeholder="Cari invoice..." 
+                   class="bg-transparent border-0 text-white text-sm focus:ring-0 placeholder-text-muted w-48">
+        </div>
+    </div>
+
+    <!-- Sales Table -->
+    <div class="rounded-2xl border border-border-dark overflow-hidden bg-surface-dark/30">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-border-dark bg-surface-dark">
+                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">No. Invoice</th>
+                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Tanggal</th>
+                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Pelanggan</th>
+                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Jatuh Tempo</th>
+                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-right">Total</th>
+                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Status</th>
+                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-right">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm" id="salesBody">
+                <!-- Loading -->
+                <tr>
+                    <td colspan="7" class="p-8 text-center text-text-muted">
+                        <span class="material-symbols-outlined animate-spin text-3xl">progress_activity</span>
+                        <p class="mt-2">Memuat data...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    @push('scripts')
+    <script>
+        async function loadSales() {
+            const start = document.getElementById('dateStart').value;
+            const end = document.getElementById('dateEnd').value;
+            let url = '/sales?';
+            if (start) url += `date_start=${start}&`;
+            if (end) url += `date_end=${end}`;
+            
+            const response = await fetch(url, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+            renderTable(result.data?.data || []);
+        }
+
+        function renderTable(sales) {
+            const tbody = document.getElementById('salesBody');
+            
+            if (sales.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-12 text-center text-text-muted">
+                            <span class="material-symbols-outlined text-5xl mb-3">receipt_long</span>
+                            <p>Belum ada invoice penjualan</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = sales.map(sale => `
+                <tr class="border-b border-border-dark/50 hover:bg-surface-highlight/30">
+                    <td class="p-4 text-primary font-medium">${sale.invoice_number}</td>
+                    <td class="p-4 text-white">${new Date(sale.date).toLocaleDateString('id-ID')}</td>
+                    <td class="p-4 text-white">${sale.contact?.name || '-'}</td>
+                    <td class="p-4 text-text-muted">${new Date(sale.due_date).toLocaleDateString('id-ID')}</td>
+                    <td class="p-4 text-white text-right font-mono font-bold">Rp ${Number(sale.total).toLocaleString('id-ID')}</td>
+                    <td class="p-4">${getStatusBadge(sale.status)}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="viewSale(${sale.id})" class="text-text-muted hover:text-white p-1">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusBadge(status) {
+            const configs = {
+                'Posted': { class: 'bg-primary/20 text-primary', icon: 'check_circle', label: 'Terposting' },
+                'Paid': { class: 'bg-blue-500/20 text-blue-400', icon: 'paid', label: 'Lunas' },
+                'Draft': { class: 'bg-gray-500/20 text-gray-400', icon: 'edit', label: 'Draft' },
+            };
+            const config = configs[status] || configs['Draft'];
+            return `<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${config.class}">
+                <span class="material-symbols-outlined text-[14px]">${config.icon}</span>${config.label}
+            </span>`;
+        }
+
+        function viewSale(id) {
+            window.location.href = `/sales/${id}`;
+        }
+
+        // Set default dates
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        document.getElementById('dateStart').value = firstDay.toISOString().split('T')[0];
+        document.getElementById('dateEnd').value = today.toISOString().split('T')[0];
+
+        document.getElementById('dateStart').addEventListener('change', loadSales);
+        document.getElementById('dateEnd').addEventListener('change', loadSales);
+
+        loadSales();
+    </script>
+    @endpush
+</x-app-layout>

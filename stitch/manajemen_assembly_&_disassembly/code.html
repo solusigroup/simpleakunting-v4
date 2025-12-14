@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manajemen Assembly &amp; Disassembly</title>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#36e27b",
+              "background-light": "#f6f8f7",
+              "background-dark": "#112117",
+              "surface-dark": "#1a2c23", 
+              "surface-highlight": "#254632",
+              "text-secondary": "#95c6a9",
+            },
+            fontFamily: {
+              "display": ["Spline Sans", "sans-serif"],
+              "body": ["Noto Sans", "sans-serif"],
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body>
+<div class="relative flex h-auto min-h-screen w-full flex-row bg-background-dark dark group/design-root overflow-x-hidden font-display text-white">
+<!-- Sidebar -->
+<div class="hidden lg:flex flex-col w-64 border-r border-surface-highlight bg-background-dark flex-shrink-0 h-screen sticky top-0 overflow-y-auto">
+<div class="flex flex-col h-full justify-between p-4">
+<div class="flex flex-col gap-4">
+<div class="flex gap-3 items-center mb-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Village logo placeholder with abstract green shapes" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCs7woMxDEpwkWL2-DfshxHEzyOmWmfeVgk3UTCXFqxBOII_Vc-K-PuMNHewq7iawbSgKV5kabmCcTgGDMtjCH_TjELllwtStVYQkTJHpvs2PftFzMlkJknI0c-RtaKinACJmX_uuMnBeI5Khhe3veCf1PDUCvEvRRyaLvkjBWt1ZYCYcqkIQXZMq4KgvxnaeBbPG59-hbu8Ajo9XAzkvq9A2hLnTbSd_gW49FFSiRvtsH_ng55_9xhUSk8rvJnmGwOE00o0wxAx_c");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-medium leading-normal">Sistem BUMDesa</h1>
+<p class="text-text-secondary text-xs font-normal leading-normal">Administrator</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-highlight/50 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-white">dashboard</span>
+<p class="text-text-secondary group-hover:text-white text-sm font-medium leading-normal">Dashboard</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-highlight cursor-pointer">
+<span class="material-symbols-outlined text-primary fill-1">inventory_2</span>
+<p class="text-white text-sm font-medium leading-normal">Inventory</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-highlight/50 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-white">payments</span>
+<p class="text-text-secondary group-hover:text-white text-sm font-medium leading-normal">Keuangan</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-highlight/50 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-white">description</span>
+<p class="text-text-secondary group-hover:text-white text-sm font-medium leading-normal">Laporan</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-highlight/50 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-white">settings</span>
+<p class="text-text-secondary group-hover:text-white text-sm font-medium leading-normal">Pengaturan</p>
+</div>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-dark border border-surface-highlight mt-auto">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary">help</span>
+<div>
+<p class="text-white text-sm font-bold mb-1">Butuh Bantuan?</p>
+<p class="text-text-secondary text-xs leading-relaxed">Hubungi support jika ada kendala pencatatan.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content -->
+<div class="flex-1 flex flex-col min-w-0">
+<!-- Top Nav -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-surface-highlight bg-background-dark/95 backdrop-blur px-6 py-3 sticky top-0 z-10">
+<div class="flex items-center gap-4 lg:hidden">
+<span class="material-symbols-outlined text-white">menu</span>
+</div>
+<div class="hidden lg:flex items-center gap-8 w-full">
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Manajemen Persediaan</h2>
+<div class="flex-1 max-w-md">
+<label class="flex w-full items-center rounded-lg bg-surface-highlight h-10 px-3 focus-within:ring-2 focus-within:ring-primary/50 transition-all">
+<span class="material-symbols-outlined text-text-secondary">search</span>
+<input class="w-full bg-transparent border-none text-white placeholder:text-text-secondary focus:ring-0 text-sm ml-2" placeholder="Cari kode transaksi, produk..."/>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<button class="relative p-2 text-text-secondary hover:text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-primary rounded-full"></span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border border-surface-highlight" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCHO4TOUvl9slmwClu41k3ONo3bFR_r-WwBlg5p35c3_7TdmuspwTtVEg0TmaUr0Xe289fNtIEGOBhTk5AZ8Kqz6ojGfWu6HfVJsKRRNLMHPRFT5bm-fNuOCQcXuNzs-_GtwGdmIn6S8VA_9CkOW_Au0tAhWFAf8a1bPmRmMjlR2GNLgp0VHsbN-mt85mwwflytLHwfnapZNo8UUSLmSnqO1kZFExT-SSHUKAqx3D9RI34SIMLLNag4LWGVEIImGN31oj3GENogAig");'></div>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth">
+<div class="max-w-[1200px] mx-auto flex flex-col gap-6">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap items-center gap-2 text-sm">
+<a class="text-text-secondary hover:text-primary transition-colors" href="#">Dashboard</a>
+<span class="text-surface-highlight">/</span>
+<a class="text-text-secondary hover:text-primary transition-colors" href="#">Inventory</a>
+<span class="text-surface-highlight">/</span>
+<span class="text-white font-medium">Manajemen Assembly &amp; Disassembly</span>
+</div>
+<!-- Page Heading -->
+<div class="flex flex-col gap-2">
+<h1 class="text-3xl lg:text-4xl font-black leading-tight tracking-[-0.033em] text-white">Manajemen Assembly &amp; Disassembly</h1>
+<p class="text-text-secondary text-base max-w-2xl">Kelola perakitan produk (Assembly) dan pembongkaran (Disassembly) untuk pencatatan stok dan HPP sesuai standar SAK EP.</p>
+</div>
+<!-- Tabs -->
+<div class="border-b border-surface-highlight">
+<div class="flex gap-8">
+<button class="flex items-center gap-2 border-b-[3px] border-primary pb-3 px-2 text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">build</span>
+<span class="text-sm font-bold tracking-wide">Mode Assembly</span>
+</button>
+<button class="flex items-center gap-2 border-b-[3px] border-transparent pb-3 px-2 text-text-secondary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">handyman</span>
+<span class="text-sm font-bold tracking-wide">Mode Disassembly</span>
+</button>
+</div>
+</div>
+<!-- Main Form Area -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Left: Production Form -->
+<div class="lg:col-span-2 flex flex-col gap-6">
+<div class="bg-surface-dark rounded-xl p-6 border border-surface-highlight shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">add_circle</span>
+                                    Input Produksi Baru
+                                </h3>
+<div class="px-3 py-1 rounded-full bg-surface-highlight text-xs font-mono text-text-secondary">
+                                    REF: AS-2023-10-001
+                                </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+<label class="flex flex-col gap-1.5">
+<span class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Tanggal Transaksi</span>
+<div class="relative">
+<input class="w-full bg-surface-highlight border-none rounded-lg text-white px-3 py-2.5 focus:ring-1 focus:ring-primary text-sm icon-white" type="date" value="2023-10-24"/>
+</div>
+</label>
+<label class="flex flex-col gap-1.5">
+<span class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Lokasi Gudang</span>
+<select class="w-full bg-surface-highlight border-none rounded-lg text-white px-3 py-2.5 focus:ring-1 focus:ring-primary text-sm appearance-none">
+<option>Gudang Utama (Pusat)</option>
+<option>Gudang Unit Produksi</option>
+</select>
+</label>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+<div class="md:col-span-2 flex flex-col gap-1.5">
+<span class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Produk Jadi (Output)</span>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-text-secondary text-[20px]">search</span>
+<input class="w-full bg-surface-highlight border-none rounded-lg text-white pl-10 pr-3 py-2.5 focus:ring-1 focus:ring-primary text-sm" placeholder="Cari produk paket atau rakitan..." type="text"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<span class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Jumlah (Qty)</span>
+<input class="w-full bg-surface-highlight border-none rounded-lg text-white px-3 py-2.5 focus:ring-1 focus:ring-primary text-sm text-right font-mono" min="1" type="number" value="10"/>
+</div>
+</div>
+<!-- BOM Table -->
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="text-sm font-semibold text-text-secondary">Komponen Bahan Baku (BOM)</span>
+<span class="text-xs text-primary bg-primary/10 px-2 py-1 rounded">Stok Tersedia</span>
+</div>
+<div class="overflow-hidden rounded-lg border border-surface-highlight bg-background-dark/50">
+<table class="w-full text-left text-sm">
+<thead class="bg-surface-highlight/50 text-text-secondary font-medium">
+<tr>
+<th class="px-4 py-3">Nama Item</th>
+<th class="px-4 py-3 text-right">Stok</th>
+<th class="px-4 py-3 text-right">Butuh</th>
+<th class="px-4 py-3 text-right">Total Biaya</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-highlight">
+<tr>
+<td class="px-4 py-3 text-white">
+<div class="flex flex-col">
+<span>Beras Premium IR64</span>
+<span class="text-xs text-text-secondary">Kg</span>
+</div>
+</td>
+<td class="px-4 py-3 text-right text-text-secondary font-mono">500</td>
+<td class="px-4 py-3 text-right text-white font-mono font-medium">50</td>
+<td class="px-4 py-3 text-right text-text-secondary font-mono">Rp 600.000</td>
+</tr>
+<tr>
+<td class="px-4 py-3 text-white">
+<div class="flex flex-col">
+<span>Minyak Goreng 1L</span>
+<span class="text-xs text-text-secondary">Pouch</span>
+</div>
+</td>
+<td class="px-4 py-3 text-right text-text-secondary font-mono">200</td>
+<td class="px-4 py-3 text-right text-white font-mono font-medium">20</td>
+<td class="px-4 py-3 text-right text-text-secondary font-mono">Rp 280.000</td>
+</tr>
+<tr>
+<td class="px-4 py-3 text-white">
+<div class="flex flex-col">
+<span>Gula Pasir Lokal</span>
+<span class="text-xs text-text-secondary">Kg</span>
+</div>
+</td>
+<td class="px-4 py-3 text-right text-text-secondary font-mono">150</td>
+<td class="px-4 py-3 text-right text-white font-mono font-medium">10</td>
+<td class="px-4 py-3 text-right text-text-secondary font-mono">Rp 135.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="text-xs text-text-secondary italic mt-1">* Komposisi diambil otomatis dari master data produk.</p>
+</div>
+</div>
+</div>
+<!-- Right: Summary Panel -->
+<div class="flex flex-col gap-6">
+<!-- Cost Summary -->
+<div class="bg-surface-dark rounded-xl p-6 border border-surface-highlight h-fit sticky top-6">
+<h4 class="text-white font-bold mb-4">Ringkasan Biaya</h4>
+<div class="flex flex-col gap-3 border-b border-surface-highlight pb-4 mb-4">
+<div class="flex justify-between items-center text-sm">
+<span class="text-text-secondary">Total Bahan Baku</span>
+<span class="text-white font-mono">Rp 1.015.000</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-text-secondary">Biaya Tenaga Kerja</span>
+<span class="text-white font-mono">Rp 50.000</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-text-secondary">Biaya Overhead (BOP)</span>
+<span class="text-white font-mono">Rp 25.000</span>
+</div>
+</div>
+<div class="flex justify-between items-center mb-6">
+<div>
+<p class="text-sm text-text-secondary">Total HPP</p>
+<p class="text-xs text-text-secondary">(Harga Pokok Produksi)</p>
+</div>
+<p class="text-xl font-bold text-primary font-mono">Rp 1.090.000</p>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full bg-primary hover:bg-green-400 text-background-dark font-bold py-3 rounded-lg transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">check_circle</span>
+                                    Proses Assembly
+                                </button>
+<button class="w-full bg-transparent border border-surface-highlight text-text-secondary hover:text-white hover:border-white py-3 rounded-lg transition-colors font-medium">
+                                    Simpan Draft
+                                </button>
+</div>
+</div>
+<!-- Quick Guide -->
+<div class="bg-primary/5 rounded-xl p-4 border border-primary/20">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1 text-[20px]">info</span>
+<div class="text-sm">
+<p class="text-white font-medium mb-1">Info SAK EP</p>
+<p class="text-text-secondary text-xs leading-relaxed">Pastikan alokasi biaya overhead dibebankan secara rasional untuk keakuratan laporan laba rugi.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- History Section -->
+<div class="flex flex-col gap-4 pt-4">
+<div class="flex justify-between items-end">
+<h3 class="text-xl font-bold text-white">Riwayat Proses Terakhir</h3>
+<a class="text-sm text-primary font-medium hover:underline" href="#">Lihat Semua</a>
+</div>
+<div class="w-full overflow-x-auto rounded-xl border border-surface-highlight bg-surface-dark">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-surface-highlight text-xs uppercase tracking-wider text-text-secondary">
+<th class="p-4 font-medium">Tanggal</th>
+<th class="p-4 font-medium">No. Referensi</th>
+<th class="p-4 font-medium">Aktivitas</th>
+<th class="p-4 font-medium">Produk</th>
+<th class="p-4 font-medium text-right">Qty</th>
+<th class="p-4 font-medium">Status</th>
+<th class="p-4 font-medium text-right">Aksi</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-highlight text-sm">
+<tr class="hover:bg-surface-highlight/30 transition-colors">
+<td class="p-4 text-white">24 Okt 2023</td>
+<td class="p-4 text-text-secondary font-mono">AS-2023-10-001</td>
+<td class="p-4">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                            Assembly
+                                        </div>
+</td>
+<td class="p-4 text-white font-medium">Paket Sembako Hemat A</td>
+<td class="p-4 text-right text-white font-mono">10</td>
+<td class="p-4">
+<div class="inline-flex items-center gap-1.5 text-primary">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span class="font-medium">Selesai</span>
+</div>
+</td>
+<td class="p-4 text-right">
+<button class="text-text-secondary hover:text-white transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-highlight/30 transition-colors">
+<td class="p-4 text-white">23 Okt 2023</td>
+<td class="p-4 text-text-secondary font-mono">DS-2023-10-045</td>
+<td class="p-4">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                                            Disassembly
+                                        </div>
+</td>
+<td class="p-4 text-white font-medium">Parsel Lebaran Besar</td>
+<td class="p-4 text-right text-white font-mono">2</td>
+<td class="p-4">
+<div class="inline-flex items-center gap-1.5 text-text-secondary">
+<span class="material-symbols-outlined text-[16px]">hourglass_top</span>
+<span class="font-medium">Draft</span>
+</div>
+</td>
+<td class="p-4 text-right">
+<button class="text-text-secondary hover:text-white transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-highlight/30 transition-colors">
+<td class="p-4 text-white">22 Okt 2023</td>
+<td class="p-4 text-text-secondary font-mono">AS-2023-10-008</td>
+<td class="p-4">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                            Assembly
+                                        </div>
+</td>
+<td class="p-4 text-white font-medium">Paket Pupuk Subsidi</td>
+<td class="p-4 text-right text-white font-mono">100</td>
+<td class="p-4">
+<div class="inline-flex items-center gap-1.5 text-primary">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span class="font-medium">Selesai</span>
+</div>
+</td>
+<td class="p-4 text-right">
+<button class="text-text-secondary hover:text-white transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<footer class="mt-12 border-t border-surface-highlight pt-6 pb-2">
+<p class="text-center text-xs text-text-secondary">© 2023 Sistem Informasi BUMDesa. Developed for SAK EP Compliance.</p>
+</footer>
+</main>
+</div>
+</div>
+</body></html>

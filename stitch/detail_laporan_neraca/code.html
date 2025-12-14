@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detail Laporan Neraca - BUMDesa Makmur</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#36e27b",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#112117",
+                        "surface-dark": "#1a2e22",
+                        "surface-highlight": "#254632",
+                        "text-secondary": "#95c6a9"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col md:flex-row text-slate-900 dark:text-white overflow-x-hidden selection:bg-primary selection:text-black">
+<!-- Mobile Header (Visible only on small screens) -->
+<div class="md:hidden flex items-center justify-between p-4 bg-background-dark border-b border-surface-highlight">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-8" data-alt="BUMDesa Logo placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCB87Cag8ztmfzmBsJ5jk6-Y1c6765ukJdBywPVV6utXOD_rEnyODzK_SUGSCjTe9BJTntbEXVvWLIYJbxBjWGYe0-KNoCnqbijTlybln2TXTS7g2_YtVJka2QVb8CjUgZ6l6rcOSLAvAWu5SiY3Pkdd02sXy6RL3nF3XU3ENhpKvHGVSZu-_tAeMR2uhyVkz7m0KHj5tY3g8S8XlmRNB_GjWQ4IOVcdqJx4KH_Sk72tcSviTBLMoXM_6ySjZyf1ngiK07G6ITXpdc");'></div>
+<span class="font-bold text-white">BUMDesa Makmur</span>
+</div>
+<button class="text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden md:flex flex-col w-72 h-screen sticky top-0 border-r border-surface-highlight bg-background-dark p-6 overflow-y-auto shrink-0 z-20">
+<div class="flex items-center gap-4 mb-10">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-12 shrink-0 border-2 border-surface-highlight" data-alt="BUMDesa abstract logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCVpIueTn74QJChI3P-JxLLC3OLkLukTm8OQA4BAfYTsC2VRhcJPv7SIzmSriVmsE54-k8MeoG6XVC0ICbq35ztHIKmSb9V062CS-vdu-Kz9AwLXfuP4kk4-Vlmkrra9T3QlFEuQRKJbrixvQPlyq2imPf1vQS-JsDu5PQWdQJBfULHEJ9uYbvI7eSGcGj1l0dIBUnsTsow8nP2fl9fE43wAZ_yEvtJIR17gs-wnD0slOeIKbJ65dxrINyCI3teD3ZsvFP6fXPnjt0");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-lg font-bold leading-tight">BUMDesa Makmur</h1>
+<p class="text-text-secondary text-xs font-normal">Admin Keuangan</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-highlight transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-white transition-colors">dashboard</span>
+<p class="text-text-secondary group-hover:text-white text-sm font-medium">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-highlight shadow-lg shadow-primary/5 border border-surface-highlight" href="#">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">description</span>
+<p class="text-white text-sm font-bold">Laporan Keuangan</p>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-highlight transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-white transition-colors">book</span>
+<p class="text-text-secondary group-hover:text-white text-sm font-medium">Jurnal Umum</p>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-highlight transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-white transition-colors">library_books</span>
+<p class="text-text-secondary group-hover:text-white text-sm font-medium">Buku Besar</p>
+</a>
+<div class="my-2 border-t border-surface-highlight/50"></div>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-highlight transition-colors group" href="#">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-white transition-colors">settings</span>
+<p class="text-text-secondary group-hover:text-white text-sm font-medium">Pengaturan</p>
+</a>
+</nav>
+<div class="mt-auto pt-8">
+<div class="p-4 rounded-xl bg-gradient-to-br from-surface-highlight to-background-dark border border-surface-highlight">
+<p class="text-white text-sm font-semibold mb-1">Butuh Bantuan?</p>
+<p class="text-text-secondary text-xs mb-3">Hubungi tim support teknis.</p>
+<button class="w-full py-2 bg-primary/20 hover:bg-primary/30 text-primary text-xs font-bold rounded-lg transition-colors">
+                    Hubungi Support
+                </button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-full min-h-screen relative w-full overflow-x-hidden">
+<!-- Header Section -->
+<div class="p-6 md:p-10 pb-0 max-w-[1400px] w-full mx-auto">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap gap-2 items-center mb-6">
+<a class="text-text-secondary hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-text-secondary text-sm">chevron_right</span>
+<a class="text-text-secondary hover:text-primary text-sm font-medium transition-colors" href="#">Laporan</a>
+<span class="material-symbols-outlined text-text-secondary text-sm">chevron_right</span>
+<span class="text-white text-sm font-medium bg-surface-highlight px-2 py-0.5 rounded-md">Neraca</span>
+</div>
+<!-- Page Title & Actions -->
+<div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-8">
+<div class="flex flex-col gap-2 max-w-2xl">
+<h2 class="text-white text-3xl md:text-4xl font-black leading-tight tracking-tight">Laporan Posisi Keuangan</h2>
+<p class="text-text-secondary text-base">
+                        Neraca saldo berdasarkan <span class="text-primary/80 font-medium">SAK Entitas Publik</span> &amp; Kepmendes 136/2022.
+                    </p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 cursor-pointer h-12 px-6 rounded-full bg-surface-highlight border border-surface-highlight hover:bg-[#2f553d] text-white text-sm font-bold transition-all">
+<span class="material-symbols-outlined text-xl">print</span>
+<span class="hidden sm:inline">Cetak</span>
+</button>
+<button class="flex items-center gap-2 cursor-pointer h-12 px-6 rounded-full bg-primary hover:bg-[#2ec56a] text-background-dark text-sm font-bold shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined text-xl">download</span>
+<span>Unduh Laporan</span>
+</button>
+</div>
+</div>
+<!-- Controls & Filters -->
+<div class="flex flex-col xl:flex-row gap-6 mb-8 bg-surface-dark p-4 rounded-lg border border-surface-highlight">
+<!-- Date Filters -->
+<div class="flex flex-1 flex-col sm:flex-row gap-4">
+<label class="flex flex-col flex-1 min-w-[200px]">
+<span class="text-text-secondary text-xs font-semibold mb-2 uppercase tracking-wider">Periode Laporan</span>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none">calendar_month</span>
+<input class="w-full pl-12 pr-4 h-12 rounded-xl bg-background-dark border border-surface-highlight text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-gray-600" type="month" value="2023-12"/>
+</div>
+</label>
+<label class="flex flex-col flex-1 min-w-[200px]">
+<span class="text-text-secondary text-xs font-semibold mb-2 uppercase tracking-wider">Bandingkan Dengan</span>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none">compare_arrows</span>
+<input class="w-full pl-12 pr-4 h-12 rounded-xl bg-background-dark border border-surface-highlight text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-gray-600" type="month" value="2023-11"/>
+</div>
+</label>
+</div>
+<!-- Search -->
+<div class="flex-1 xl:flex-none xl:w-96 flex flex-col justify-end">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none">search</span>
+<input class="w-full pl-12 pr-4 h-12 rounded-xl bg-background-dark border border-surface-highlight text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-gray-600" placeholder="Cari nama akun atau kode..." type="text"/>
+</div>
+</div>
+</div>
+<!-- Stats Overview -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+<div class="flex flex-col gap-3 rounded-lg p-6 bg-surface-dark border border-surface-highlight relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">account_balance_wallet</span>
+</div>
+<p class="text-text-secondary text-sm font-medium">Total Aset</p>
+<div class="flex items-baseline gap-2">
+<p class="text-white text-2xl lg:text-3xl font-bold">Rp 1.250.000.000</p>
+</div>
+<div class="flex items-center gap-1 text-primary bg-primary/10 w-fit px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<p class="text-xs font-bold">+5.2%</p>
+</div>
+</div>
+<div class="flex flex-col gap-3 rounded-lg p-6 bg-surface-dark border border-surface-highlight relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-white">receipt_long</span>
+</div>
+<p class="text-text-secondary text-sm font-medium">Total Liabilitas</p>
+<div class="flex items-baseline gap-2">
+<p class="text-white text-2xl lg:text-3xl font-bold">Rp 450.000.000</p>
+</div>
+<div class="flex items-center gap-1 text-orange-400 bg-orange-400/10 w-fit px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<p class="text-xs font-bold">+1.1%</p>
+</div>
+</div>
+<div class="flex flex-col gap-3 rounded-lg p-6 bg-surface-dark border border-surface-highlight relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-blue-400">pie_chart</span>
+</div>
+<p class="text-text-secondary text-sm font-medium">Total Ekuitas</p>
+<div class="flex items-baseline gap-2">
+<p class="text-white text-2xl lg:text-3xl font-bold">Rp 800.000.000</p>
+</div>
+<div class="flex items-center gap-1 text-primary bg-primary/10 w-fit px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<p class="text-xs font-bold">+8.4%</p>
+</div>
+</div>
+</div>
+<!-- Financial Table -->
+<div class="bg-surface-dark rounded-lg border border-surface-highlight overflow-hidden mb-12">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-highlight/50 border-b border-surface-highlight">
+<th class="p-4 pl-6 text-xs font-bold text-text-secondary uppercase tracking-wider w-[40%]">Uraian Akun</th>
+<th class="p-4 text-xs font-bold text-text-secondary uppercase tracking-wider text-right w-[10%]">Kode</th>
+<th class="p-4 text-xs font-bold text-text-secondary uppercase tracking-wider text-right w-[20%]">31 Des 2023</th>
+<th class="p-4 text-xs font-bold text-text-secondary uppercase tracking-wider text-right w-[20%]">30 Nov 2023</th>
+<th class="p-4 pr-6 text-xs font-bold text-text-secondary uppercase tracking-wider text-right w-[10%]">Tren</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<!-- SECTION: ASET -->
+<tr class="bg-surface-highlight/20">
+<td class="p-4 pl-6 font-bold text-primary text-base" colspan="5">1. ASET</td>
+</tr>
+<!-- Sub: Aset Lancar -->
+<tr class="group hover:bg-surface-highlight/10 transition-colors">
+<td class="p-4 pl-10 font-bold text-white">1.1 Aset Lancar</td>
+<td class="p-4 text-right text-text-secondary font-mono">1100</td>
+<td class="p-4 text-right font-medium text-white font-mono"></td>
+<td class="p-4 text-right font-medium text-text-secondary font-mono"></td>
+<td class="p-4 pr-6 text-right"></td>
+</tr>
+<!-- Detail Rows -->
+<tr class="group hover:bg-surface-highlight/10 transition-colors border-b border-surface-highlight/30">
+<td class="p-3 pl-14 text-gray-300">Kas Tunai</td>
+<td class="p-3 text-right text-gray-500 font-mono text-xs">1101</td>
+<td class="p-3 text-right text-white font-mono">Rp 150.000.000</td>
+<td class="p-3 text-right text-gray-400 font-mono">Rp 140.000.000</td>
+<td class="p-3 pr-6 text-right text-primary font-mono text-xs">+7.1%</td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors border-b border-surface-highlight/30">
+<td class="p-3 pl-14 text-gray-300">Bank (Rekening BUMDesa)</td>
+<td class="p-3 text-right text-gray-500 font-mono text-xs">1102</td>
+<td class="p-3 text-right text-white font-mono">Rp 350.000.000</td>
+<td class="p-3 text-right text-gray-400 font-mono">Rp 320.000.000</td>
+<td class="p-3 pr-6 text-right text-primary font-mono text-xs">+9.3%</td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors border-b border-surface-highlight/30">
+<td class="p-3 pl-14 text-gray-300">Piutang Usaha</td>
+<td class="p-3 text-right text-gray-500 font-mono text-xs">1103</td>
+<td class="p-3 text-right text-white font-mono">Rp 75.000.000</td>
+<td class="p-3 text-right text-gray-400 font-mono">Rp 80.000.000</td>
+<td class="p-3 pr-6 text-right text-red-400 font-mono text-xs">-6.2%</td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors border-b border-surface-highlight/30">
+<td class="p-3 pl-14 text-gray-300">Persediaan Barang Dagang</td>
+<td class="p-3 text-right text-gray-500 font-mono text-xs">1104</td>
+<td class="p-3 text-right text-white font-mono">Rp 125.000.000</td>
+<td class="p-3 text-right text-gray-400 font-mono">Rp 110.000.000</td>
+<td class="p-3 pr-6 text-right text-primary font-mono text-xs">+13.6%</td>
+</tr>
+<!-- Sub Total Aset Lancar -->
+<tr class="bg-surface-highlight/10 font-bold">
+<td class="p-4 pl-10 text-white">Total Aset Lancar</td>
+<td class="p-4 text-right"></td>
+<td class="p-4 text-right text-white font-mono">Rp 700.000.000</td>
+<td class="p-4 text-right text-text-secondary font-mono">Rp 650.000.000</td>
+<td class="p-4 pr-6 text-right text-primary font-mono text-xs">+7.6%</td>
+</tr>
+<!-- Sub: Aset Tetap -->
+<tr class="group hover:bg-surface-highlight/10 transition-colors mt-4">
+<td class="p-4 pl-10 font-bold text-white pt-6">1.2 Aset Tidak Lancar</td>
+<td class="p-4 pt-6 text-right text-text-secondary font-mono">1200</td>
+<td class="p-4 pt-6 text-right font-medium text-white font-mono"></td>
+<td class="p-4 pt-6 text-right font-medium text-text-secondary font-mono"></td>
+<td class="p-4 pt-6 pr-6 text-right"></td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors border-b border-surface-highlight/30">
+<td class="p-3 pl-14 text-gray-300">Aset Tetap (Tanah &amp; Bangunan)</td>
+<td class="p-3 text-right text-gray-500 font-mono text-xs">1201</td>
+<td class="p-3 text-right text-white font-mono">Rp 600.000.000</td>
+<td class="p-3 text-right text-gray-400 font-mono">Rp 600.000.000</td>
+<td class="p-3 pr-6 text-right text-gray-500 font-mono text-xs">0%</td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors border-b border-surface-highlight/30">
+<td class="p-3 pl-14 text-gray-300">Akumulasi Penyusutan</td>
+<td class="p-3 text-right text-gray-500 font-mono text-xs">1202</td>
+<td class="p-3 text-right text-white font-mono text-red-300">(Rp 50.000.000)</td>
+<td class="p-3 text-right text-gray-400 font-mono">(Rp 48.000.000)</td>
+<td class="p-3 pr-6 text-right text-red-400 font-mono text-xs">+4.1%</td>
+</tr>
+<!-- Sub Total Aset Tidak Lancar -->
+<tr class="bg-surface-highlight/10 font-bold">
+<td class="p-4 pl-10 text-white">Total Aset Tidak Lancar</td>
+<td class="p-4 text-right"></td>
+<td class="p-4 text-right text-white font-mono">Rp 550.000.000</td>
+<td class="p-4 text-right text-text-secondary font-mono">Rp 552.000.000</td>
+<td class="p-4 pr-6 text-right text-red-400 font-mono text-xs">-0.3%</td>
+</tr>
+<!-- GRAND TOTAL ASET -->
+<tr class="bg-surface-highlight text-white border-t-2 border-primary">
+<td class="p-4 pl-6 font-black text-lg">JUMLAH ASET</td>
+<td class="p-4"></td>
+<td class="p-4 text-right font-black font-mono text-lg">Rp 1.250.000.000</td>
+<td class="p-4 text-right font-medium text-text-secondary font-mono">Rp 1.202.000.000</td>
+<td class="p-4 pr-6 text-right text-primary font-bold font-mono">+3.9%</td>
+</tr>
+<!-- Spacer -->
+<tr class="h-8 bg-background-dark">
+<td colspan="5"></td>
+</tr>
+<!-- SECTION: LIABILITAS -->
+<tr class="bg-surface-highlight/20">
+<td class="p-4 pl-6 font-bold text-primary text-base" colspan="5">2. LIABILITAS &amp; EKUITAS</td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors">
+<td class="p-4 pl-10 font-bold text-white">2.1 Liabilitas Jangka Pendek</td>
+<td class="p-4 text-right text-text-secondary font-mono">2100</td>
+<td class="p-4 text-right font-medium text-white font-mono"></td>
+<td class="p-4 text-right font-medium text-text-secondary font-mono"></td>
+<td class="p-4 pr-6 text-right"></td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors border-b border-surface-highlight/30">
+<td class="p-3 pl-14 text-gray-300">Utang Usaha</td>
+<td class="p-3 text-right text-gray-500 font-mono text-xs">2101</td>
+<td class="p-3 text-right text-white font-mono">Rp 150.000.000</td>
+<td class="p-3 text-right text-gray-400 font-mono">Rp 180.000.000</td>
+<td class="p-3 pr-6 text-right text-green-400 font-mono text-xs">-16.6%</td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors border-b border-surface-highlight/30">
+<td class="p-3 pl-14 text-gray-300">Utang Pajak</td>
+<td class="p-3 text-right text-gray-500 font-mono text-xs">2102</td>
+<td class="p-3 text-right text-white font-mono">Rp 25.000.000</td>
+<td class="p-3 text-right text-gray-400 font-mono">Rp 22.000.000</td>
+<td class="p-3 pr-6 text-right text-orange-400 font-mono text-xs">+13.6%</td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors mt-4">
+<td class="p-4 pl-10 font-bold text-white pt-6">2.2 Liabilitas Jangka Panjang</td>
+<td class="p-4 pt-6 text-right text-text-secondary font-mono">2200</td>
+<td class="p-4 pt-6 text-right font-medium text-white font-mono"></td>
+<td class="p-4 pt-6 text-right font-medium text-text-secondary font-mono"></td>
+<td class="p-4 pt-6 pr-6 text-right"></td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors border-b border-surface-highlight/30">
+<td class="p-3 pl-14 text-gray-300">Utang Bank</td>
+<td class="p-3 text-right text-gray-500 font-mono text-xs">2201</td>
+<td class="p-3 text-right text-white font-mono">Rp 275.000.000</td>
+<td class="p-3 text-right text-gray-400 font-mono">Rp 300.000.000</td>
+<td class="p-3 pr-6 text-right text-green-400 font-mono text-xs">-8.3%</td>
+</tr>
+<!-- Sub Total Liabilitas -->
+<tr class="bg-surface-highlight/10 font-bold">
+<td class="p-4 pl-10 text-white">Total Liabilitas</td>
+<td class="p-4 text-right"></td>
+<td class="p-4 text-right text-white font-mono">Rp 450.000.000</td>
+<td class="p-4 text-right text-text-secondary font-mono">Rp 502.000.000</td>
+<td class="p-4 pr-6 text-right text-green-400 font-mono text-xs">-10.3%</td>
+</tr>
+<!-- EKUITAS -->
+<tr class="group hover:bg-surface-highlight/10 transition-colors mt-4">
+<td class="p-4 pl-10 font-bold text-white pt-6">2.3 Ekuitas</td>
+<td class="p-4 pt-6 text-right text-text-secondary font-mono">3000</td>
+<td class="p-4 pt-6 text-right font-medium text-white font-mono"></td>
+<td class="p-4 pt-6 text-right font-medium text-text-secondary font-mono"></td>
+<td class="p-4 pt-6 pr-6 text-right"></td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors border-b border-surface-highlight/30">
+<td class="p-3 pl-14 text-gray-300">Modal Disetor</td>
+<td class="p-3 text-right text-gray-500 font-mono text-xs">3100</td>
+<td class="p-3 text-right text-white font-mono">Rp 500.000.000</td>
+<td class="p-3 text-right text-gray-400 font-mono">Rp 500.000.000</td>
+<td class="p-3 pr-6 text-right text-gray-500 font-mono text-xs">0%</td>
+</tr>
+<tr class="group hover:bg-surface-highlight/10 transition-colors border-b border-surface-highlight/30">
+<td class="p-3 pl-14 text-gray-300">Saldo Laba</td>
+<td class="p-3 text-right text-gray-500 font-mono text-xs">3200</td>
+<td class="p-3 text-right text-white font-mono">Rp 300.000.000</td>
+<td class="p-3 text-right text-gray-400 font-mono">Rp 200.000.000</td>
+<td class="p-3 pr-6 text-right text-primary font-mono text-xs">+50%</td>
+</tr>
+<!-- Sub Total Ekuitas -->
+<tr class="bg-surface-highlight/10 font-bold">
+<td class="p-4 pl-10 text-white">Total Ekuitas</td>
+<td class="p-4 text-right"></td>
+<td class="p-4 text-right text-white font-mono">Rp 800.000.000</td>
+<td class="p-4 text-right text-text-secondary font-mono">Rp 700.000.000</td>
+<td class="p-4 pr-6 text-right text-primary font-mono text-xs">+14.2%</td>
+</tr>
+<!-- GRAND TOTAL LIAB & EKUITAS -->
+<tr class="bg-surface-highlight text-white border-t-2 border-primary">
+<td class="p-4 pl-6 font-black text-lg">JUMLAH LIABILITAS &amp; EKUITAS</td>
+<td class="p-4"></td>
+<td class="p-4 text-right font-black font-mono text-lg">Rp 1.250.000.000</td>
+<td class="p-4 text-right font-medium text-text-secondary font-mono">Rp 1.202.000.000</td>
+<td class="p-4 pr-6 text-right text-primary font-bold font-mono">+3.9%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination / Footer of Table -->
+<div class="px-6 py-4 border-t border-surface-highlight flex justify-between items-center bg-surface-dark/50">
+<p class="text-xs text-text-secondary">Menampilkan 1-18 dari 45 akun</p>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-xs font-medium text-white bg-surface-highlight rounded hover:bg-surface-highlight/80 transition-colors disabled:opacity-50">Previous</button>
+<button class="px-3 py-1 text-xs font-medium text-background-dark bg-primary rounded hover:bg-primary/90 transition-colors">1</button>
+<button class="px-3 py-1 text-xs font-medium text-white bg-transparent hover:bg-surface-highlight rounded transition-colors">2</button>
+<button class="px-3 py-1 text-xs font-medium text-white bg-surface-highlight rounded hover:bg-surface-highlight/80 transition-colors">Next</button>
+</div>
+</div>
+</div>
+<!-- Disclaimer Footer -->
+<div class="pb-10 pt-4 border-t border-surface-highlight mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-text-secondary text-xs text-center md:text-left">
+                        © 2024 BUMDesa Makmur. Sistem Informasi Keuangan Desa. <br/>
+                        Disajikan sesuai standar SAK Entitas Publik.
+                    </p>
+<div class="flex gap-4">
+<a class="text-text-secondary hover:text-white text-xs" href="#">Kebijakan Privasi</a>
+<a class="text-text-secondary hover:text-white text-xs" href="#">Syarat &amp; Ketentuan</a>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
