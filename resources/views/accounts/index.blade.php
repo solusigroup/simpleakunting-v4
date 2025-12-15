@@ -5,10 +5,16 @@
                 <h2 class="text-2xl font-bold text-white font-display">Chart of Accounts</h2>
                 <p class="text-text-muted text-sm mt-1">Kelola akun-akun untuk pencatatan transaksi</p>
             </div>
-            <x-btn type="primary" onclick="openCreateModal()">
-                <span class="material-symbols-outlined text-xl">add</span>
-                Tambah Akun
-            </x-btn>
+            <div class="flex gap-2">
+                <x-btn type="secondary" onclick="window.location.href='/accounts/import'">
+                    <span class="material-symbols-outlined text-xl">upload_file</span>
+                    Import Excel
+                </x-btn>
+                <x-btn type="primary" onclick="openCreateModal()">
+                    <span class="material-symbols-outlined text-xl">add</span>
+                    Tambah Akun
+                </x-btn>
+            </div>
         </div>
     </x-slot>
 
@@ -148,24 +154,39 @@
             tbody.innerHTML = filtered.map(acc => `
                 <tr class="border-b border-border-dark/50 hover:bg-surface-highlight/30">
                     <td class="p-4 text-white font-mono">${acc.code}</td>
-                    <td class="p-4 text-white ${acc.is_parent ? 'font-bold' : ''}">${'—'.repeat(acc.level - 1)} ${acc.name}</td>
+                    <td class="p-4 text-white ${acc.is_parent ? 'font-bold' : ''}">
+                        ${'—'.repeat(acc.level - 1)} ${acc.name}
+                        ${acc.is_system ? '<span class="ml-2 px-2 py-0.5 text-[10px] bg-yellow-500/20 text-yellow-400 rounded border border-yellow-500/30 font-semibold">SYSTEM</span>' : ''}
+                    </td>
                     <td class="p-4">
                         <span class="px-2 py-1 rounded text-xs font-medium ${getTypeColor(acc.type)}">${acc.type}</span>
                     </td>
                     <td class="p-4 text-text-muted">${acc.report_type}</td>
                     <td class="p-4 text-text-muted">${acc.normal_balance}</td>
                     <td class="p-4">
-                        ${acc.is_active 
-                            ? '<span class="inline-flex items-center gap-1 text-primary text-xs"><span class="material-symbols-outlined text-[14px]">check_circle</span> Aktif</span>'
-                            : '<span class="inline-flex items-center gap-1 text-text-muted text-xs"><span class="material-symbols-outlined text-[14px]">cancel</span> Nonaktif</span>'
-                        }
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" 
+                                   ${acc.is_active ? 'checked' : ''} 
+                                   onchange="toggleStatus(${acc.id}, this.checked)"
+                                   class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-600 peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            <span class="ms-3 text-sm font-medium ${acc.is_active ? 'text-primary' : 'text-text-muted'}">
+                                ${acc.is_active ? 'Aktif' : 'Nonaktif'}
+                            </span>
+                        </label>
                     </td>
                     <td class="p-4 text-right">
                         ${!acc.is_system ? `
-                            <button onclick="editAccount(${acc.id})" class="text-text-muted hover:text-white p-1">
+                            <button onclick="editAccount(${acc.id})" 
+                                    class="text-text-muted hover:text-white p-1 transition-colors"
+                                    title="Edit akun">
                                 <span class="material-symbols-outlined text-xl">edit</span>
                             </button>
-                        ` : ''}
+                        ` : `
+                            <span class="inline-flex items-center gap-1 text-text-muted/40" title="Akun sistem tidak dapat diedit">
+                                <span class="material-symbols-outlined text-xl">lock</span>
+                            </span>
+                        `}
                     </td>
                 </tr>
             `).join('');
@@ -206,6 +227,38 @@
 
         function closeModal() {
             document.getElementById('accountModal').classList.add('hidden');
+        }
+
+        async function toggleStatus(id, isActive) {
+            try {
+                const response = await fetch(`/accounts/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ is_active: isActive })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    // Update local data
+                    const account = accounts.find(a => a.id === id);
+                    if (account) {
+                        account.is_active = isActive;
+                    }
+                    renderTable();
+                } else {
+                    alert(result.message || 'Terjadi kesalahan');
+                    // Revert by reloading
+                    loadAccounts();
+                }
+            } catch (error) {
+                console.error('Error toggling status:', error);
+                alert('Terjadi kesalahan saat mengubah status');
+                loadAccounts();
+            }
         }
 
         document.getElementById('accountForm').addEventListener('submit', async function(e) {

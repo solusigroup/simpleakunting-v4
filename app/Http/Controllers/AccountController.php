@@ -140,20 +140,42 @@ class AccountController extends Controller
         $account = ChartOfAccount::where('company_id', $user->company_id)
             ->findOrFail($id);
 
-        // System accounts cannot be deleted but can be deactivated
-        if ($account->is_system && $request->has('code')) {
+        // System accounts cannot change their code
+        if ($account->is_system && $request->has('code') && $request->code !== $account->code) {
             return response()->json([
                 'success' => false,
                 'message' => 'Akun sistem tidak dapat diubah kodenya.',
             ], 422);
         }
 
-        $request->validate([
-            'name' => ['sometimes', 'string', 'max:100'],
+        // Validate all editable fields
+        $validated = $request->validate([
+            'code' => ['sometimes', 'required', 'string', 'max:20'],
+            'name' => ['sometimes', 'required', 'string', 'max:100'],
+            'type' => ['sometimes', 'required', 'in:Asset,Liability,Equity,Revenue,Expense'],
+            'report_type' => ['sometimes', 'required', 'in:NERACA,LABARUGI'],
+            'normal_balance' => ['sometimes', 'required', 'in:DEBIT,KREDIT'],
+            'is_parent' => ['sometimes', 'boolean'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
-        $account->update($request->only(['name', 'is_active']));
+        // Check if code is being changed and if it already exists
+        if ($request->has('code') && $request->code !== $account->code) {
+            $exists = ChartOfAccount::where('company_id', $user->company_id)
+                ->where('code', $request->code)
+                ->where('id', '!=', $id)
+                ->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kode akun sudah digunakan.',
+                ], 422);
+            }
+        }
+
+        // Update the account with validated data
+        $account->update($validated);
 
         return response()->json([
             'success' => true,

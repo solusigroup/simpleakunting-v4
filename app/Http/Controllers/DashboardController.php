@@ -20,9 +20,10 @@ class DashboardController extends Controller
             return view('setup.wizard');
         }
 
-        // Get date range (current month by default)
-        $startDate = now()->startOfMonth()->format('Y-m-d');
-        $endDate = now()->format('Y-m-d');
+        // Get date range from query params or default to current month
+        $startDate = $request->query('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->query('end_date', now()->format('Y-m-d'));
+
 
         // Calculate metrics
         $totalRevenue = $this->getTotalRevenue($company->id, $startDate, $endDate);

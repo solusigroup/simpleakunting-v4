@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Journal;
 use App\Models\JournalItem;
+use App\Traits\ValidatesCashBalance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CashController extends Controller
 {
+    use ValidatesCashBalance;
     /**
      * POST /cash/spend
      * Uang Keluar (Expense) - Pengeluaran langsung dari Kas/Bank.
@@ -41,6 +43,35 @@ class CashController extends Controller
             'items.*.amount' => ['required', 'numeric', 'min:0.01'],
             'items.*.memo' => ['nullable', 'string'],
         ]);
+
+        // =============================================
+        // CASH BALANCE VALIDATION
+        // =============================================
+        $totalAmount = collect($request->items)->sum('amount');
+        
+        // Build simulated journal lines for validation
+        $simulatedLines = [
+            ['account_id' => $request->from_account_id, 'debit' => 0, 'credit' => $totalAmount],
+        ];
+        
+        $cashValidation = $this->validateCashBalance($company, $simulatedLines);
+        
+        if (!$cashValidation['valid']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Transaksi ditolak: Saldo kas tidak mencukupi',
+                'errors' => [
+                    'current_cash_balance' => $cashValidation['current_balance'],
+                    'transaction_amount' => $totalAmount,
+                    'new_balance' => $cashValidation['new_balance'],
+                ],
+                'user_message' => sprintf(
+                    "Saldo kas saat ini: Rp %s. Pengeluaran ini memerlukan: Rp %s.",
+                    number_format($cashValidation['current_balance'], 0, ',', '.'),
+                    number_format($totalAmount, 0, ',', '.')
+                ),
+            ], 422);
+        }
 
         $journal = DB::transaction(function () use ($request, $company) {
             $totalAmount = collect($request->items)->sum('amount');

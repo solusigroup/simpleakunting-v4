@@ -3,7 +3,11 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountImportController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ContactImportController;
+use App\Http\Controllers\InventoryImportController;
+use App\Http\Controllers\FixedAssetImportController;
 use App\Http\Controllers\BusinessUnitController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\PurchaseController;
@@ -11,6 +15,8 @@ use App\Http\Controllers\CashController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\FixedAssetController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -42,12 +48,27 @@ Route::middleware('auth')->group(function () {
     // Chart of Accounts
     Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
     Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
+    
+    // Chart of Accounts Import (must be before {id} routes)
+    Route::get('/accounts/import', [AccountImportController::class, 'showForm'])->name('accounts.import.form');
+    Route::get('/accounts/import/template', [AccountImportController::class, 'downloadTemplate'])->name('accounts.import.template');
+    Route::post('/accounts/import', [AccountImportController::class, 'import'])->name('accounts.import');
+    
+    // Chart of Accounts - parameterized routes (must be after specific routes)
     Route::put('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.update');
     Route::get('/accounts/{id}', [AccountController::class, 'show'])->name('accounts.show');
     
     // Contacts (Customers/Suppliers)
     Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
     Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
+    
+    // Contacts Import (before {id} routes)
+    Route::get('/contacts/import', [ContactImportController::class, 'showForm'])->name('contacts.import.form');
+    Route::get('/contacts/import/template', [ContactImportController::class, 'downloadTemplate'])->name('contacts.import.template');
+    Route::post('/contacts/import', [ContactImportController::class, 'import'])->name('contacts.import');
+    Route::get('/contacts/export', [ContactImportController::class, 'export'])->name('contacts.export');
+    
+    // Contacts parameterized routes
     Route::put('/contacts/{id}', [ContactController::class, 'update'])->name('contacts.update');
     Route::get('/contacts/{id}', [ContactController::class, 'show'])->name('contacts.show');
     
@@ -55,6 +76,34 @@ Route::middleware('auth')->group(function () {
     Route::get('/units', [BusinessUnitController::class, 'index'])->name('units.index');
     Route::post('/units', [BusinessUnitController::class, 'store'])->name('units.store');
     Route::put('/units/{id}', [BusinessUnitController::class, 'update'])->name('units.update');
+    
+    // Inventory (Persediaan)
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
+    
+    // Inventory Import (before {id} routes)
+    Route::get('/inventory/import', [InventoryImportController::class, 'showForm'])->name('inventory.import.form');
+    Route::get('/inventory/import/template', [InventoryImportController::class, 'downloadTemplate'])->name('inventory.import.template');
+    Route::post('/inventory/import', [InventoryImportController::class, 'import'])->name('inventory.import');
+    Route::get('/inventory/export', [InventoryImportController::class, 'export'])->name('inventory.export');
+    
+    // Inventory parameterized routes
+    Route::get('/inventory/{id}', [InventoryController::class, 'show'])->name('inventory.show');
+    Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inventory.update');
+    
+    // Fixed Assets (Aset Tetap)
+    Route::get('/assets', [FixedAssetController::class, 'index'])->name('assets.index');
+    Route::post('/assets', [FixedAssetController::class, 'store'])->name('assets.store');
+    
+    // Fixed Assets Import (before {id} routes)
+    Route::get('/assets/import', [FixedAssetImportController::class, 'showForm'])->name('assets.import.form');
+    Route::get('/assets/import/template', [FixedAssetImportController::class, 'downloadTemplate'])->name('assets.import.template');
+    Route::post('/assets/import', [FixedAssetImportController::class, 'import'])->name('assets.import');
+    Route::get('/assets/export', [FixedAssetImportController::class, 'export'])->name('assets.export');
+    
+    // Fixed Assets parameterized routes
+    Route::get('/assets/{id}', [FixedAssetController::class, 'show'])->name('assets.show');
+    Route::put('/assets/{id}', [FixedAssetController::class, 'update'])->name('assets.update');
     
     // ==========================================
     // TRANSACTIONS
@@ -76,14 +125,42 @@ Route::middleware('auth')->group(function () {
     Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
     Route::get('/purchases/{id}', [PurchaseController::class, 'show'])->name('purchases.show');
     
-    // Cash & Bank
-    Route::post('/cash/spend', [CashController::class, 'spend'])->name('cash.spend');
-    Route::post('/cash/receive', [CashController::class, 'receive'])->name('cash.receive');
+    // ==========================================
+    // CASH TRANSACTIONS
+    // ==========================================
+    
+    // Cash Receipt (Penerimaan Kas)
+    Route::get('/cash/receive', function () {
+        return view('cash.receive');
+    })->name('cash.receive');
+    Route::post('/cash/receive', [CashController::class, 'receive'])->name('cash.receive.store');
+    
+    // Cash Disbursement (Pengeluaran Kas)
+    Route::get('/cash/spend', function () {
+        return view('cash.spend');  
+    })->name('cash.spend');
+    Route::post('/cash/spend', [CashController::class, 'spend'])->name('cash.spend.store');
     
     // Journal (Manual Entry)
     Route::get('/journals', [JournalController::class, 'index'])->name('journals.index');
     Route::post('/journals/manual', [JournalController::class, 'storeManual'])->name('journals.manual');
     Route::get('/journals/{id}', [JournalController::class, 'show'])->name('journals.show');
+    
+    // Closing & Adjustment
+    Route::get('/journals/closing', function () {
+        return view('journals.closing');
+    })->name('journals.closing');
+    Route::get('/journals/adjustment', function () {
+        $accounts = \App\Models\ChartOfAccount::where('company_id', auth()->user()->company_id)
+            ->where('is_parent', false)
+            ->orderBy('code')
+            ->get();
+        $businessUnits = \App\Models\BusinessUnit::where('company_id', auth()->user()->company_id)
+            ->where('is_active', true)
+            ->orderBy('code')
+            ->get();
+        return view('journals.adjustment', compact('accounts', 'businessUnits'));
+    })->name('journals.adjustment');
     
     // ==========================================
     // REPORTS
@@ -93,9 +170,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])->name('balance-sheet');
         Route::get('/profit-loss', [ReportController::class, 'profitLoss'])->name('profit-loss');
         Route::get('/trial-balance', [ReportController::class, 'trialBalance'])->name('trial-balance');
-        Route::get('/ledger/{account_id}', [ReportController::class, 'ledger'])->name('ledger');
+        Route::get('/ledger/{account_id?}', [ReportController::class, 'ledger'])->name('ledger');
+        Route::get('/cash-flow', [ReportController::class, 'cashFlow'])->name('cash-flow');
+        Route::get('/financial-analysis', [ReportController::class, 'financialAnalysis'])->name('financial-analysis');
     });
 });
+
 
 require __DIR__.'/auth.php';
 

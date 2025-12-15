@@ -316,9 +316,12 @@
 
         // Set default dates
         const today = new Date();
-        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-        document.getElementById('dateStart').value = firstDay.toISOString().split('T')[0];
-        document.getElementById('dateEnd').value = today.toISOString().split('T')[0];
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+        const day = String(today.getDate()).padStart(2, '0');
+        
+        document.getElementById('dateStart').value = `${year}-${month}-01`; // First day of current month
+        document.getElementById('dateEnd').value = `${year}-${month}-${day}`; // Today
 
         document.getElementById('sourceFilter').addEventListener('change', loadJournals);
         document.getElementById('dateStart').addEventListener('change', loadJournals);

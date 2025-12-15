@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Journal;
 use App\Models\JournalItem;
+use App\Traits\ValidatesCashBalance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class JournalController extends Controller
 {
+    use ValidatesCashBalance;
     /**
      * GET /journals
      * List Jurnal Umum.
@@ -112,6 +114,30 @@ class JournalController extends Controller
                     'message' => "Baris ke-" . ($index + 1) . " harus memiliki nilai Debit atau Kredit.",
                 ], 422);
             }
+        }
+
+        // =============================================
+        // CASH BALANCE VALIDATION
+        // Ensure cash account (1.1.1) never goes negative
+        // =============================================
+        $cashValidation = $this->validateCashBalance($company, $request->lines);
+        
+        if (!$cashValidation['valid']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Transaksi ditolak: Saldo kas tidak mencukupi',
+                'errors' => [
+                    'current_cash_balance' => $cashValidation['current_balance'],
+                    'transaction_impact' => $cashValidation['impact'],
+                    'new_balance' => $cashValidation['new_balance'],
+                    'required_amount' => $cashValidation['required_amount'],
+                ],
+                'user_message' => sprintf(
+                    "Saldo kas saat ini: Rp %s. Transaksi ini memerlukan: Rp %s.",
+                    number_format($cashValidation['current_balance'], 0, ',', '.'),
+                    number_format($cashValidation['required_amount'], 0, ',', '.')
+                ),
+            ], 422);
         }
 
         $journal = DB::transaction(function () use ($request, $company) {

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('fixed_assets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->foreignId('coa_id')->constrained('chart_of_accounts')->onDelete('restrict');
-            $table->foreignId('accum_coa_id')->constrained('chart_of_accounts')->onDelete('restrict');
+            $table->foreignId('coa_id')->nullable()->constrained('chart_of_accounts')->onDelete('restrict');
+            $table->foreignId('accum_coa_id')->nullable()->constrained('chart_of_accounts')->onDelete('restrict');
             $table->string('code', 20);
             $table->string('name');
             $table->date('acquisition_date');

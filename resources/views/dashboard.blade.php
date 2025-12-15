@@ -6,14 +6,38 @@
                 <p class="text-text-muted text-sm mt-1">{{ $company->name }} • Periode {{ \Carbon\Carbon::parse($startDate)->format('d M') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</p>
             </div>
             <div class="flex items-center gap-3">
-                <x-btn type="secondary">
+                <!-- Date Filter Button -->
+                <x-btn type="secondary" onclick="document.getElementById('dateFilterModal').classList.remove('hidden')">
                     <span class="material-symbols-outlined text-xl">calendar_today</span>
                     Filter Tanggal
                 </x-btn>
-                <x-btn type="primary">
-                    <span class="material-symbols-outlined text-xl">add</span>
-                    Transaksi Baru
-                </x-btn>
+                
+                <!-- Transaction Dropdown -->
+                <div class="relative" x-data="{ open: false }">
+                    <x-btn type="primary" @click="open = !open">
+                        <span class="material-symbols-outlined text-xl">add</span>
+                        Transaksi Baru
+                        <span class="material-symbols-outlined text-sm ml-1">expand_more</span>
+                    </x-btn>
+                    <div x-show="open" @click.away="open = false" 
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         class="absolute right-0 mt-2 w-48 bg-surface-dark border border-border-dark rounded-xl shadow-xl z-50 overflow-hidden">
+                        <a href="{{ route('sales.create') }}" class="flex items-center gap-3 px-4 py-3 text-white hover:bg-surface-highlight transition">
+                            <span class="material-symbols-outlined text-primary">receipt_long</span>
+                            Penjualan Baru
+                        </a>
+                        <a href="{{ route('purchases.create') }}" class="flex items-center gap-3 px-4 py-3 text-white hover:bg-surface-highlight transition">
+                            <span class="material-symbols-outlined text-blue-400">shopping_cart</span>
+                            Pembelian Baru
+                        </a>
+                        <a href="{{ route('journals.index') }}" class="flex items-center gap-3 px-4 py-3 text-white hover:bg-surface-highlight transition">
+                            <span class="material-symbols-outlined text-orange-400">edit_note</span>
+                            Jurnal Manual
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </x-slot>
@@ -121,6 +145,49 @@
                     <p>Belum ada pembelian</p>
                 </div>
                 @endforelse
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Filter Modal -->
+    <div id="dateFilterModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="bg-surface-dark border border-border-dark rounded-2xl p-6 w-full max-w-md mx-4">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-white">Filter Tanggal</h3>
+                <button onclick="document.getElementById('dateFilterModal').classList.add('hidden')" class="text-text-muted hover:text-white">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form action="{{ route('dashboard') }}" method="GET">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-text-muted mb-2">Tanggal Mulai</label>
+                        <input type="date" name="start_date" value="{{ $startDate }}" 
+                               class="w-full bg-surface-highlight border border-border-dark rounded-xl px-4 py-3 text-white focus:border-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-text-muted mb-2">Tanggal Akhir</label>
+                        <input type="date" name="end_date" value="{{ $endDate }}" 
+                               class="w-full bg-surface-highlight border border-border-dark rounded-xl px-4 py-3 text-white focus:border-primary focus:outline-none">
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="document.getElementById('dateFilterModal').classList.add('hidden')" 
+                            class="flex-1 px-4 py-3 border border-border-dark rounded-xl text-white hover:bg-surface-highlight transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-primary hover:bg-primary-dark text-white rounded-xl transition">
+                        Terapkan Filter
+                    </button>
+                </div>
+            </form>
+            <div class="mt-4 flex gap-2">
+                <a href="{{ route('dashboard', ['start_date' => now()->startOfMonth()->format('Y-m-d'), 'end_date' => now()->format('Y-m-d')]) }}" 
+                   class="text-xs text-primary hover:underline">Bulan Ini</a>
+                <a href="{{ route('dashboard', ['start_date' => now()->subMonth()->startOfMonth()->format('Y-m-d'), 'end_date' => now()->subMonth()->endOfMonth()->format('Y-m-d')]) }}" 
+                   class="text-xs text-primary hover:underline">Bulan Lalu</a>
+                <a href="{{ route('dashboard', ['start_date' => now()->startOfYear()->format('Y-m-d'), 'end_date' => now()->format('Y-m-d')]) }}" 
+                   class="text-xs text-primary hover:underline">Tahun Ini</a>
             </div>
         </div>
     </div>

@@ -2,27 +2,27 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <a href="{{ route('sales.index') }}" class="w-10 h-10 rounded-xl bg-surface-dark border border-border-dark flex items-center justify-center text-text-muted hover:text-white hover:border-primary transition">
+                <a href="{{ route('dashboard') }}" class="w-10 h-10 rounded-xl bg-surface-dark border border-border-dark flex items-center justify-center text-text-muted hover:text-white hover:border-primary transition">
                     <span class="material-symbols-outlined">arrow_back</span>
                 </a>
                 <div>
-                    <h2 class="text-2xl font-bold text-white font-display">Invoice Penjualan Baru</h2>
-                    <p class="text-text-muted text-sm mt-1">Buat invoice untuk pelanggan</p>
+                    <h2 class="text-2xl font-bold text-white font-display">Penerimaan Kas</h2>
+                    <p class="text-text-muted text-sm mt-1">Catat penerimaan uang masuk ke kas/bank</p>
                 </div>
             </div>
         </div>
     </x-slot>
 
-    <form id="salesForm" class="space-y-6">
-        <!-- Customer & Date -->
+    <form id="receiveForm" class="space-y-6">
+        <!-- Header Info -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 p-6 rounded-2xl border border-border-dark bg-surface-dark/30">
-                <h3 class="font-bold text-white mb-4">Informasi Invoice</h3>
+                <h3 class="font-bold text-white mb-4">Informasi Penerimaan</h3>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-text-muted mb-2">Pelanggan *</label>
-                        <select id="contact_id" required class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
-                            <option value="">Pilih Pelanggan...</option>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Akun Kas/Bank Tujuan *</label>
+                        <select id="to_account_id" required class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="">Pilih Akun Kas/Bank...</option>
                         </select>
                     </div>
                     <div>
@@ -32,23 +32,13 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-text-muted mb-2">Akun Piutang/Kas *</label>
-                        <select id="receivable_account_id" required class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
-                            <option value="">Pilih Akun...</option>
-                        </select>
-                    </div>
-                    <div>
                         <label class="block text-sm font-medium text-text-muted mb-2">Tanggal *</label>
                         <input type="date" id="date" required class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-text-muted mb-2">Jatuh Tempo *</label>
-                        <input type="date" id="due_date" required class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
-                    </div>
                 </div>
                 <div class="mt-4">
-                    <label class="block text-sm font-medium text-text-muted mb-2">Catatan</label>
-                    <textarea id="notes" rows="2" placeholder="Catatan tambahan..." class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white placeholder-text-muted focus:border-primary focus:ring-primary resize-none"></textarea>
+                    <label class="block text-sm font-medium text-text-muted mb-2">Keterangan</label>
+                    <textarea id="description" rows="2" placeholder="Keterangan penerimaan..." class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white placeholder-text-muted focus:border-primary focus:ring-primary resize-none"></textarea>
                 </div>
             </div>
 
@@ -57,20 +47,7 @@
                 <h3 class="font-bold text-primary mb-4">Ringkasan</h3>
                 <div class="space-y-3">
                     <div class="flex justify-between">
-                        <span class="text-text-muted">Subtotal</span>
-                        <span class="text-white font-mono" id="subtotal">Rp 0</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-text-muted">Pajak</span>
-                        <span class="text-white font-mono">Rp 0</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-text-muted">Diskon</span>
-                        <span class="text-white font-mono">Rp 0</span>
-                    </div>
-                    <hr class="border-border-dark">
-                    <div class="flex justify-between">
-                        <span class="text-primary font-bold">Total</span>
+                        <span class="text-text-muted">Total Penerimaan</span>
                         <span class="text-primary font-bold font-mono text-xl" id="total">Rp 0</span>
                     </div>
                 </div>
@@ -80,7 +57,7 @@
         <!-- Line Items -->
         <div class="p-6 rounded-2xl border border-border-dark bg-surface-dark/30">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-white">Item Penjualan</h3>
+                <h3 class="font-bold text-white">Detail Penerimaan</h3>
                 <button type="button" onclick="addItem()" class="px-4 py-2 rounded-full bg-primary text-background-dark font-bold hover:bg-[#2ec56a] transition text-sm">
                     <span class="material-symbols-outlined align-middle mr-1 text-xl">add</span>
                     Tambah Item
@@ -90,10 +67,8 @@
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-border-dark">
-                            <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Akun Pendapatan</th>
-                            <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Deskripsi</th>
-                            <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-24">Qty</th>
-                            <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-32">Harga</th>
+                            <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Akun Sumber (Pendapatan/Piutang)</th>
+                            <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Keterangan</th>
                             <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-36">Jumlah</th>
                             <th class="p-3 w-12"></th>
                         </tr>
@@ -107,34 +82,43 @@
 
         <!-- Actions -->
         <div class="flex justify-end gap-4">
-            <a href="{{ route('sales.index') }}" class="px-6 py-3 rounded-full border border-border-dark text-text-muted hover:bg-surface-highlight hover:text-white transition">
+            <a href="{{ route('dashboard') }}" class="px-6 py-3 rounded-full border border-border-dark text-text-muted hover:bg-surface-highlight hover:text-white transition">
                 Batal
             </a>
             <button type="submit" id="submitBtn" class="px-8 py-3 rounded-full bg-primary text-background-dark font-bold hover:bg-[#2ec56a] transition">
                 <span class="material-symbols-outlined align-middle mr-1">save</span>
-                Simpan Invoice
+                Simpan Penerimaan
             </button>
         </div>
     </form>
 
     @push('scripts')
     <script>
-        let customers = [];
-        let accounts = [];
+        let cashAccounts = [];
         let revenueAccounts = [];
         let businessUnits = [];
         let itemCount = 0;
 
         async function loadData() {
-            // Load customers
-            const customersRes = await fetch('/contacts?type=CUSTOMER', { headers: { 'Accept': 'application/json' } });
-            const customersData = await customersRes.json();
-            customers = customersData.data || [];
+            // Load accounts
+            const accountsRes = await fetch('/accounts?detail_only=1', { headers: { 'Accept': 'application/json' } });
+            const accountsData = await accountsRes.json();
+            const accounts = accountsData.data || [];
             
-            const customerSelect = document.getElementById('contact_id');
-            customers.forEach(c => {
-                customerSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+            // Cash/Bank accounts for TO account
+            const toSelect = document.getElementById('to_account_id');
+            cashAccounts = accounts.filter(a => a.type === 'Asset' && (
+                a.code.startsWith('1.1.1') || 
+                a.code.startsWith('1100') ||
+                a.name.toLowerCase().includes('kas') ||
+                a.name.toLowerCase().includes('bank')
+            ));
+            cashAccounts.forEach(a => {
+                toSelect.innerHTML += `<option value="${a.id}">${a.code} - ${a.name}</option>`;
             });
+            
+            // Revenue and Receivable accounts for FROM accounts
+            revenueAccounts = accounts.filter(a => a.type === 'Revenue' || (a.type === 'Asset' && a.name.toLowerCase().includes('piutang')));
 
             // Load business units
             try {
@@ -150,20 +134,6 @@
             } catch (error) {
                 console.log('Business units not available:', error);
             }
-
-            // Load accounts
-            const accountsRes = await fetch('/accounts?detail_only=1', { headers: { 'Accept': 'application/json' } });
-            const accountsData = await accountsRes.json();
-            accounts = accountsData.data || [];
-            
-            // Asset accounts for receivable
-            const receivableSelect = document.getElementById('receivable_account_id');
-            accounts.filter(a => a.type === 'Asset').forEach(a => {
-                receivableSelect.innerHTML += `<option value="${a.id}">${a.code} - ${a.name}</option>`;
-            });
-            
-            // Revenue accounts for items
-            revenueAccounts = accounts.filter(a => a.type === 'Revenue');
         }
 
         function addItem() {
@@ -174,26 +144,20 @@
             tr.className = 'border-b border-border-dark/50';
             tr.innerHTML = `
                 <td class="p-2">
-                    <select name="account_${itemCount}" required class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm focus:border-primary">
+                    <select name="from_account_${itemCount}" required class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm focus:border-primary">
                         <option value="">Pilih...</option>
                         ${revenueAccounts.map(a => `<option value="${a.id}">${a.code} - ${a.name}</option>`).join('')}
                     </select>
                 </td>
                 <td class="p-2">
-                    <input type="text" name="desc_${itemCount}" required placeholder="Deskripsi item" 
+                    <input type="text" name="memo_${itemCount}" placeholder="Keterangan item" 
                            class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm placeholder-text-muted focus:border-primary">
                 </td>
                 <td class="p-2">
-                    <input type="number" name="qty_${itemCount}" value="1" min="0.01" step="0.01" required
-                           onchange="calculateTotals()"
-                           class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm text-right focus:border-primary">
-                </td>
-                <td class="p-2">
                     <input type="number" name="amount_${itemCount}" value="0" min="0" step="1" required
-                           onchange="calculateTotals()"
+                           onchange="calculateTotal()"
                            class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm text-right focus:border-primary">
                 </td>
-                <td class="p-2 text-right font-mono text-white" id="total_${itemCount}">Rp 0</td>
                 <td class="p-2">
                     <button type="button" onclick="removeItem(${itemCount})" class="text-text-muted hover:text-accent-red">
                         <span class="material-symbols-outlined">delete</span>
@@ -205,25 +169,19 @@
 
         function removeItem(id) {
             document.getElementById(`item-${id}`)?.remove();
-            calculateTotals();
+            calculateTotal();
         }
 
-        function calculateTotals() {
-            let subtotal = 0;
-            document.querySelectorAll('[name^="qty_"]').forEach(qtyInput => {
-                const id = qtyInput.name.replace('qty_', '');
-                const qty = parseFloat(qtyInput.value) || 0;
-                const amount = parseFloat(document.querySelector(`[name="amount_${id}"]`)?.value) || 0;
-                const total = qty * amount;
-                subtotal += total;
-                document.getElementById(`total_${id}`).textContent = 'Rp ' + total.toLocaleString('id-ID');
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll('[name^="amount_"]').forEach(input => {
+                total += parseFloat(input.value) || 0;
             });
             
-            document.getElementById('subtotal').textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
-            document.getElementById('total').textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
+            document.getElementById('total').textContent = 'Rp ' + total.toLocaleString('id-ID');
         }
 
-        document.getElementById('salesForm').addEventListener('submit', async function(e) {
+        document.getElementById('receiveForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const btn = document.getElementById('submitBtn');
@@ -231,31 +189,35 @@
             btn.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-1">progress_activity</span> Menyimpan...';
 
             const items = [];
-            document.querySelectorAll('[name^="account_"]').forEach(sel => {
-                const id = sel.name.replace('account_', '');
+            document.querySelectorAll('[name^="from_account_"]').forEach(sel => {
+                const id = sel.name.replace('from_account_', '');
                 if (sel.value) {
                     items.push({
-                        account_id: parseInt(sel.value),
-                        description: document.querySelector(`[name="desc_${id}"]`)?.value || '',
-                        qty: parseFloat(document.querySelector(`[name="qty_${id}"]`)?.value) || 0,
+                        from_account_id: parseInt(sel.value),
                         amount: parseFloat(document.querySelector(`[name="amount_${id}"]`)?.value) || 0,
+                        memo: document.querySelector(`[name="memo_${id}"]`)?.value || null,
                     });
                 }
             });
 
+            if (items.length === 0) {
+                alert('Tambahkan minimal 1 item penerimaan');
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined align-middle mr-1">save</span> Simpan Penerimaan';
+                return;
+            }
+
             const unitId = document.getElementById('unit_id').value;
             const data = {
-                contact_id: parseInt(document.getElementById('contact_id').value),
+                to_account_id: parseInt(document.getElementById('to_account_id').value),
                 date: document.getElementById('date').value,
-                due_date: document.getElementById('due_date').value,
+                description: document.getElementById('description').value,
                 unit_id: unitId ? parseInt(unitId) : null,
-                receivable_account_id: parseInt(document.getElementById('receivable_account_id').value),
-                notes: document.getElementById('notes').value,
                 items
             };
 
             try {
-                const response = await fetch('/sales', {
+                const response = await fetch('/cash/receive', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -267,7 +229,8 @@
 
                 const result = await response.json();
                 if (result.success) {
-                    window.location.href = '/sales';
+                    alert('Penerimaan kas berhasil dicatat!');
+                    window.location.href = '/dashboard';
                 } else {
                     alert(result.message || 'Terjadi kesalahan');
                 }
@@ -276,15 +239,12 @@
                 alert('Terjadi kesalahan saat menyimpan');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-outlined align-middle mr-1">save</span> Simpan Invoice';
+                btn.innerHTML = '<span class="material-symbols-outlined align-middle mr-1">save</span> Simpan Penerimaan';
             }
         });
 
         // Init
         document.getElementById('date').value = new Date().toISOString().split('T')[0];
-        const nextMonth = new Date();
-        nextMonth.setMonth(nextMonth.getMonth() + 1);
-        document.getElementById('due_date').value = nextMonth.toISOString().split('T')[0];
         
         loadData().then(() => {
             addItem();

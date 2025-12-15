@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('inventories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->foreignId('coa_id')->constrained('chart_of_accounts')->onDelete('restrict');
+            $table->foreignId('coa_id')->nullable()->constrained('chart_of_accounts')->onDelete('restrict');
             $table->string('code', 20);
             $table->string('name');
             $table->string('unit'); // pcs, kg, liter

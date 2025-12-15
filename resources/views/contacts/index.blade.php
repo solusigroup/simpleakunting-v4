@@ -5,10 +5,20 @@
                 <h2 class="text-2xl font-bold text-white font-display">Pelanggan & Supplier</h2>
                 <p class="text-text-muted text-sm mt-1">Kelola data pelanggan dan supplier</p>
             </div>
-            <x-btn type="primary" onclick="openCreateModal()">
-                <span class="material-symbols-outlined text-xl">add</span>
-                Tambah Kontak
-            </x-btn>
+            <div class="flex gap-2">
+                <x-btn type="secondary" onclick="window.location.href='/contacts/export'">
+                    <span class="material-symbols-outlined text-xl">download</span>
+                    Export Excel
+                </x-btn>
+                <x-btn type="secondary" onclick="window.location.href='/contacts/import'">
+                    <span class="material-symbols-outlined text-xl">upload_file</span>
+                    Import Excel
+                </x-btn>
+                <x-btn type="primary" onclick="openCreateModal()">
+                    <span class="material-symbols-outlined text-xl">add</span>
+                    Tambah Kontak
+                </x-btn>
+            </div>
         </div>
     </x-slot>
 

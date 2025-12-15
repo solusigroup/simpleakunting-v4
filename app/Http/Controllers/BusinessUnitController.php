@@ -12,32 +12,43 @@ class BusinessUnitController extends Controller
      * GET /units
      * List Business Units (BUMDesa only).
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
         $user = $request->user();
         $company = $user->company;
 
         if (!$company) {
-            return response()->json(['success' => false, 'message' => 'Company not found'], 400);
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Company not found'], 400);
+            }
+            return redirect()->route('setup.wizard');
         }
 
-        // Only BUMDesa has business units
-        if (!$company->isBumdesa()) {
+        $isBumdesa = $company->isBumdesa();
+        
+        $units = collect();
+        if ($isBumdesa) {
+            $units = BusinessUnit::where('company_id', $company->id)
+                ->orderBy('code')
+                ->get();
+        }
+
+        // Return JSON for API requests
+        if ($request->wantsJson()) {
+            if (!$isBumdesa) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unit Usaha hanya tersedia untuk BUMDesa.',
+                ], 400);
+            }
             return response()->json([
-                'success' => false,
-                'message' => 'Unit Usaha hanya tersedia untuk BUMDesa.',
-            ], 400);
+                'success' => true,
+                'data' => $units,
+            ]);
         }
 
-        $units = BusinessUnit::where('company_id', $company->id)
-            ->when($request->boolean('active_only', true), fn($q) => $q->where('is_active', true))
-            ->orderBy('code')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $units,
-        ]);
+        // Return view for browser requests
+        return view('units.index', compact('units', 'isBumdesa', 'company'));
     }
 
     /**
