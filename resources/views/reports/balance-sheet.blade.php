@@ -478,7 +478,7 @@
         // Init
         initializeDates();
         loadUnits();
-        loadReport();
+        // Server renders initial data, loadReport() only for user-triggered refresh
     </script>
     @endpush
 </x-app-layout>
