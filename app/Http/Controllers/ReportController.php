@@ -1169,6 +1169,31 @@ class ReportController extends Controller
     }
 
     /**
+     * Get account balance for a specific period (between start and end date)
+     */
+    private function getAccountBalanceForPeriod($account, $startDate, $endDate)
+    {
+        $query = JournalItem::where('coa_id', $account->id)
+            ->whereHas('journal', function($q) use ($startDate, $endDate) {
+                $q->where('is_posted', true)
+                  ->whereBetween('date', [$startDate, $endDate]);
+            });
+
+        $totalDebit = (clone $query)->sum('debit');
+        $totalCredit = (clone $query)->sum('credit');
+
+        // For revenue accounts (4.x.x), balance is credit - debit
+        // For expense accounts (5.x.x, 6.x.x), balance is debit - credit
+        $accountType = substr($account->code, 0, 1);
+        
+        if (in_array($accountType, ['4'])) { // Revenue
+            return $totalCredit - $totalDebit;
+        } else { // Expense
+            return $totalDebit - $totalCredit;
+        }
+    }
+
+    /**
      * Calculate net income for period
      */
     private function calculateNetIncome($company, $startDate, $endDate)
