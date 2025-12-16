@@ -62,10 +62,10 @@ class ContactController extends Controller
     {
         $user = $request->user();
         
-        if (!$user->canManageMasterData()) {
+        if (!$user->canEdit()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Anda tidak memiliki izin untuk menambah kontak.',
+                'message' => 'Anda tidak memiliki izin untuk menambah data.',
             ], 403);
         }
 
@@ -122,10 +122,10 @@ class ContactController extends Controller
     {
         $user = $request->user();
         
-        if (!$user->canManageMasterData()) {
+        if (!$user->canEdit()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Anda tidak memiliki izin untuk mengedit kontak.',
+                'message' => 'Anda tidak memiliki izin untuk mengedit data.',
             ], 403);
         }
 
