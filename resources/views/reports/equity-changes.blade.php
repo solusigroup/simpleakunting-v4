@@ -118,6 +118,10 @@
 
     @push('scripts')
     <script>
+        // Server-side data initialization
+        const initialData = @json($data);
+        const initialPeriod = @json($period);
+
         function formatCurrency(value) {
             const absValue = Math.abs(value);
             const formatted = 'Rp ' + absValue.toLocaleString('id-ID');
@@ -130,25 +134,32 @@
 
             try {
                 const response = await fetch(`/reports/equity-changes?start_date=${startDate}&end_date=${endDate}`, {
-                    headers: { 'Accept': 'application/json' }
+                    headers: { 
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
                 const result = await response.json();
 
                 if (result.success) {
                     const data = result.data;
-                    
-                    // Update summary cards
-                    document.getElementById('beginningEquity').textContent = formatCurrency(data.beginning_equity);
-                    document.getElementById('additions').textContent = formatCurrency(data.additions);
-                    document.getElementById('deductions').textContent = formatCurrency(data.deductions);
-                    document.getElementById('endingEquity').textContent = formatCurrency(data.ending_equity);
-                    
-                    // Update table
-                    renderTable(data);
+                    updateUI(data);
                 }
             } catch (error) {
                 console.error('Error loading report:', error);
+                alert('Gagal memuat data. Silakan refresh halaman.');
             }
+        }
+
+        function updateUI(data) {
+            // Update summary cards
+            document.getElementById('beginningEquity').textContent = formatCurrency(data.beginning_equity);
+            document.getElementById('additions').textContent = formatCurrency(data.additions);
+            document.getElementById('deductions').textContent = formatCurrency(data.deductions);
+            document.getElementById('endingEquity').textContent = formatCurrency(data.ending_equity);
+            
+            // Update table
+            renderTable(data);
         }
 
         function renderTable(data) {
@@ -207,15 +218,17 @@
         }
 
         function initializeDates() {
-            const today = new Date();
-            const firstDay = new Date(today.getFullYear(), 0, 1); // Start of year
-
-            document.getElementById('startDate').value = firstDay.toISOString().split('T')[0];
-            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            // Use server-provided dates
+            document.getElementById('startDate').value = initialPeriod.start_date;
+            document.getElementById('endDate').value = initialPeriod.end_date;
         }
 
-        initializeDates();
-        loadReport();
+        // Initialize with server data
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDates();
+            updateUI(initialData);
+        });
     </script>
     @endpush
 </x-app-layout>
+
