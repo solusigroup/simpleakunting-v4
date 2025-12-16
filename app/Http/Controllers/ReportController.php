@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ChartOfAccount;
 use App\Models\JournalItem;
+use App\Helpers\ReportHelper;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -577,5 +579,477 @@ class ReportController extends Controller
 
         return view('reports.financial-analysis', $data);
     }
+
+    /**
+     * GET /reports/balance-sheet/export-pdf
+     * Export Balance Sheet to PDF
+     */
+    public function exportBalanceSheetPDF(Request $request)
+    {
+        $validated = $request->validate([
+            'end_date' => 'required|date',
+            'unit_id' => 'nullable|exists:business_units,id'
+        ]);
+
+        $user = $request->user();
+        $company = $user->company;
+
+        // Get report data (reuse existing logic)
+        $endDate = $validated['end_date'];
+        $unitId = $validated['unit_id'] ?? null;
+
+        $accounts = ChartOfAccount::where('company_id', $company->id)
+            ->where('report_type', 'NERACA')
+            ->where('is_parent', false)
+            ->orderBy('code')
+            ->get();
+
+        $report = [
+            'Aset' => [],
+            'Kewajiban' => [],
+            'Ekuitas' => [],
+        ];
+
+        $totals = [
+            'Aset' => 0,
+            'Kewajiban' => 0,
+            'Ekuitas' => 0,
+        ];
+
+        foreach ($accounts as $account) {
+            $balance = $this->getAccountBalance($account, null, $endDate, $unitId);
+            
+            $category = match($account->type) {
+                'Asset' => 'Aset',
+                'Liability' => 'Kewajiban',
+                'Equity' => 'Ekuitas',
+                default => null,
+            };
+
+            if ($category) {
+                $report[$category][] = [
+                    'account_code' => $account->code,
+                    'account_name' => $account->name,
+                    'balance' => $balance,
+                ];
+                $totals[$category] += $balance;
+            }
+        }
+
+        $data = [
+            'sections' => $report,
+            'totals' => $totals,
+            'is_balanced' => abs($totals['Aset'] - ($totals['Kewajiban'] + $totals['Ekuitas'])) < 0.01,
+        ];
+
+        // Prepare view data
+        $viewData = [
+            'company' => $company,
+            'endDate' => $endDate,
+            'data' => $data,
+            'timestamp' => now()->format('d M Y H:i'),
+            'city' => ReportHelper::extractCity($company->address ?? ''),
+            'date' => now()->format('Y-m-d')
+        ];
+
+        // Generate PDF
+        $pdf = Pdf::loadView('reports.pdf.balance-sheet', $viewData);
+        $pdf->setPaper('A4', 'portrait');
+
+        // Download with proper filename
+        $filename = sprintf('Neraca_%s_%s.pdf', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($endDate))
+        );
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * POST /reports/balance-sheet/comparative
+     * Get comparative balance sheet data (JSON API)
+     */
+    public function balanceSheetComparative(Request $request)
+    {
+        $validated = $request->validate([
+            'periods' => 'required|array|min:2|max:4',
+            'periods.*.start_date' => 'nullable|date',
+            'periods.*.end_date' => 'required|date',
+            'periods.*.label' => 'required|string',
+            'unit_id' => 'nullable|exists:business_units,id'
+        ]);
+
+        $user = $request->user();
+        $company = $user->company;
+        $periods = $validated['periods'];
+        $unitId = $validated['unit_id'] ?? null;
+
+        // Build comparative data
+        $comparativeData = $this->buildComparativeData($company, $periods, 'NERACA', $unitId);
+
+        return response()->json([
+            'success' => true,
+            'data' => $comparativeData
+        ]);
+    }
+
+    /**
+     * GET /reports/balance-sheet/comparative/export-pdf
+     * Export Comparative Balance Sheet to PDF
+     */
+    public function exportBalanceSheetComparativePDF(Request $request)
+    {
+        $periodsJson = $request->query('periods');
+        $periods = json_decode($periodsJson, true);
+
+        if (!$periods || !is_array($periods) || count($periods) < 2) {
+            return back()->withErrors(['periods' => 'At least 2 periods required for comparison']);
+        }
+
+        $user = $request->user();
+        $company = $user->company;
+        $unitId = $request->query('unit_id');
+
+        // Build comparative data
+        $comparativeData = $this->buildComparativeData($company, $periods, 'NERACA', $unitId);
+
+        // Prepare view data
+        $viewData = [
+            'company' => $company,
+            'periods' => $periods,
+            'data' => $comparativeData,
+            'timestamp' => now()->format('d M Y H:i'),
+            'city' => ReportHelper::extractCity($company->address ?? ''),
+            'date' => now()->format('Y-m-d')
+        ];
+
+        // Generate PDF
+        $pdf = Pdf::loadView('reports.pdf.balance-sheet-comparative', $viewData);
+        $pdf->setPaper('A4', 'portrait');
+
+        // Download with proper filename
+        $filename = sprintf('Neraca_Komparatif_%s_%s.pdf', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d')
+        );
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Build comparative data for reports
+     */
+    protected function buildComparativeData($company, array $periods, string $reportType, $unitId = null)
+    {
+        $accounts = ChartOfAccount::where('company_id', $company->id)
+            ->where('report_type', $reportType)
+            ->where('is_parent', false)
+            ->orderBy('code')
+            ->get();
+
+        // Determine sections based on report type
+        $sections = match($reportType) {
+            'NERACA' => ['Aset' => 'Asset', 'Kewajiban' => 'Liability', 'Ekuitas' => 'Equity'],
+            'LABARUGI' => ['Pendapatan' => 'Revenue', 'Beban' => 'Expense'],
+            default => []
+        };
+
+        $report = array_fill_keys(array_keys($sections), []);
+        $totals = array_fill_keys(array_keys($sections), array_fill(0, count($periods), 0));
+        
+        $accountsIncreased = 0;
+        $accountsDecreased = 0;
+        $accountsStable = 0;
+
+        foreach ($accounts as $account) {
+            $values = [];
+            
+            // Get balance for each period
+            foreach ($periods as $period) {
+                $startDate = $period['start_date'] ?? null;
+                $endDate = $period['end_date'];
+                $balance = $this->getAccountBalance($account, $startDate, $endDate, $unitId);
+                $values[] = $balance;
+            }
+
+            // Calculate variance (first vs last period)
+            $variance = ReportHelper::calculateVariance($values[0], end($values));
+
+            // Classify trend
+            if ($variance['trend'] === 'increase') $accountsIncreased++;
+            elseif ($variance['trend'] === 'decrease') $accountsDecreased++;
+            else $accountsStable++;
+
+            // Categorize by account type
+            foreach ($sections as $sectionName => $accountType) {
+                if ($account->type === $accountType) {
+                    $report[$sectionName][] = [
+                        'account_code' => $account->code,
+                        'account_name' => $account->name,
+                        'values' => $values,
+                        'variance' => $variance
+                    ];
+
+                    // Add to totals
+                    foreach ($values as $index => $value) {
+                        $totals[$sectionName][$index] += $value;
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Calculate totals variance
+        $totalsVariance = [];
+        foreach ($totals as $section => $values) {
+            $totalsVariance[$section] = ReportHelper::calculateVariance($values[0], end($values));
+        }
+
+        // Calculate summary statistics
+        $totalAccounts = $accountsIncreased + $accountsDecreased + $accountsStable;
+        $avgGrowthRate = $totalAccounts > 0 
+            ? array_sum(array_column(array_column(array_merge(...array_values($report)), 'variance'), 'percentage')) / $totalAccounts
+            : 0;
+
+        return [
+            'company' => [
+                'name' => $company->name,
+                'logo' => $company->logo
+            ],
+            'report_type' => $reportType === 'NERACA' ? 'balance_sheet_comparative' : 'profit_loss_comparative',
+            'periods' => $periods,
+            'sections' => $report,
+            'totals' => $totals,
+            'totals_variance' => $totalsVariance,
+            'summary' => [
+                'total_accounts' => $totalAccounts,
+                'accounts_increased' => $accountsIncreased,
+                'accounts_decreased' => $accountsDecreased,
+                'accounts_stable' => $accountsStable,
+                'avg_growth_rate' => round($avgGrowthRate, 2)
+            ]
+        ];
+    }
+
+    /**
+     * GET /reports/profit-loss/export-pdf
+     * Export Profit-Loss to PDF
+     */
+    public function exportProfitLossPDF(Request $request)
+    {
+        $validated = $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'required|date',
+            'unit_id' => 'nullable|exists:business_units,id'
+        ]);
+
+        $user = $request->user();
+        $company = $user->company;
+
+        $startDate = $validated['start_date'] ?? null;
+        $endDate = $validated['end_date'];
+        $unitId = $validated['unit_id'] ?? null;
+
+        $accounts = ChartOfAccount::where('company_id', $company->id)
+            ->where('report_type', 'LABARUGI')
+            ->where('is_parent', false)
+            ->orderBy('code')
+            ->get();
+
+        $report = [
+            'Pendapatan' => [],
+            'Beban' => [],
+        ];
+
+        foreach ($accounts as $account) {
+            $balance = $this->getAccountBalance($account, $startDate, $endDate, $unitId);
+            
+            $category = match($account->type) {
+                'Revenue' => 'Pendapatan',
+                'Expense' => 'Beban',
+                default => null,
+            };
+
+            if ($category) {
+                $report[$category][] = [
+                    'account_code' => $account->code,
+                    'account_name' => $account->name,
+                    'balance' => $balance,
+                ];
+            }
+        }
+
+        $totalRevenue = array_sum(array_column($report['Pendapatan'], 'balance'));
+        $totalExpense = array_sum(array_column($report['Beban'], 'balance'));
+        $netProfit = $totalRevenue - $totalExpense;
+
+        $viewData = [
+            'company' => $company,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'sections' => $report,
+            'totalRevenue' => $totalRevenue,
+            'totalExpense' => $totalExpense,
+            'netProfit' => $netProfit,
+            'timestamp' => now()->format('d M Y H:i'),
+            'city' => ReportHelper::extractCity($company->address ?? ''),
+            'date' => now()->format('Y-m-d')
+        ];
+
+        $pdf = Pdf::loadView('reports.pdf.profit-loss', $viewData);
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = sprintf('LabaRugi_%s_%s.pdf', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($endDate))
+        );
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * POST /reports/profit-loss/comparative
+     * Get comparative profit-loss data (JSON API)
+     */
+    public function profitLossComparative(Request $request)
+    {
+        $validated = $request->validate([
+            'periods' => 'required|array|min:2|max:4',
+            'periods.*.start_date' => 'nullable|date',
+            'periods.*.end_date' => 'required|date',
+            'periods.*.label' => 'required|string',
+            'unit_id' => 'nullable|exists:business_units,id'
+        ]);
+
+        $user = $request->user();
+        $company = $user->company;
+        $periods = $validated['periods'];
+        $unitId = $validated['unit_id'] ?? null;
+
+        $comparativeData = $this->buildComparativeData($company, $periods, 'LABARUGI', $unitId);
+
+        return response()->json([
+            'success' => true,
+            'data' => $comparativeData
+        ]);
+    }
+
+    /**
+     * GET /reports/profit-loss/comparative/export-pdf
+     * Export Comparative Profit-Loss to PDF
+     */
+    public function exportProfitLossComparativePDF(Request $request)
+    {
+        $periodsJson = $request->query('periods');
+        $periods = json_decode($periodsJson, true);
+
+        if (!$periods || !is_array($periods) || count($periods) < 2) {
+            return back()->withErrors(['periods' => 'At least 2 periods required for comparison']);
+        }
+
+        $user = $request->user();
+        $company = $user->company;
+        $unitId = $request->query('unit_id');
+
+        $comparativeData = $this->buildComparativeData($company, $periods, 'LABARUGI', $unitId);
+
+        $viewData = [
+            'company' => $company,
+            'periods' => $periods,
+            'data' => $comparativeData,
+            'timestamp' => now()->format('d M Y H:i'),
+            'city' => ReportHelper::extractCity($company->address ?? ''),
+            'date' => now()->format('Y-m-d')
+        ];
+
+        $pdf = Pdf::loadView('reports.pdf.profit-loss-comparative', $viewData);
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = sprintf('LabaRugi_Komparatif_%s_%s.pdf', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d')
+        );
+
+        return $pdf->download($filename);
+    }
+    public function exportCashFlowPDF(Request $request)
+{
+    $validated = $request->validate([
+        'start_date' => 'nullable|date',
+        'end_date' => 'required|date',
+    ]);
+    $user = $request->user();
+    $company = $user->company;
+    
+    $startDate = $validated['start_date'] ?? null;
+    $endDate = $validated['end_date'];
+    // Get cash accounts
+    $cashAccounts = ChartOfAccount::where('company_id', $company->id)
+        ->where(function($q) {
+            $q->where('code', 'LIKE', '1.1.1%')
+              ->orWhere('code', 'LIKE', '1100%')
+              ->orWhere('name', 'LIKE', '%Kas%')
+              ->orWhere('name', 'LIKE', '%Bank%');
+        })
+        ->where('is_parent', false)
+        ->get();
+    $beginningBalance = 0;
+    if ($startDate) {
+        foreach ($cashAccounts as $account) {
+            $beginningBalance += $this->getAccountBalance($account, null, $startDate, null);
+        }
+    }
+    $operating = ['inflow' => 0, 'outflow' => 0, 'net' => 0];
+    $investing = ['inflow' => 0, 'outflow' => 0, 'net' => 0];
+    $financing = ['inflow' => 0, 'outflow' => 0, 'net' => 0];
+    $cashItems = JournalItem::whereHas('journal', function($q) use ($company, $startDate, $endDate) {
+            $q->where('company_id', $company->id)
+              ->where('is_posted', true);
+            if ($startDate) $q->where('date', '>=', $startDate);
+            $q->where('date', '<=', $endDate);
+        })
+        ->whereIn('coa_id', $cashAccounts->pluck('id'))
+        ->with(['journal'])
+        ->get();
+    foreach ($cashItems as $item) {
+        $type = $item->journal->type ?? '';
+        $netCash = $item->debit - $item->credit;
+        if (in_array($type, ['SI', 'PI', 'JU', 'CR', 'CP', ''])) {
+            if ($netCash > 0) $operating['inflow'] += $netCash;
+            else $operating['outflow'] += abs($netCash);
+        } elseif (in_array($type, ['FA'])) {
+            if ($netCash > 0) $investing['inflow'] += $netCash;
+            else $investing['outflow'] += abs($netCash);
+        } else {
+            if ($netCash > 0) $financing['inflow'] += $netCash;
+            else $financing['outflow'] += abs($netCash);
+        }
+    }
+    $operating['net'] = $operating['inflow'] - $operating['outflow'];
+    $investing['net'] = $investing['inflow'] - $investing['outflow'];
+    $financing['net'] = $financing['inflow'] - $financing['outflow'];
+    $netChange = $operating['net'] + $investing['net'] + $financing['net'];
+    $endingBalance = $beginningBalance + $netChange;
+    $viewData = [
+        'company' => $company,
+        'period' => ['start_date' => $startDate, 'end_date' => $endDate],
+        'beginning_balance' => $beginningBalance,
+        'operating' => $operating,
+        'investing' => $investing,
+        'financing' => $financing,
+        'net_change' => $netChange,
+        'ending_balance' => $endingBalance,
+        'timestamp' => now()->format('d M Y H:i'),
+        'city' => ReportHelper::extractCity($company->address ?? ''),
+        'date' => now()->format('Y-m-d')
+    ];
+    $pdf = Pdf::loadView('reports.pdf.cash-flow', $viewData);
+    $pdf->setPaper('A4', 'portrait');
+    $filename = sprintf('ArusKas_%s_%s.pdf', 
+        str_replace(' ', '_', $company->name), 
+        date('Y-m-d', strtotime($endDate))
+    );
+    return $pdf->download($filename);
+}
 }
 

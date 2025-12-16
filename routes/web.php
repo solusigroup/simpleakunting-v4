@@ -184,9 +184,23 @@ Route::middleware('auth')->group(function () {
         Route::get('/ledger/{account_id?}', [ReportController::class, 'ledger'])->name('ledger');
         Route::get('/cash-flow', [ReportController::class, 'cashFlow'])->name('cash-flow');
         Route::get('/financial-analysis', [ReportController::class, 'financialAnalysis'])->name('financial-analysis');
+        
+        // PDF Export routes
+        Route::get('/balance-sheet/export-pdf', [ReportController::class, 'exportBalanceSheetPDF'])->name('balance-sheet.export-pdf');
+        
+        // Comparative routes
+        Route::post('/balance-sheet/comparative', [ReportController::class, 'balanceSheetComparative'])->name('balance-sheet.comparative');
+        Route::get('/balance-sheet/comparative/export-pdf', [ReportController::class, 'exportBalanceSheetComparativePDF'])->name('balance-sheet.comparative.export-pdf');
+        
+        // Profit-Loss Export routes
+        Route::get('/profit-loss/export-pdf', [ReportController::class, 'exportProfitLossPDF'])->name('profit-loss.export-pdf');
+        Route::post('/profit-loss/comparative', [ReportController::class, 'profitLossComparative'])->name('profit-loss.comparative');
+        Route::get('/profit-loss/comparative/export-pdf', [ReportController::class, 'exportProfitLossComparativePDF'])->name('profit-loss.comparative.export-pdf');
+        
+        // Cash Flow Export routes
+        Route::get('/cash-flow/export-pdf', [ReportController::class, 'exportCashFlowPDF'])->name('cash-flow.export-pdf');
     });
 });
-
 
 require __DIR__.'/auth.php';
 

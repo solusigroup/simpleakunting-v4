@@ -104,7 +104,23 @@
                                 class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
                             <option value="Sekretaris" {{ old('secretary_title', $company->secretary_title) == 'Sekretaris' ? 'selected' : '' }}>Sekretaris</option>
                             <option value="Wakil Direktur Keuangan" {{ old('secretary_title', $company->secretary_title) == 'Wakil Direktur Keuangan' ? 'selected' : '' }}>Wakil Direktur Keuangan</option>
+                            <option value="Kepala Keuangan" {{ old('secretary_title', $company->secretary_title) == 'Kepala Keuangan' ? 'selected' : '' }}>Kepala Keuangan</option>
                         </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Nama Staff (Pembuat Laporan)</label>
+                        <input type="text" name="staff_name" value="{{ old('staff_name', $company->staff_name) }}"
+                               class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary"
+                               placeholder="Nama lengkap staff akuntansi">
+                        <p class="mt-1 text-xs text-text-muted">Opsional - untuk signature "Dibuat Oleh"</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Jabatan Staff</label>
+                        <input type="text" name="staff_title" value="{{ old('staff_title', $company->staff_title) }}"
+                               class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary"
+                               placeholder="Staff Akuntansi">
                     </div>
                 </div>
             </div>

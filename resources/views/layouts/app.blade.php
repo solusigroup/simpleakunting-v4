@@ -1,6 +1,18 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ darkMode: localStorage.getItem('darkMode') !== 'false' }" 
-      :class="darkMode ? 'dark' : ''" x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" 
+      x-data="{ 
+        darkMode: localStorage.getItem('darkMode') !== 'false',
+        sidebarOpen: window.innerWidth >= 1024,
+        sidebarMinimized: localStorage.getItem('sidebarMinimized') === 'true'
+      }" 
+      :class="darkMode ? 'dark' : ''" 
+      x-init="
+        $watch('darkMode', val => localStorage.setItem('darkMode', val));
+        $watch('sidebarMinimized', val => localStorage.setItem('sidebarMinimized', val));
+        window.addEventListener('resize', () => {
+          if (window.innerWidth >= 1024) sidebarOpen = true;
+        });
+      ">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -44,23 +56,58 @@
             background-color: #1a2e22;
             color: #ffffff;
         }
+        
+        /* Sidebar transitions */
+        aside {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Hide text in minimized sidebar on desktop */
+        @media (min-width: 1024px) {
+            aside[data-minimized="true"] .sidebar-text,
+            aside[data-minimized="true"] .sidebar-group-label {
+                display: none;
+            }
+            
+            /* Center icons when minimized */
+            aside[data-minimized="true"] a,
+            aside[data-minimized="true"] button {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body class="font-body antialiased bg-background-dark dark:bg-background-dark text-white min-h-screen">
     <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <aside class="w-72 h-screen sticky top-0 border-r border-border-dark bg-background-dark flex flex-col">
+        <!-- Mobile Overlay -->
+        <div x-show="sidebarOpen && window.innerWidth < 1024" 
+             @click="sidebarOpen = false"
+             x-transition:enter="transition-opacity ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-black/50 z-40 lg:hidden" x-cloak></div>
+        
+        <!-- Unified Sidebar (Push Layout) -->
+        <aside :class="sidebarOpen ? 'w-72' : 'w-0 lg:w-72'"
+               class="h-screen border-r border-border-dark bg-background-dark flex-shrink-0 transition-all duration-300 overflow-hidden sticky top-0">
+            <div class="w-72 h-full flex flex-col">
             <!-- Logo -->
-            <div class="p-6 border-b border-border-dark">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-                        <span class="material-symbols-outlined text-background-dark">account_balance</span>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-bold text-white">Simple Akunting</h1>
-                        <p class="text-xs text-text-muted">{{ auth()->user()->company->entity_type ?? 'UMKM' }}</p>
-                    </div>
+            <div class="p-6 border-b border-border-dark flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-background-dark">account_balance</span>
                 </div>
+                <div class="sidebar-text flex-1">
+                    <h1 class="text-lg font-bold text-white">Simple Akunting</h1>
+                    <p class="text-xs text-text-muted">{{ auth()->user()->company->entity_type ?? 'UMKM' }}</p>
+                </div>
+                <!-- Close button for mobile -->
+                <button @click="sidebarOpen = false" 
+                        class="lg:hidden text-white hover:text-primary transition">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
             </div>
 
             <!-- Navigation -->
@@ -79,8 +126,8 @@
                 <div class="pt-4">
                     <button @click="transaksi = !transaksi" 
                             class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
-                        <span>Transaksi</span>
-                        <span class="material-symbols-outlined text-sm transition-transform" 
+                        <span class="sidebar-group-label">Transaksi</span>
+                        <span class="material-symbols-outlined text-sm transition-transform sidebar-group-label" 
                               :class="transaksi ? 'rotate-0' : '-rotate-90'">expand_more</span>
                     </button>
                 </div>
@@ -106,8 +153,8 @@
                 <div class="pt-4">
                     <button @click="masterData = !masterData" 
                             class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
-                        <span>Master Data</span>
-                        <span class="material-symbols-outlined text-sm transition-transform" 
+                        <span class="sidebar-group-label">Master Data</span>
+                        <span class="material-symbols-outlined text-sm transition-transform sidebar-group-label" 
                               :class="masterData ? 'rotate-0' : '-rotate-90'">expand_more</span>
                     </button>
                 </div>
@@ -135,8 +182,8 @@
                 <div class="pt-4">
                     <button @click="laporan = !laporan" 
                             class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
-                        <span>Laporan</span>
-                        <span class="material-symbols-outlined text-sm transition-transform" 
+                        <span class="sidebar-group-label">Laporan</span>
+                        <span class="material-symbols-outlined text-sm transition-transform sidebar-group-label" 
                               :class="laporan ? 'rotate-0' : '-rotate-90'">expand_more</span>
                     </button>
                 </div>
@@ -166,8 +213,8 @@
                 <div class="pt-4">
                     <button @click="pengaturan = !pengaturan" 
                             class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
-                        <span>Pengaturan</span>
-                        <span class="material-symbols-outlined text-sm transition-transform" 
+                        <span class="sidebar-group-label">Pengaturan</span>
+                        <span class="material-symbols-outlined text-sm transition-transform sidebar-group-label" 
                               :class="pengaturan ? 'rotate-0' : '-rotate-90'">expand_more</span>
                     </button>
                 </div>
@@ -200,36 +247,47 @@
 
                 <!-- User Menu -->
                 <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-dark">
-                    <div class="w-10 h-10 bg-primary-dark rounded-full flex items-center justify-center">
+                    <div class="w-10 h-10 bg-primary-dark rounded-full flex items-center justify-center flex-shrink-0">
                         <span class="text-primary font-bold">{{ substr(auth()->user()->name, 0, 1) }}</span>
                     </div>
-                    <div class="flex-1 min-w-0">
+                    <div class="flex-1 min-w-0 sidebar-text">
                         <p class="text-sm font-medium text-white truncate">{{ auth()->user()->name }}</p>
                         <p class="text-xs text-text-muted truncate">{{ auth()->user()->role }}</p>
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="text-text-muted hover:text-primary">
+                        <button type="submit" class="text-text-muted hover:text-primary" title="Logout">
                             <span class="material-symbols-outlined">logout</span>
                         </button>
                     </form>
                 </div>
             </div>
+            </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 min-h-screen">
+        <main class="flex-1 min-h-screen overflow-x-hidden">
             <!-- Header -->
             @if(isset($header))
             <header class="sticky top-0 z-10 bg-background-dark/95 backdrop-blur border-b border-border-dark">
-                <div class="px-8 py-6">
-                    {{ $header }}
+                <div class="px-4 sm:px-8 py-6">
+                    <div class="flex items-center gap-4">
+                        <!-- Mobile Hamburger in Header -->
+                        <button @click="sidebarOpen = !sidebarOpen" 
+                                class="lg:hidden text-white hover:text-primary transition flex-shrink-0">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                        
+                        <div class="flex-1">
+                            {{ $header }}
+                        </div>
+                    </div>
                 </div>
             </header>
             @endif
 
             <!-- Page Content -->
-            <div class="p-8">
+            <div class="p-4 sm:p-8">
                 {{ $slot }}
             </div>
         </main>

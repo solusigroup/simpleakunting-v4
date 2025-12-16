@@ -25,6 +25,8 @@ class CompanySettingsController extends Controller
             'director_title' => 'nullable|string|max:255',
             'secretary_name' => 'nullable|string|max:255',
             'secretary_title' => 'nullable|string|max:255',
+            'staff_name' => 'nullable|string|max:255',
+            'staff_title' => 'nullable|string|max:255',
         ]);
 
         auth()->user()->company->update($validated);

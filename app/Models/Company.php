@@ -25,6 +25,8 @@ class Company extends Model
         'director_title',
         'secretary_name',
         'secretary_title',
+        'staff_name',
+        'staff_title',
     ];
 
     protected $casts = [
