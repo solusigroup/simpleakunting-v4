@@ -33,9 +33,14 @@
             <div>
                 <label class="block text-sm font-medium text-text-muted mb-2">Role</label>
                 <select name="role" class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
-                    <option value="User" {{ $user->role == 'User' ? 'selected' : '' }}>User</option>
-                    <option value="Admin" {{ $user->role == 'Admin' ? 'selected' : '' }}>Admin</option>
+                    <option value="Admin" {{ $user->role == 'Admin' ? 'selected' : '' }}>Admin - Akses penuh sistem</option>
+                    <option value="Manajer" {{ $user->role == 'Manajer' ? 'selected' : '' }}>Manajer - Approve & supervisi</option>
+                    <option value="Staff" {{ $user->role == 'Staff' ? 'selected' : '' }}>Staff - Input data</option>
+                    <option value="Viewer" {{ $user->role == 'Viewer' ? 'selected' : '' }}>Viewer - Hanya lihat laporan</option>
                 </select>
+                <p class="mt-2 text-xs text-text-muted">
+                    Staff dapat input data, Manajer dapat approve, Admin full access, Viewer hanya bisa lihat
+                </p>
             </div>
 
             <div class="pt-4 border-t border-border-dark">
