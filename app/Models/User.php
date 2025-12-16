@@ -58,11 +58,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is Admin.
+     * Check if user is Administrator.
      */
     public function isAdmin(): bool
     {
-        return $this->role === 'Admin';
+        return $this->role === 'Administrator';
     }
 
     /**
@@ -74,19 +74,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is Staff.
+     * Check if user is Operator (Staff).
      */
-    public function isStaff(): bool
+    public function isOperator(): bool
     {
-        return $this->role === 'Staff';
+        return $this->role === 'Operator';
     }
 
     /**
-     * Check if user is Viewer.
+     * Check if user is Peninjau (Viewer).
      */
-    public function isViewer(): bool
+    public function isPeninjau(): bool
     {
-        return $this->role === 'Viewer';
+        return $this->role === 'Peninjau';
     }
 
     /**
@@ -94,7 +94,7 @@ class User extends Authenticatable
      */
     public function canEdit(): bool
     {
-        return in_array($this->role, ['Admin', 'Manajer', 'Staff']);
+        return in_array($this->role, ['Administrator', 'Manajer', 'Operator']);
     }
 
     /**
@@ -102,7 +102,7 @@ class User extends Authenticatable
      */
     public function canDelete(): bool
     {
-        return in_array($this->role, ['Admin', 'Manajer']);
+        return in_array($this->role, ['Administrator', 'Manajer']);
     }
 
     /**
@@ -126,7 +126,7 @@ class User extends Authenticatable
      */
     public function canApprove(): bool
     {
-        return in_array($this->role, ['Admin', 'Manajer']);
+        return in_array($this->role, ['Administrator', 'Manajer']);
     }
 
     /**

@@ -32,13 +32,13 @@
             <div>
                 <label class="block text-sm font-medium text-text-muted mb-2">Role</label>
                 <select name="role" class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
-                    <option value="Admin">Admin - Akses penuh sistem</option>
+                    <option value="Administrator">Administrator - Akses penuh sistem</option>
                     <option value="Manajer">Manajer - Approve & supervisi</option>
-                    <option value="Staff" selected>Staff - Input data</option>
-                    <option value="Viewer">Viewer - Hanya lihat laporan</option>
+                    <option value="Operator" selected>Operator - Input data</option>
+                    <option value="Peninjau">Peninjau - Hanya lihat laporan</option>
                 </select>
                 <p class="mt-2 text-xs text-text-muted">
-                    Staff dapat input data, Manajer dapat approve, Admin full access, Viewer hanya bisa lihat
+                    Operator dapat input data, Manajer dapat approve, Administrator full access, Peninjau hanya bisa lihat
                 </p>
             </div>
 
