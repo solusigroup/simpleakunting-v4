@@ -137,13 +137,14 @@
         </x-sidebar-item>
     </div>
     @endif
-    <!-- Help -->
-    <div class="pt-4 mt-auto">
-        <x-sidebar-item href="{{ route('help') }}" icon="menu_book" :active="request()->routeIs('help')">
-            Panduan Aplikasi
-        </x-sidebar-item>
-    </div>
 </nav>
+
+<!-- Help - Pinned at bottom -->
+<div class="px-4 pb-2">
+    <x-sidebar-item href="{{ route('help') }}" icon="menu_book" :active="request()->routeIs('help')">
+        Panduan Aplikasi
+    </x-sidebar-item>
+</div>
 
 <!-- User Menu -->
 <div class="p-4 border-t border-border-dark">
