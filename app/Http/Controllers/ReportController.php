@@ -1107,16 +1107,16 @@ class ReportController extends Controller
                   ->where('is_posted', true)
                   ->whereBetween('date', [$startDate, $endDate]);
             })
-            ->with(['journal', 'coa'])
+            ->with(['journal', 'account'])
             ->get();
 
         foreach ($equityTransactions as $item) {
             $amount = $item->credit - $item->debit; // Credit increases equity
-            $type = str_contains(strtolower($item->coa->name), 'modal') ? 'capital' : 'retained';
+            $type = str_contains(strtolower($item->account->name), 'modal') ? 'capital' : 'retained';
             
             $capitalChanges[] = [
                 'date' => $item->journal->date,
-                'description' => $item->journal->description ?: $item->coa->name,
+                'description' => $item->journal->description ?: $item->account->name,
                 'amount' => $amount,
                 'type' => $type
             ];
@@ -1274,15 +1274,15 @@ class ReportController extends Controller
                   ->where('is_posted', true)
                   ->whereBetween('date', [$startDate, $endDate]);
             })
-            ->with(['journal', 'coa'])
+            ->with(['journal', 'account'])
             ->get();
 
         foreach ($equityTransactions as $item) {
             $amount = $item->credit - $item->debit;
-            $type = str_contains(strtolower($item->coa->name), 'modal') ? 'capital' : 'retained';
+            $type = str_contains(strtolower($item->account->name), 'modal') ? 'capital' : 'retained';
             $capitalChanges[] = [
                 'date' => $item->journal->date,
-                'description' => $item->journal->description ?: $item->coa->name,
+                'description' => $item->journal->description ?: $item->account->name,
                 'amount' => $amount,
                 'type' => $type
             ];
