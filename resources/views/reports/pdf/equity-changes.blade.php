@@ -82,6 +82,14 @@
 </table>
 
 <!-- Summary Box -->
+@php
+    $additions = max(0, $net_income);
+    $deductions = abs(min(0, $net_income));
+    foreach($changes as $c) {
+        if($c['amount'] > 0) $additions += $c['amount'];
+        else $deductions += abs($c['amount']);
+    }
+@endphp
 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px;">
     <h4 style="margin: 0 0 10px 0; color: #333;">Ringkasan Perubahan Ekuitas</h4>
     <table style="width: 100%;">
@@ -91,11 +99,11 @@
         </tr>
         <tr>
             <td style="padding: 5px 0;">Penambahan:</td>
-            <td style="text-align: right; font-family: monospace; color: #28a745;">+ {{ App\Helpers\ReportHelper::formatCurrency(max(0, $net_income) + array_sum(array_map(fn($c) => max(0, $c['amount']), $changes))) }}</td>
+            <td style="text-align: right; font-family: monospace; color: #28a745;">+ {{ App\Helpers\ReportHelper::formatCurrency($additions) }}</td>
         </tr>
         <tr>
             <td style="padding: 5px 0;">Pengurangan:</td>
-            <td style="text-align: right; font-family: monospace; color: #dc3545;">- {{ App\Helpers\ReportHelper::formatCurrency(abs(min(0, $net_income)) + array_sum(array_map(fn($c) => abs(min(0, $c['amount'])), $changes))) }}</td>
+            <td style="text-align: right; font-family: monospace; color: #dc3545;">- {{ App\Helpers\ReportHelper::formatCurrency($deductions) }}</td>
         </tr>
         <tr style="border-top: 2px solid #333; font-weight: bold;">
             <td style="padding: 10px 0 5px 0;">Modal Akhir:</td>
