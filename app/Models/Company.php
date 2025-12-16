@@ -21,6 +21,10 @@ class Company extends Model
         'npwp',
         'address',
         'fiscal_start',
+        'director_name',
+        'director_title',
+        'secretary_name',
+        'secretary_title',
     ];
 
     protected $casts = [

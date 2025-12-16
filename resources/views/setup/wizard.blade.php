@@ -72,6 +72,39 @@
                             <input type="date" id="fiscalStart" 
                                    class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
                         </div>
+                        
+                        <!-- Signatory Section -->
+                        <div class="pt-4 border-t border-border-dark">
+                            <h3 class="text-white font-semibold mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">verified</span>
+                                Pejabat Penandatangan Laporan
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-text-muted mb-2">Nama Direktur</label>
+                                    <input type="text" id="directorName" placeholder="Nama lengkap"
+                                           class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white placeholder-text-muted focus:border-primary focus:ring-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-text-muted mb-2">Jabatan Direktur</label>
+                                    <input type="text" id="directorTitle" placeholder="Direktur Utama" value="Direktur"
+                                           class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white placeholder-text-muted focus:border-primary focus:ring-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-text-muted mb-2">Nama Sekretaris/Wadir</label>
+                                    <input type="text" id="secretaryName" placeholder="Nama lengkap"
+                                           class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white placeholder-text-muted focus:border-primary focus:ring-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-text-muted mb-2">Jabatan</label>
+                                    <select id="secretaryTitle" 
+                                            class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                                        <option value="Sekretaris">Sekretaris</option>
+                                        <option value="Wakil Direktur Keuangan">Wakil Direktur Keuangan</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </form>
 
                     <div class="flex justify-end mt-8">
@@ -213,6 +246,10 @@
                 npwp: document.getElementById('npwp').value,
                 address: document.getElementById('address').value,
                 fiscal_start: document.getElementById('fiscalStart').value,
+                director_name: document.getElementById('directorName').value,
+                director_title: document.getElementById('directorTitle').value,
+                secretary_name: document.getElementById('secretaryName').value,
+                secretary_title: document.getElementById('secretaryTitle').value,
             };
 
             try {
