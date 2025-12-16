@@ -60,10 +60,10 @@ class BusinessUnitController extends Controller
         $user = $request->user();
         $company = $user->company;
 
-        if (!$user->canManageMasterData()) {
+        if (!$user->canEdit()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Anda tidak memiliki izin untuk menambah unit usaha.',
+                'message' => 'Anda tidak memiliki izin untuk menambah data.',
             ], 403);
         }
 
@@ -116,10 +116,10 @@ class BusinessUnitController extends Controller
         $user = $request->user();
         $company = $user->company;
 
-        if (!$user->canManageMasterData()) {
+        if (!$user->canEdit()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Anda tidak memiliki izin untuk mengedit unit usaha.',
+                'message' => 'Anda tidak memiliki izin untuk mengedit data.',
             ], 403);
         }
 
