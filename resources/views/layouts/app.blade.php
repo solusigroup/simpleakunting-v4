@@ -67,7 +67,8 @@
             <nav class="flex-1 p-4 space-y-1 overflow-y-auto" x-data="{ 
                 transaksi: true, 
                 masterData: true, 
-                laporan: true 
+                laporan: true,
+                pengaturan: true 
             }">
                 <!-- Dashboard -->
                 <x-sidebar-item href="{{ route('dashboard') }}" icon="dashboard" :active="request()->routeIs('dashboard')">
@@ -157,6 +158,24 @@
                     </x-sidebar-item>
                     <x-sidebar-item href="{{ route('reports.financial-analysis') }}" icon="analytics" :active="request()->routeIs('reports.financial-analysis')">
                         Analisa Keuangan
+                    </x-sidebar-item>
+                </div>
+
+                <!-- Pengaturan Group -->
+                <div class="pt-4">
+                    <button @click="pengaturan = !pengaturan" 
+                            class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
+                        <span>Pengaturan</span>
+                        <span class="material-symbols-outlined text-sm transition-transform" 
+                              :class="pengaturan ? 'rotate-0' : '-rotate-90'">expand_more</span>
+                    </button>
+                </div>
+                <div x-show="pengaturan" x-collapse>
+                    <x-sidebar-item href="{{ route('company.settings') }}" icon="business" :active="request()->routeIs('company.settings')">
+                        Perusahaan
+                    </x-sidebar-item>
+                    <x-sidebar-item href="{{ route('users.index') }}" icon="group" :active="request()->routeIs('users.*')">
+                        Kelola Pengguna
                     </x-sidebar-item>
                 </div>
             </nav>

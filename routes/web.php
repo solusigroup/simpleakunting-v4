@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SetupController;
+use App\Http\Controllers\CompanySettingsController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountImportController;
 use App\Http\Controllers\ContactController;
@@ -40,6 +42,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/user/profile', [SetupController::class, 'profile'])->name('user.profile');
     Route::post('/setup/init-coa', [SetupController::class, 'initCoa'])->name('setup.init-coa');
     Route::post('/api/company/update', [SetupController::class, 'updateCompany'])->name('api.company.update');
+    
+    // Company Settings
+    Route::get('/company/settings', [CompanySettingsController::class, 'edit'])->name('company.settings');
+    Route::put('/company/settings', [CompanySettingsController::class, 'update'])->name('company.update');
+    
+    // User Management
+    Route::resource('users', UserController::class);
     
     // ==========================================
     // MASTER DATA
