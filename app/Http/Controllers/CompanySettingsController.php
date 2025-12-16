@@ -27,7 +27,13 @@ class CompanySettingsController extends Controller
             'secretary_title' => 'nullable|string|max:255',
             'staff_name' => 'nullable|string|max:255',
             'staff_title' => 'nullable|string|max:255',
+            'logo' => 'nullable|image|max:2048', // Max 2MB
         ]);
+
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists? Optional but good practice.
+            $validated['logo'] = $request->file('logo')->store('company-logos', 'public');
+        }
 
         auth()->user()->company->update($validated);
 

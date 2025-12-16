@@ -16,7 +16,7 @@
         </div>
         @endif
 
-        <form method="POST" action="{{ route('company.update') }}" class="bg-surface-dark rounded-2xl border border-border-dark p-8 space-y-6">
+        <form method="POST" action="{{ route('company.update') }}" enctype="multipart/form-data" class="bg-surface-dark rounded-2xl border border-border-dark p-8 space-y-6">
             @csrf
             @method('PUT')
 
@@ -28,6 +28,26 @@
                 </h3>
                 
                 <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2 mb-4">
+                        <label class="block text-sm font-medium text-text-muted mb-2">Logo Perusahaan</label>
+                        <div class="flex items-center gap-6">
+                            <div class="w-24 h-24 bg-surface-highlight rounded-xl flex items-center justify-center overflow-hidden border border-border-dark">
+                                @if($company->logo)
+                                    <img src="{{ asset('storage/' . $company->logo) }}" alt="Logo" class="w-full h-full object-contain">
+                                @else
+                                    <span class="material-symbols-outlined text-4xl text-text-muted">business</span>
+                                @endif
+                            </div>
+                            <div class="flex-1">
+                                <input type="file" name="logo" accept="image/*"
+                                       class="w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-background-dark hover:file:bg-primary-dark cursor-pointer">
+                                <p class="mt-2 text-xs text-text-muted">Format: JPG, PNG. Maksimal 2MB.</p>
+                                @error('logo')
+                                    <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-span-2">
                         <label class="block text-sm font-medium text-text-muted mb-2">Nama Perusahaan</label>
                         <input type="text" name="name" value="{{ old('name', $company->name) }}" required
