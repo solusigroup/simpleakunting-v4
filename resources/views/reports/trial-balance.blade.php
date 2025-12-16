@@ -71,10 +71,13 @@
         }
 
         function initializeWithServerData() {
-            const serverData = @json($data ?? null);
-            if (serverData) {
-                renderData(serverData);
-            }
+            const serverData = @json([
+                'accounts' => $accounts ?? [],
+                'total_debit' => $total_debit ?? 0,
+                'total_credit' => $total_credit ?? 0,
+                'is_balanced' => $is_balanced ?? true
+            ]);
+            renderData(serverData);
         }
 
         function renderData(data) {

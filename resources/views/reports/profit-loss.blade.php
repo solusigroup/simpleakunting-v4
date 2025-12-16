@@ -439,9 +439,36 @@
             document.getElementById('period2End').value = today.toISOString().split('T')[0];
         }
 
+        // Initialize data from server on page load
+        function initializeWithServerData() {
+            const serverData = @json([
+                'sections' => $sections ?? [],
+                'total_revenue' => $total_revenue ?? 0,
+                'total_expense' => $total_expense ?? 0,
+                'net_profit' => $net_profit ?? 0
+            ]);
+
+            // Render sections
+            renderSection('revenueSection', serverData.sections.Pendapatan || []);
+            renderSection('expenseSection', serverData.sections.Beban || []);
+
+            // Update totals
+            document.getElementById('totalRevenue').textContent = formatCurrency(serverData.total_revenue || 0);
+            document.getElementById('totalExpense').textContent = formatCurrency(serverData.total_expense || 0);
+            document.getElementById('totalRevenueCard').textContent = formatCurrency(serverData.total_revenue || 0);
+            document.getElementById('totalExpenseCard').textContent = formatCurrency(serverData.total_expense || 0);
+
+            // Net profit with color
+            const netProfit = serverData.net_profit || 0;
+            const netProfitCard = document.getElementById('netProfitCard');
+            netProfitCard.textContent = formatCurrency(netProfit);
+            netProfitCard.classList.toggle('text-primary', netProfit >= 0);
+            netProfitCard.classList.toggle('text-accent-red', netProfit < 0);
+        }
+
         initializeDates();
         loadUnits();
-        // Server renders initial data, loadReport() only for user-triggered refresh
+        initializeWithServerData(); // Render data from server immediately
     </script>
     @endpush
 </x-app-layout>

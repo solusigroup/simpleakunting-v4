@@ -475,10 +475,33 @@
             document.getElementById('period2End').value = today;
         }
 
+        // Initialize data from server on page load
+        function initializeWithServerData() {
+            const serverData = @json([
+                'sections' => $sections ?? [],
+                'totals' => $totals ?? ['Aset' => 0, 'Kewajiban' => 0, 'Ekuitas' => 0],
+                'is_balanced' => $is_balanced ?? true
+            ]);
+
+            // Render sections
+            renderSection('assetsSection', serverData.sections.Aset || []);
+            renderSection('liabilitiesSection', serverData.sections.Kewajiban || []);
+            renderSection('equitySection', serverData.sections.Ekuitas || []);
+
+            // Update totals
+            document.getElementById('totalAssets').textContent = formatCurrency(serverData.totals.Aset || 0);
+            document.getElementById('totalLiabilities').textContent = formatCurrency(serverData.totals.Kewajiban || 0);
+            document.getElementById('totalEquity').textContent = formatCurrency(serverData.totals.Ekuitas || 0);
+            document.getElementById('totalLiabEquity').textContent = formatCurrency((serverData.totals.Kewajiban || 0) + (serverData.totals.Ekuitas || 0));
+
+            // Balance alert
+            document.getElementById('balanceAlert').classList.toggle('hidden', serverData.is_balanced);
+        }
+
         // Init
         initializeDates();
         loadUnits();
-        // Server renders initial data, loadReport() only for user-triggered refresh
+        initializeWithServerData(); // Render data from server immediately
     </script>
     @endpush
 </x-app-layout>
