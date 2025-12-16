@@ -69,7 +69,7 @@
 
         <!-- Login Button -->
         <button type="submit" 
-                class="auth-btn w-full py-3.5 rounded-xl font-semibold text-background-dark flex items-center justify-center gap-2">
+                class="auth-btn w-full py-3.5 rounded-xl font-semibold text-white flex items-center justify-center gap-2">
             <span class="material-symbols-outlined">login</span>
             Masuk
         </button>
