@@ -5,7 +5,7 @@
 
     <div class="flex flex-col lg:flex-row gap-8">
         <!-- Sidebar Navigation -->
-        <div class="w-full lg:w-64 flex-shrink-0">
+        <div class="w-full lg:w-64 flex-shrink-0 lg:order-last">
             <div class="sticky top-24 bg-surface-dark border border-border-dark rounded-xl p-4">
                 <h3 class="font-bold text-primary mb-4 uppercase text-xs tracking-wider">Daftar Isi</h3>
                 <nav class="space-y-1">
