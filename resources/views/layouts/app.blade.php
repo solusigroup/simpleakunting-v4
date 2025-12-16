@@ -161,7 +161,8 @@
                     </x-sidebar-item>
                 </div>
 
-                <!-- Pengaturan Group -->
+                <!-- Pengaturan Group (Admin only) -->
+                @if(auth()->user()->isAdmin())
                 <div class="pt-4">
                     <button @click="pengaturan = !pengaturan" 
                             class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
@@ -178,6 +179,7 @@
                         Kelola Pengguna
                     </x-sidebar-item>
                 </div>
+                @endif
             </nav>
 
             <!-- Theme Toggle & User Menu -->
