@@ -71,13 +71,17 @@
         }
 
         function initializeWithServerData() {
-            const serverData = @json([
-                'accounts' => $accounts ?? [],
-                'total_debit' => $total_debit ?? 0,
-                'total_credit' => $total_credit ?? 0,
-                'is_balanced' => $is_balanced ?? true
-            ]);
-            renderData(serverData);
+            const serverAccounts = @json($accounts ?? []);
+            const serverTotalDebit = {{ $total_debit ?? 0 }};
+            const serverTotalCredit = {{ $total_credit ?? 0 }};
+            const serverIsBalanced = {{ $is_balanced ? 'true' : 'false' }};
+            
+            renderData({
+                accounts: serverAccounts,
+                total_debit: serverTotalDebit,
+                total_credit: serverTotalCredit,
+                is_balanced: serverIsBalanced
+            });
         }
 
         function renderData(data) {

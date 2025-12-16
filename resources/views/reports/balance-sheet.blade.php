@@ -477,25 +477,23 @@
 
         // Initialize data from server on page load
         function initializeWithServerData() {
-            const serverData = @json([
-                'sections' => $sections ?? [],
-                'totals' => $totals ?? ['Aset' => 0, 'Kewajiban' => 0, 'Ekuitas' => 0],
-                'is_balanced' => $is_balanced ?? true
-            ]);
+            const serverSections = @json($sections ?? []);
+            const serverTotals = @json($totals ?? ['Aset' => 0, 'Kewajiban' => 0, 'Ekuitas' => 0]);
+            const serverIsBalanced = {{ $is_balanced ? 'true' : 'false' }};
 
             // Render sections
-            renderSection('assetsSection', serverData.sections.Aset || []);
-            renderSection('liabilitiesSection', serverData.sections.Kewajiban || []);
-            renderSection('equitySection', serverData.sections.Ekuitas || []);
+            renderSection('assetsSection', serverSections.Aset || []);
+            renderSection('liabilitiesSection', serverSections.Kewajiban || []);
+            renderSection('equitySection', serverSections.Ekuitas || []);
 
             // Update totals
-            document.getElementById('totalAssets').textContent = formatCurrency(serverData.totals.Aset || 0);
-            document.getElementById('totalLiabilities').textContent = formatCurrency(serverData.totals.Kewajiban || 0);
-            document.getElementById('totalEquity').textContent = formatCurrency(serverData.totals.Ekuitas || 0);
-            document.getElementById('totalLiabEquity').textContent = formatCurrency((serverData.totals.Kewajiban || 0) + (serverData.totals.Ekuitas || 0));
+            document.getElementById('totalAssets').textContent = formatCurrency(serverTotals.Aset || 0);
+            document.getElementById('totalLiabilities').textContent = formatCurrency(serverTotals.Kewajiban || 0);
+            document.getElementById('totalEquity').textContent = formatCurrency(serverTotals.Ekuitas || 0);
+            document.getElementById('totalLiabEquity').textContent = formatCurrency((serverTotals.Kewajiban || 0) + (serverTotals.Ekuitas || 0));
 
             // Balance alert
-            document.getElementById('balanceAlert').classList.toggle('hidden', serverData.is_balanced);
+            document.getElementById('balanceAlert').classList.toggle('hidden', serverIsBalanced);
         }
 
         // Init
