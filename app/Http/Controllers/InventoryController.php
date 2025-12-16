@@ -65,7 +65,7 @@ class InventoryController extends Controller
                 ], 400);
             }
 
-            if (!$user->canManageMasterData()) {
+            if (!$user->canEdit()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Anda tidak memiliki izin.',
@@ -148,7 +148,7 @@ class InventoryController extends Controller
         $user = $request->user();
         $company = $user->company;
 
-        if (!$user->canManageMasterData()) {
+        if (!$user->canEdit()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki izin.',

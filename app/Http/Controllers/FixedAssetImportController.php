@@ -88,7 +88,7 @@ class FixedAssetImportController extends Controller
             return response()->json(['success' => false, 'message' => 'Company not found'], 400);
         }
 
-        if (!$user->canManageMasterData()) {
+        if (!$user->canEdit()) {
             return response()->json(['success' => false, 'message' => 'Anda tidak memiliki izin untuk import aset tetap.'], 403);
         }
 

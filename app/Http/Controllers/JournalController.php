@@ -67,7 +67,7 @@ class JournalController extends Controller
         $user = $request->user();
         
         // Only Manajer and above can create manual journals
-        if (!$user->canManageMasterData()) {
+        if (!$user->canEdit()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Hanya Manajer atau Administrator yang dapat membuat jurnal manual.',

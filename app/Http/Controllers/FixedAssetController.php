@@ -74,7 +74,7 @@ class FixedAssetController extends Controller
                 ], 400);
             }
 
-            if (!$user->canManageMasterData()) {
+            if (!$user->canEdit()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Anda tidak memiliki izin.',
@@ -167,7 +167,7 @@ class FixedAssetController extends Controller
         $user = $request->user();
         $company = $user->company;
 
-        if (!$user->canManageMasterData()) {
+        if (!$user->canEdit()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki izin.',

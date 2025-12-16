@@ -97,7 +97,7 @@ class ContactImportController extends Controller
             ], 400);
         }
 
-        if (!$user->canManageMasterData()) {
+        if (!$user->canEdit()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki izin untuk import kontak.',
