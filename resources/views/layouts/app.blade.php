@@ -206,6 +206,9 @@
                     <x-sidebar-item href="{{ route('reports.financial-analysis') }}" icon="analytics" :active="request()->routeIs('reports.financial-analysis')">
                         Analisa Keuangan
                     </x-sidebar-item>
+                    <x-sidebar-item href="{{ route('reports.equity-changes') }}" icon="account_balance" :active="request()->routeIs('reports.equity-changes')">
+                        Perubahan Ekuitas
+                    </x-sidebar-item>
                 </div>
 
                 <!-- Pengaturan Group (Admin access) -->

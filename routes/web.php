@@ -199,6 +199,10 @@ Route::middleware('auth')->group(function () {
         
         // Cash Flow Export routes
         Route::get('/cash-flow/export-pdf', [ReportController::class, 'exportCashFlowPDF'])->name('cash-flow.export-pdf');
+        
+        // Equity Changes routes
+        Route::get('/equity-changes', [ReportController::class, 'equityChanges'])->name('equity-changes');
+        Route::get('/equity-changes/export-pdf', [ReportController::class, 'exportEquityChangesPDF'])->name('equity-changes.export-pdf');
     });
 });
 

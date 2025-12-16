@@ -1051,5 +1051,255 @@ class ReportController extends Controller
     );
     return $pdf->download($filename);
 }
+
+    /**
+     * GET /reports/equity-changes
+     * Statement of Changes in Equity
+     */
+    public function equityChanges(Request $request)
+    {
+        $validated = $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+        ]);
+
+        $user = $request->user();
+        $company = $user->company;
+        
+        $endDate = $validated['end_date'] ?? date('Y-m-d');
+        $startDate = $validated['start_date'] ?? date('Y-01-01');
+
+        // Get equity accounts (code 3.x.x)
+        $equityAccounts = ChartOfAccount::where('company_id', $company->id)
+            ->where(function($q) {
+                $q->where('code', 'LIKE', '3%')
+                  ->orWhere('code', 'LIKE', '3.%');
+            })
+            ->where('is_parent', false)
+            ->get();
+
+        // Calculate beginning equity (before start date)
+        $beginningCapital = 0;
+        $beginningRetained = 0;
+        
+        foreach ($equityAccounts as $account) {
+            $balance = $this->getAccountBalance($account, null, $startDate, null);
+            if (str_contains(strtolower($account->name), 'modal') || str_contains(strtolower($account->name), 'capital')) {
+                $beginningCapital += $balance;
+            } else {
+                $beginningRetained += $balance;
+            }
+        }
+        $beginningEquity = $beginningCapital + $beginningRetained;
+
+        // Calculate net income for the period
+        $netIncome = $this->calculateNetIncome($company, $startDate, $endDate);
+
+        // Calculate capital changes during period
+        $capitalChanges = [];
+        $additions = 0;
+        $deductions = 0;
+
+        // Get equity transactions in period
+        $equityTransactions = JournalItem::whereIn('coa_id', $equityAccounts->pluck('id'))
+            ->whereHas('journal', function($q) use ($company, $startDate, $endDate) {
+                $q->where('company_id', $company->id)
+                  ->where('is_posted', true)
+                  ->whereBetween('date', [$startDate, $endDate]);
+            })
+            ->with(['journal', 'coa'])
+            ->get();
+
+        foreach ($equityTransactions as $item) {
+            $amount = $item->credit - $item->debit; // Credit increases equity
+            $type = str_contains(strtolower($item->coa->name), 'modal') ? 'capital' : 'retained';
+            
+            $capitalChanges[] = [
+                'date' => $item->journal->date,
+                'description' => $item->journal->description ?: $item->coa->name,
+                'amount' => $amount,
+                'type' => $type
+            ];
+            
+            if ($amount > 0) $additions += $amount;
+            else $deductions += abs($amount);
+        }
+
+        // Add net income to additions
+        if ($netIncome > 0) {
+            $additions += $netIncome;
+        } else {
+            $deductions += abs($netIncome);
+        }
+
+        // Calculate ending equity
+        $endingCapital = $beginningCapital;
+        $endingRetained = $beginningRetained + $netIncome;
+        
+        foreach ($capitalChanges as $change) {
+            if ($change['type'] === 'capital') {
+                $endingCapital += $change['amount'];
+            } else {
+                $endingRetained += $change['amount'];
+            }
+        }
+        $endingEquity = $endingCapital + $endingRetained;
+
+        $data = [
+            'beginning_capital' => $beginningCapital,
+            'beginning_retained' => $beginningRetained,
+            'beginning_equity' => $beginningEquity,
+            'changes' => $capitalChanges,
+            'net_income' => $netIncome,
+            'additions' => $additions,
+            'deductions' => $deductions,
+            'ending_capital' => $endingCapital,
+            'ending_retained' => $endingRetained,
+            'ending_equity' => $endingEquity,
+        ];
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'data' => $data]);
+        }
+
+        return view('reports.equity-changes', [
+            'data' => $data,
+            'period' => ['start_date' => $startDate, 'end_date' => $endDate]
+        ]);
+    }
+
+    /**
+     * Calculate net income for period
+     */
+    private function calculateNetIncome($company, $startDate, $endDate)
+    {
+        // Revenue accounts (4.x.x)
+        $revenueAccounts = ChartOfAccount::where('company_id', $company->id)
+            ->where('code', 'LIKE', '4%')
+            ->where('is_parent', false)
+            ->get();
+
+        // Expense accounts (5.x.x, 6.x.x)
+        $expenseAccounts = ChartOfAccount::where('company_id', $company->id)
+            ->where(function($q) {
+                $q->where('code', 'LIKE', '5%')
+                  ->orWhere('code', 'LIKE', '6%');
+            })
+            ->where('is_parent', false)
+            ->get();
+
+        $totalRevenue = 0;
+        foreach ($revenueAccounts as $account) {
+            $totalRevenue += $this->getAccountBalanceForPeriod($account, $startDate, $endDate);
+        }
+
+        $totalExpense = 0;
+        foreach ($expenseAccounts as $account) {
+            $totalExpense += $this->getAccountBalanceForPeriod($account, $startDate, $endDate);
+        }
+
+        return $totalRevenue - $totalExpense;
+    }
+
+    /**
+     * GET /reports/equity-changes/export-pdf
+     * Export Statement of Changes in Equity to PDF
+     */
+    public function exportEquityChangesPDF(Request $request)
+    {
+        $validated = $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'required|date',
+        ]);
+
+        $user = $request->user();
+        $company = $user->company;
+        
+        $endDate = $validated['end_date'];
+        $startDate = $validated['start_date'] ?? date('Y-01-01');
+
+        // Reuse data calculation from equityChanges
+        $request->merge(['start_date' => $startDate, 'end_date' => $endDate]);
+        
+        // Get equity data
+        $equityAccounts = ChartOfAccount::where('company_id', $company->id)
+            ->where('code', 'LIKE', '3%')
+            ->where('is_parent', false)
+            ->get();
+
+        $beginningCapital = 0;
+        $beginningRetained = 0;
+        
+        foreach ($equityAccounts as $account) {
+            $balance = $this->getAccountBalance($account, null, $startDate, null);
+            if (str_contains(strtolower($account->name), 'modal') || str_contains(strtolower($account->name), 'capital')) {
+                $beginningCapital += $balance;
+            } else {
+                $beginningRetained += $balance;
+            }
+        }
+        $beginningEquity = $beginningCapital + $beginningRetained;
+
+        $netIncome = $this->calculateNetIncome($company, $startDate, $endDate);
+
+        $capitalChanges = [];
+        $equityTransactions = JournalItem::whereIn('coa_id', $equityAccounts->pluck('id'))
+            ->whereHas('journal', function($q) use ($company, $startDate, $endDate) {
+                $q->where('company_id', $company->id)
+                  ->where('is_posted', true)
+                  ->whereBetween('date', [$startDate, $endDate]);
+            })
+            ->with(['journal', 'coa'])
+            ->get();
+
+        foreach ($equityTransactions as $item) {
+            $amount = $item->credit - $item->debit;
+            $type = str_contains(strtolower($item->coa->name), 'modal') ? 'capital' : 'retained';
+            $capitalChanges[] = [
+                'date' => $item->journal->date,
+                'description' => $item->journal->description ?: $item->coa->name,
+                'amount' => $amount,
+                'type' => $type
+            ];
+        }
+
+        $endingCapital = $beginningCapital;
+        $endingRetained = $beginningRetained + $netIncome;
+        foreach ($capitalChanges as $change) {
+            if ($change['type'] === 'capital') {
+                $endingCapital += $change['amount'];
+            } else {
+                $endingRetained += $change['amount'];
+            }
+        }
+        $endingEquity = $endingCapital + $endingRetained;
+
+        $viewData = [
+            'company' => $company,
+            'period' => ['start_date' => $startDate, 'end_date' => $endDate],
+            'beginning_capital' => $beginningCapital,
+            'beginning_retained' => $beginningRetained,
+            'beginning_equity' => $beginningEquity,
+            'changes' => $capitalChanges,
+            'net_income' => $netIncome,
+            'ending_capital' => $endingCapital,
+            'ending_retained' => $endingRetained,
+            'ending_equity' => $endingEquity,
+            'timestamp' => now()->format('d M Y H:i'),
+            'city' => ReportHelper::extractCity($company->address ?? ''),
+            'date' => now()->format('Y-m-d')
+        ];
+
+        $pdf = Pdf::loadView('reports.pdf.equity-changes', $viewData);
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = sprintf('PerubahanEkuitas_%s_%s.pdf', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($endDate))
+        );
+
+        return $pdf->download($filename);
+    }
 }
+
 
