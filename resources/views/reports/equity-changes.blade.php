@@ -128,27 +128,10 @@
             return value < 0 ? '(' + formatted + ')' : formatted;
         }
 
-        async function loadReport() {
+        function loadReport() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
-
-            try {
-                const response = await fetch(`/reports/equity-changes?start_date=${startDate}&end_date=${endDate}`, {
-                    headers: { 
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    const data = result.data;
-                    updateUI(data);
-                }
-            } catch (error) {
-                console.error('Error loading report:', error);
-                alert('Gagal memuat data. Silakan refresh halaman.');
-            }
+            window.location.href = `/reports/equity-changes?start_date=${startDate}&end_date=${endDate}`;
         }
 
         function updateUI(data) {

@@ -65,45 +65,49 @@
             return 'Rp ' + value.toLocaleString('id-ID');
         }
 
-        async function loadReport() {
+        function loadReport() {
             const endDate = document.getElementById('endDate').value;
-            const url = `/reports/trial-balance?end_date=${endDate}`;
+            window.location.href = `/reports/trial-balance?end_date=${endDate}`;
+        }
 
-            const response = await fetch(url, {
-                headers: { 'Accept': 'application/json' }
-            });
-            const result = await response.json();
-
-            if (result.success) {
-                const data = result.data;
-                const tbody = document.getElementById('trialBalanceBody');
-                
-                if (data.accounts.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="4" class="p-8 text-center text-text-muted">Tidak ada data</td>
-                        </tr>
-                    `;
-                } else {
-                    tbody.innerHTML = data.accounts.map(acc => `
-                        <tr class="border-b border-border-dark/50 hover:bg-surface-highlight/30">
-                            <td class="p-4 text-white font-mono">${acc.account_code}</td>
-                            <td class="p-4 text-white">${acc.account_name}</td>
-                            <td class="p-4 text-right font-mono ${acc.debit > 0 ? 'text-white' : 'text-text-muted'}">${formatCurrency(acc.debit)}</td>
-                            <td class="p-4 text-right font-mono ${acc.credit > 0 ? 'text-white' : 'text-text-muted'}">${formatCurrency(acc.credit)}</td>
-                        </tr>
-                    `).join('');
-                }
-                
-                document.getElementById('totalDebit').textContent = formatCurrency(data.total_debit);
-                document.getElementById('totalCredit').textContent = formatCurrency(data.total_credit);
-                document.getElementById('balanceAlert').classList.toggle('hidden', data.is_balanced);
+        function initializeWithServerData() {
+            const serverData = @json($data ?? null);
+            if (serverData) {
+                renderData(serverData);
             }
         }
 
-        // Init
-        document.getElementById('endDate').value = new Date().toISOString().split('T')[0];
-        loadReport();
+        function renderData(data) {
+            const tbody = document.getElementById('trialBalanceBody');
+            
+            if (!data.accounts || data.accounts.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="p-8 text-center text-text-muted">Tidak ada data</td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = data.accounts.map(acc => `
+                    <tr class="border-b border-border-dark/50 hover:bg-surface-highlight/30">
+                        <td class="p-4 text-white font-mono">${acc.account_code}</td>
+                        <td class="p-4 text-white">${acc.account_name}</td>
+                        <td class="p-4 text-right font-mono ${acc.debit > 0 ? 'text-white' : 'text-text-muted'}">${formatCurrency(acc.debit)}</td>
+                        <td class="p-4 text-right font-mono ${acc.credit > 0 ? 'text-white' : 'text-text-muted'}">${formatCurrency(acc.credit)}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            document.getElementById('totalDebit').textContent = formatCurrency(data.total_debit);
+            document.getElementById('totalCredit').textContent = formatCurrency(data.total_credit);
+            document.getElementById('balanceAlert').classList.toggle('hidden', data.is_balanced);
+        }
+
+        // Init - use server-provided data
+        document.addEventListener('DOMContentLoaded', function() {
+            const endDate = '{{ $end_date ?? now()->format("Y-m-d") }}';
+            document.getElementById('endDate').value = endDate;
+            initializeWithServerData();
+        });
     </script>
     @endpush
 </x-app-layout>

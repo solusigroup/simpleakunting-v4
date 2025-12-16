@@ -367,7 +367,12 @@
 
         function loadReport() {
             if (currentMode === 'single') {
-                loadSinglePeriodReport();
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const unitId = document.getElementById('unitFilter')?.value || '';
+                let url = `/reports/profit-loss?start_date=${startDate}&end_date=${endDate}`;
+                if (unitId) url += `&unit_id=${unitId}`;
+                window.location.href = url;
             } else {
                 loadComparativeReport();
             }

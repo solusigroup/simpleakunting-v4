@@ -394,7 +394,11 @@
 
         function loadReport() {
             if (currentMode === 'single') {
-                loadSinglePeriodReport();
+                const endDate = document.getElementById('endDate').value;
+                const unitId = document.getElementById('unitFilter')?.value || '';
+                let url = `/reports/balance-sheet?end_date=${endDate}`;
+                if (unitId) url += `&unit_id=${unitId}`;
+                window.location.href = url;
             } else {
                 loadComparativeReport();
             }
