@@ -161,8 +161,8 @@
                     </x-sidebar-item>
                 </div>
 
-                <!-- Pengaturan Group (Admin only) -->
-                @if(auth()->user()->isAdmin())
+                <!-- Pengaturan Group (Admin access) -->
+                @if(auth()->user()->isAdmin() || !auth()->user()->role || auth()->user()->role == 'User')
                 <div class="pt-4">
                     <button @click="pengaturan = !pengaturan" 
                             class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
