@@ -137,6 +137,12 @@
         </x-sidebar-item>
     </div>
     @endif
+    <!-- Help -->
+    <div class="pt-4 mt-auto">
+        <x-sidebar-item href="{{ route('help') }}" icon="menu_book" :active="request()->routeIs('help')">
+            Panduan Aplikasi
+        </x-sidebar-item>
+    </div>
 </nav>
 
 <!-- User Menu -->

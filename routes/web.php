@@ -42,6 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/user/profile', [SetupController::class, 'profile'])->name('user.profile');
     Route::post('/setup/init-coa', [SetupController::class, 'initCoa'])->name('setup.init-coa');
     Route::post('/api/company/update', [SetupController::class, 'updateCompany'])->name('api.company.update');
+
+    // Help / Manual
+    Route::view('/help', 'help.index')->name('help');
     
     // Company Settings (Administrator only)
     Route::middleware(['role:Administrator'])->group(function () {
