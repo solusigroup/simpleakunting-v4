@@ -58,35 +58,51 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is Administrator.
+     * Check if user is Admin.
      */
     public function isAdmin(): bool
     {
-        return $this->role === 'Administrator';
+        return $this->role === 'Admin';
     }
 
     /**
-     * Check if user is Manager.
+     * Check if user is Manajer.
      */
-    public function isManager(): bool
+    public function isManajer(): bool
     {
         return $this->role === 'Manajer';
     }
 
     /**
-     * Check if user is Operator.
+     * Check if user is Staff.
      */
-    public function isOperator(): bool
+    public function isStaff(): bool
     {
-        return $this->role === 'Operator';
+        return $this->role === 'Staff';
     }
 
     /**
-     * Check if user is Reviewer.
+     * Check if user is Viewer.
      */
-    public function isReviewer(): bool
+    public function isViewer(): bool
     {
-        return $this->role === 'Peninjau';
+        return $this->role === 'Viewer';
+    }
+
+    /**
+     * Check if user can create/edit data.
+     */
+    public function canEdit(): bool
+    {
+        return in_array($this->role, ['Admin', 'Manajer', 'Staff']);
+    }
+
+    /**
+     * Check if user can delete data.
+     */
+    public function canDelete(): bool
+    {
+        return in_array($this->role, ['Admin', 'Manajer']);
     }
 
     /**
@@ -98,19 +114,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user can manage master data.
+     * Check if user can manage users.
      */
-    public function canManageMasterData(): bool
+    public function canManageUsers(): bool
     {
-        return in_array($this->role, ['Administrator', 'Manajer']);
+        return $this->isAdmin();
     }
 
     /**
-     * Check if user can create transactions.
+     * Check if user can approve/supervise.
      */
-    public function canCreateTransactions(): bool
+    public function canApprove(): bool
     {
-        return in_array($this->role, ['Administrator', 'Manajer', 'Operator']);
+        return in_array($this->role, ['Admin', 'Manajer']);
     }
 
     /**
@@ -121,4 +137,3 @@ class User extends Authenticatable
         return true; // All roles can view reports
     }
 }
-

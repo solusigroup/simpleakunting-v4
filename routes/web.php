@@ -43,12 +43,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/setup/init-coa', [SetupController::class, 'initCoa'])->name('setup.init-coa');
     Route::post('/api/company/update', [SetupController::class, 'updateCompany'])->name('api.company.update');
     
-    // Company Settings
-    Route::get('/company/settings', [CompanySettingsController::class, 'edit'])->name('company.settings');
-    Route::put('/company/settings', [CompanySettingsController::class, 'update'])->name('company.update');
-    
-    // User Management
-    Route::resource('users', UserController::class);
+    // Company Settings (Admin only)
+    Route::middleware(['role:Admin'])->group(function () {
+        Route::get('/company/settings', [CompanySettingsController::class, 'edit'])->name('company.settings');
+        Route::put('/company/settings', [CompanySettingsController::class, 'update'])->name('company.update');
+        
+        // User Management (Admin only)
+        Route::resource('users', UserController::class);
+    });
     
     // ==========================================
     // MASTER DATA
