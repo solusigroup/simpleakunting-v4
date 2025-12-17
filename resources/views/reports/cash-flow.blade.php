@@ -47,7 +47,10 @@
                 <input type="date" name="end_date" value="{{ $period['end_date'] }}" 
                        class="w-full bg-surface-highlight border border-border-dark rounded-xl px-4 py-2 text-white focus:border-primary focus:outline-none">
             </div>
-            <x-btn type="primary" type="submit">Filter</x-btn>
+            <button type="submit" class="px-6 h-12 rounded-full font-medium bg-primary hover:bg-primary-dark text-background-dark transition flex items-center gap-2">
+                <span class="material-symbols-outlined">filter_list</span>
+                Filter
+            </button>
         </form>
     </div>
 
