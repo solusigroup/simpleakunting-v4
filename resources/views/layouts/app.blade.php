@@ -78,7 +78,7 @@
 </head>
 <body class="font-body antialiased bg-background-dark dark:bg-background-dark text-white min-h-screen">
     <div class="flex min-h-screen">
-        <!-- Mobile Overlay -->
+        <!-- Mobile Overlay (behind sidebar) -->
         <div x-show="sidebarOpen && isMobile" 
              @click="sidebarOpen = false"
              x-transition:enter="transition-opacity ease-out duration-300"
@@ -89,9 +89,12 @@
              x-transition:leave-end="opacity-0"
              class="fixed inset-0 bg-black/50 z-40 lg:hidden" x-cloak></div>
         
-        <!-- Unified Sidebar (Push Layout) -->
-        <aside :class="sidebarOpen ? 'w-72' : 'w-0'"
-               class="h-screen border-r border-border-dark bg-background-dark flex-shrink-0 transition-all duration-300 overflow-hidden sticky top-0">
+        <!-- Sidebar: Fixed on mobile, Push on desktop -->
+        <aside :class="[
+                   sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+                   sidebarOpen ? 'w-72' : 'lg:w-0'
+               ]"
+               class="fixed lg:relative h-screen border-r border-border-dark bg-background-dark flex-shrink-0 transition-all duration-300 overflow-hidden z-50 lg:z-auto lg:sticky top-0 w-72 lg:w-auto">
             <div class="w-72 h-full flex flex-col">
             <!-- Logo -->
             @include('layouts.partials.sidebar-content')
