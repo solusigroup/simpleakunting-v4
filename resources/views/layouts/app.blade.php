@@ -2,15 +2,17 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" 
       x-data="{ 
         darkMode: localStorage.getItem('darkMode') !== 'false',
-        sidebarOpen: window.innerWidth >= 1024,
-        sidebarMinimized: localStorage.getItem('sidebarMinimized') === 'true'
+        sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false',
+        sidebarMinimized: localStorage.getItem('sidebarMinimized') === 'true',
+        isMobile: window.innerWidth < 1024
       }" 
       :class="darkMode ? 'dark' : ''" 
       x-init="
         $watch('darkMode', val => localStorage.setItem('darkMode', val));
+        $watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val));
         $watch('sidebarMinimized', val => localStorage.setItem('sidebarMinimized', val));
         window.addEventListener('resize', () => {
-          if (window.innerWidth >= 1024) sidebarOpen = true;
+          isMobile = window.innerWidth < 1024;
         });
       ">
 <head>
@@ -80,7 +82,7 @@
 <body class="font-body antialiased bg-background-dark dark:bg-background-dark text-white min-h-screen">
     <div class="flex min-h-screen">
         <!-- Mobile Overlay -->
-        <div x-show="sidebarOpen && window.innerWidth < 1024" 
+        <div x-show="sidebarOpen && isMobile" 
              @click="sidebarOpen = false"
              x-transition:enter="transition-opacity ease-out duration-300"
              x-transition:enter-start="opacity-0"
@@ -91,7 +93,7 @@
              class="fixed inset-0 bg-black/50 z-40 lg:hidden" x-cloak></div>
         
         <!-- Unified Sidebar (Push Layout) -->
-        <aside :class="sidebarOpen ? 'w-72' : 'w-0 lg:w-72'"
+        <aside :class="sidebarOpen ? 'w-72' : 'w-0'"
                class="h-screen border-r border-border-dark bg-background-dark flex-shrink-0 transition-all duration-300 overflow-hidden sticky top-0">
             <div class="w-72 h-full flex flex-col">
             <!-- Logo -->
@@ -108,8 +110,9 @@
                     <div class="flex items-center gap-4">
                         <!-- Mobile Hamburger in Header -->
                         <button @click="sidebarOpen = !sidebarOpen" 
-                                class="lg:hidden text-white hover:text-primary transition flex-shrink-0">
-                            <span class="material-symbols-outlined">menu</span>
+                                class="text-white hover:text-primary transition flex-shrink-0"
+                                :title="sidebarOpen ? 'Tutup Sidebar' : 'Buka Sidebar'">
+                            <span class="material-symbols-outlined" x-text="sidebarOpen ? 'menu_open' : 'menu'"></span>
                         </button>
                         
                         <div class="flex-1">

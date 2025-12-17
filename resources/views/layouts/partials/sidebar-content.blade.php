@@ -6,9 +6,10 @@
         <h1 class="text-lg font-bold text-white">Simple Akunting</h1>
         <p class="text-xs text-text-muted">{{ auth()->user()->company->entity_type ?? 'UMKM' }}</p>
     </div>
-    <!-- Close button for mobile -->
+    <!-- Close button -->
     <button @click="sidebarOpen = false" 
-            class="lg:hidden text-white hover:text-primary transition">
+            class="text-white hover:text-primary transition"
+            title="Tutup Sidebar">
         <span class="material-symbols-outlined">close</span>
     </button>
 </div>
