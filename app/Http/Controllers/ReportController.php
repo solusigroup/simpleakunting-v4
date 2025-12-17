@@ -394,7 +394,7 @@ class ReportController extends Controller
                     $q->where('business_unit_id', $unitId);
                 }
             })
-            ->with(['journal:id,date,reference,description,type'])
+            ->with(['journal:id,date,reference,description,source'])
             ->get();
 
         // Classify by activity type
@@ -406,17 +406,17 @@ class ReportController extends Controller
         $financingOut = 0;
 
         foreach ($journalItems as $item) {
-            $type = $item->journal->type ?? 'JU';
+            $source = $item->journal->source ?? 'manual';
             $netCash = $item->debit - $item->credit;
 
-            if (in_array($type, ['SI', 'PI', 'JU', 'CR', 'CP'])) {
+            if (in_array($source, ['sales', 'purchase', 'manual', 'cash_receipt', 'cash_payment'])) {
                 // Operating activities
                 if ($netCash > 0) {
                     $operatingIn += $netCash;
                 } else {
                     $operatingOut += abs($netCash);
                 }
-            } elseif (in_array($type, ['FA'])) {
+            } elseif (in_array($source, ['asset', 'fixed_asset'])) {
                 // Investing activities
                 if ($netCash > 0) {
                     $investingIn += $netCash;
@@ -424,11 +424,11 @@ class ReportController extends Controller
                     $investingOut += abs($netCash);
                 }
             } else {
-                // Financing activities
+                // Financing activities (equity, loan, etc) or fallback to operating
                 if ($netCash > 0) {
-                    $financingIn += $netCash;
+                    $operatingIn += $netCash;
                 } else {
-                    $financingOut += abs($netCash);
+                    $operatingOut += abs($netCash);
                 }
             }
         }
