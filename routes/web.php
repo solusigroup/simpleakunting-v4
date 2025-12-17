@@ -19,6 +19,8 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\FixedAssetController;
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\BudgetController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -53,6 +55,10 @@ Route::middleware('auth')->group(function () {
         
         // User Management (Administrator only)
         Route::resource('users', UserController::class);
+        
+        // Audit Trail (Administrator only)
+        Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+        Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
     });
     
     // ==========================================
@@ -159,6 +165,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/journals', [JournalController::class, 'index'])->name('journals.index');
     Route::post('/journals/manual', [JournalController::class, 'storeManual'])->name('journals.manual');
     Route::get('/journals/{id}', [JournalController::class, 'show'])->name('journals.show');
+    
+    // Budgets (Anggaran)
+    Route::get('/budgets', [BudgetController::class, 'index'])->name('budgets.index');
+    Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store');
+    Route::put('/budgets/{budget}', [BudgetController::class, 'update'])->name('budgets.update');
+    Route::delete('/budgets/{budget}', [BudgetController::class, 'destroy'])->name('budgets.destroy');
+    Route::get('/budgets/comparison', [BudgetController::class, 'comparison'])->name('budgets.comparison');
     
     // Closing & Adjustment
     Route::get('/journals/closing', function () {

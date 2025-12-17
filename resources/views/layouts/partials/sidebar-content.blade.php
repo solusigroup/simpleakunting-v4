@@ -51,6 +51,9 @@
         <x-sidebar-item href="{{ route('cash.spend') }}" icon="wallet" :active="request()->routeIs('cash.spend')">
             Pengeluaran Kas
         </x-sidebar-item>
+        <x-sidebar-item href="{{ route('budgets.index') }}" icon="account_balance_wallet" :active="request()->routeIs('budgets.*')">
+            Anggaran
+        </x-sidebar-item>
     </div>
 
     <!-- Master Data Group -->
@@ -131,6 +134,9 @@
         </x-sidebar-item>
         <x-sidebar-item href="{{ route('users.index') }}" icon="group" :active="request()->routeIs('users.*')">
             Kelola Pengguna
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('audit-logs.index') }}" icon="history" :active="request()->routeIs('audit-logs.*')">
+            Audit Trail
         </x-sidebar-item>
     </div>
     @endif
