@@ -219,6 +219,15 @@ Route::middleware('auth')->group(function () {
         // Equity Changes routes
         Route::get('/equity-changes', [ReportController::class, 'equityChanges'])->name('equity-changes');
         Route::get('/equity-changes/export-pdf', [ReportController::class, 'exportEquityChangesPDF'])->name('equity-changes.export-pdf');
+        
+        // Journal List
+        Route::get('/journal-list', [ReportController::class, 'journalList'])->name('journal-list');
+        
+        // Sales Report
+        Route::get('/sales', [ReportController::class, 'salesReport'])->name('sales');
+        
+        // Purchase Report
+        Route::get('/purchases', [ReportController::class, 'purchaseReport'])->name('purchases');
     });
 });
 

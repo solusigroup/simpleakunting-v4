@@ -1325,6 +1325,214 @@ class ReportController extends Controller
 
         return $pdf->download($filename);
     }
+
+    /**
+     * GET /reports/journal-list
+     * Daftar Jurnal.
+     */
+    public function journalList(Request $request)
+    {
+        $user = $request->user();
+        $company = $user->company;
+
+        $startDate = $request->query('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->query('end_date', now()->format('Y-m-d'));
+        $source = $request->query('source');
+        $unitId = $request->query('unit_id');
+
+        $query = \App\Models\Journal::where('company_id', $company->id)
+            ->where('is_posted', true)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->with(['items.account:id,code,name', 'businessUnit:id,name'])
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc');
+
+        if ($source) {
+            $query->where('source', $source);
+        }
+        if ($unitId) {
+            $query->where('business_unit_id', $unitId);
+        }
+
+        $journals = $query->paginate(50);
+
+        // Calculate totals
+        $totalDebit = 0;
+        $totalCredit = 0;
+        foreach ($journals as $journal) {
+            foreach ($journal->items as $item) {
+                $totalDebit += $item->debit;
+                $totalCredit += $item->credit;
+            }
+        }
+
+        $data = [
+            'period' => [
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ],
+            'journals' => $journals,
+            'total_debit' => $totalDebit,
+            'total_credit' => $totalCredit,
+            'source' => $source,
+        ];
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'data' => $data]);
+        }
+
+        return view('reports.journal-list', $data);
+    }
+
+    /**
+     * GET /reports/sales
+     * Laporan Penjualan.
+     */
+    public function salesReport(Request $request)
+    {
+        $user = $request->user();
+        $company = $user->company;
+
+        $startDate = $request->query('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->query('end_date', now()->format('Y-m-d'));
+        $contactId = $request->query('contact_id');
+        $status = $request->query('status');
+
+        $query = \App\Models\Invoice::where('company_id', $company->id)
+            ->where('type', 'Sales')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->with(['contact:id,name,code'])
+            ->orderBy('date', 'desc');
+
+        if ($contactId) {
+            $query->where('contact_id', $contactId);
+        }
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $invoices = $query->get();
+
+        // Calculate summaries
+        $totalSales = $invoices->sum('total');
+        $totalTax = $invoices->sum('tax');
+        $totalDiscount = $invoices->sum('discount');
+        $countInvoices = $invoices->count();
+
+        // Group by customer
+        $byCustomer = $invoices->groupBy('contact_id')->map(function ($items, $contactId) {
+            $contact = $items->first()->contact;
+            return [
+                'contact_name' => $contact ? $contact->name : 'Unknown',
+                'count' => $items->count(),
+                'total' => $items->sum('total'),
+            ];
+        })->values();
+
+        // Get customers for dropdown
+        $customers = \App\Models\Contact::where('company_id', $company->id)
+            ->customers()
+            ->active()
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
+
+        $data = [
+            'period' => [
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ],
+            'invoices' => $invoices,
+            'summary' => [
+                'total_sales' => $totalSales,
+                'total_tax' => $totalTax,
+                'total_discount' => $totalDiscount,
+                'count' => $countInvoices,
+            ],
+            'by_customer' => $byCustomer,
+            'customers' => $customers,
+        ];
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'data' => $data]);
+        }
+
+        return view('reports.sales', $data);
+    }
+
+    /**
+     * GET /reports/purchases
+     * Laporan Pembelian.
+     */
+    public function purchaseReport(Request $request)
+    {
+        $user = $request->user();
+        $company = $user->company;
+
+        $startDate = $request->query('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->query('end_date', now()->format('Y-m-d'));
+        $contactId = $request->query('contact_id');
+        $status = $request->query('status');
+
+        $query = \App\Models\Invoice::where('company_id', $company->id)
+            ->where('type', 'Purchase')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->with(['contact:id,name,code'])
+            ->orderBy('date', 'desc');
+
+        if ($contactId) {
+            $query->where('contact_id', $contactId);
+        }
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $invoices = $query->get();
+
+        // Calculate summaries
+        $totalPurchases = $invoices->sum('total');
+        $totalTax = $invoices->sum('tax');
+        $totalDiscount = $invoices->sum('discount');
+        $countInvoices = $invoices->count();
+
+        // Group by supplier
+        $bySupplier = $invoices->groupBy('contact_id')->map(function ($items, $contactId) {
+            $contact = $items->first()->contact;
+            return [
+                'contact_name' => $contact ? $contact->name : 'Unknown',
+                'count' => $items->count(),
+                'total' => $items->sum('total'),
+            ];
+        })->values();
+
+        // Get suppliers for dropdown
+        $suppliers = \App\Models\Contact::where('company_id', $company->id)
+            ->suppliers()
+            ->active()
+            ->orderBy('name')
+            ->get(['id', 'name', 'code']);
+
+        $data = [
+            'period' => [
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ],
+            'invoices' => $invoices,
+            'summary' => [
+                'total_purchases' => $totalPurchases,
+                'total_tax' => $totalTax,
+                'total_discount' => $totalDiscount,
+                'count' => $countInvoices,
+            ],
+            'by_supplier' => $bySupplier,
+            'suppliers' => $suppliers,
+        ];
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'data' => $data]);
+        }
+
+        return view('reports.purchases', $data);
+    }
 }
 
 

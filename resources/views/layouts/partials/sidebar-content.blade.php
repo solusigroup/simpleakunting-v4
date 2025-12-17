@@ -113,6 +113,15 @@
         <x-sidebar-item href="{{ route('reports.equity-changes') }}" icon="account_balance" :active="request()->routeIs('reports.equity-changes')">
             Perubahan Ekuitas
         </x-sidebar-item>
+        <x-sidebar-item href="{{ route('reports.journal-list') }}" icon="receipt_long" :active="request()->routeIs('reports.journal-list')">
+            Daftar Jurnal
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('reports.sales') }}" icon="point_of_sale" :active="request()->routeIs('reports.sales')">
+            Lap. Penjualan
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('reports.purchases') }}" icon="local_shipping" :active="request()->routeIs('reports.purchases')">
+            Lap. Pembelian
+        </x-sidebar-item>
         <x-sidebar-item href="{{ route('reports.financial-analysis') }}" icon="analytics" :active="request()->routeIs('reports.financial-analysis')">
             Analisa Keuangan
         </x-sidebar-item>
