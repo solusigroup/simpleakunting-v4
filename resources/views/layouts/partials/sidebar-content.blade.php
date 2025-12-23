@@ -107,6 +107,9 @@
         <x-sidebar-item href="{{ route('productions.index') }}" icon="factory" :active="request()->routeIs('productions.*')">
             Produksi
         </x-sidebar-item>
+        <x-sidebar-item href="{{ route('reports.manufacturing.production-cost') }}" icon="payments" :active="request()->routeIs('reports.manufacturing.*')">
+            Laporan Manufaktur
+        </x-sidebar-item>
     </div>
 
     <!-- Laporan Group -->

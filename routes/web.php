@@ -25,6 +25,7 @@ use App\Http\Controllers\BiologicalAssetController;
 use App\Http\Controllers\BiologicalReportController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\ProductionController;
+use App\Http\Controllers\ManufacturingReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -167,6 +168,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/productions/{id}/start', [ProductionController::class, 'start'])->name('productions.start');
     Route::post('/productions/{id}/complete', [ProductionController::class, 'complete'])->name('productions.complete');
     Route::post('/productions/{id}/cancel', [ProductionController::class, 'cancel'])->name('productions.cancel');
+    
+    // Manufacturing Reports
+    Route::get('/reports/manufacturing/production-cost', [ManufacturingReportController::class, 'productionCost'])->name('reports.manufacturing.production-cost');
+    Route::get('/reports/manufacturing/material-usage', [ManufacturingReportController::class, 'materialUsage'])->name('reports.manufacturing.material-usage');
+    Route::get('/reports/manufacturing/wip', [ManufacturingReportController::class, 'wipValuation'])->name('reports.manufacturing.wip');
     
     // ==========================================
     // TRANSACTIONS
