@@ -27,13 +27,17 @@ class CompanySettingsController extends Controller
             'secretary_title' => 'nullable|string|max:255',
             'staff_name' => 'nullable|string|max:255',
             'staff_title' => 'nullable|string|max:255',
-            'logo' => 'nullable|image|max:2048', // Max 2MB
+            'logo' => 'nullable|image|max:2048',
+            'enable_psak69' => 'nullable|boolean',
+            'business_sector' => 'nullable|in:general,livestock,plantation,aquaculture,forestry,mixed_agriculture',
         ]);
 
         if ($request->hasFile('logo')) {
-            // Delete old logo if exists? Optional but good practice.
             $validated['logo'] = $request->file('logo')->store('company-logos', 'public');
         }
+
+        // Convert checkbox value
+        $validated['enable_psak69'] = $request->boolean('enable_psak69');
 
         auth()->user()->company->update($validated);
 

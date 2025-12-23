@@ -145,6 +145,64 @@
                 </div>
             </div>
 
+            <!-- PSAK 69 / Aset Biologis Section -->
+            <div class="pt-6 border-t border-border-dark">
+                <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-green-400">eco</span>
+                    Fitur Aset Biologis (PSAK 69)
+                </h3>
+                
+                <div class="p-4 rounded-xl bg-green-500/10 border border-green-500/30 mb-4">
+                    <p class="text-sm text-text-muted">
+                        PSAK 69 mengatur pengakuan, pengukuran, dan pengungkapan aset biologis (hewan ternak, tanaman perkebunan, dll).
+                        Aktifkan fitur ini jika bisnis Anda bergerak di bidang agribisnis.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Sektor Bisnis</label>
+                        <select name="business_sector" id="business_sector" onchange="togglePsak69()"
+                                class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="general" {{ old('business_sector', $company->business_sector) == 'general' ? 'selected' : '' }}>Umum (Non-Agribisnis)</option>
+                            <option value="livestock" {{ old('business_sector', $company->business_sector) == 'livestock' ? 'selected' : '' }}>Peternakan</option>
+                            <option value="plantation" {{ old('business_sector', $company->business_sector) == 'plantation' ? 'selected' : '' }}>Perkebunan</option>
+                            <option value="aquaculture" {{ old('business_sector', $company->business_sector) == 'aquaculture' ? 'selected' : '' }}>Perikanan</option>
+                            <option value="forestry" {{ old('business_sector', $company->business_sector) == 'forestry' ? 'selected' : '' }}>Kehutanan</option>
+                            <option value="mixed_agriculture" {{ old('business_sector', $company->business_sector) == 'mixed_agriculture' ? 'selected' : '' }}>Agribisnis Campuran</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <label class="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-background-dark border border-border-dark hover:border-green-500/50 transition w-full">
+                            <input type="hidden" name="enable_psak69" value="0">
+                            <input type="checkbox" name="enable_psak69" id="enable_psak69" value="1" 
+                                   {{ old('enable_psak69', $company->enable_psak69) ? 'checked' : '' }}
+                                   class="form-checkbox rounded bg-surface-dark border-border-dark text-green-500 focus:ring-green-500 w-5 h-5">
+                            <div>
+                                <span class="text-white font-medium">Aktifkan PSAK 69</span>
+                                <p class="text-xs text-text-muted">Menu aset biologis akan muncul</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div id="psak69_info" class="mt-4 p-4 rounded-xl bg-primary/10 border border-primary/30 {{ old('enable_psak69', $company->enable_psak69) ? '' : 'hidden' }}">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-primary">info</span>
+                        <div class="text-sm">
+                            <p class="text-white font-medium mb-1">Fitur yang akan diaktifkan:</p>
+                            <ul class="text-text-muted space-y-1">
+                                <li>• Pencatatan aset biologis (hewan/tanaman)</li>
+                                <li>• Transformasi biologis (pertumbuhan, panen, reproduksi)</li>
+                                <li>• Valuasi aset biologis (nilai wajar)</li>
+                                <li>• Laporan rekonsiliasi aset biologis</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Submit Button -->
             <div class="flex justify-end gap-3 pt-6 border-t border-border-dark">
                 <a href="{{ route('dashboard') }}" 
@@ -159,4 +217,30 @@
             </div>
         </form>
     </div>
+
+    @push('scripts')
+    <script>
+        function togglePsak69() {
+            const sector = document.getElementById('business_sector').value;
+            const checkbox = document.getElementById('enable_psak69');
+            const info = document.getElementById('psak69_info');
+            
+            const agriSectors = ['livestock', 'plantation', 'aquaculture', 'forestry', 'mixed_agriculture'];
+            
+            if (agriSectors.includes(sector)) {
+                checkbox.checked = true;
+                info.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('enable_psak69').addEventListener('change', function() {
+            const info = document.getElementById('psak69_info');
+            if (this.checked) {
+                info.classList.remove('hidden');
+            } else {
+                info.classList.add('hidden');
+            }
+        });
+    </script>
+    @endpush
 </x-app-layout>
