@@ -10,6 +10,8 @@ class AgriculturalProduce extends Model
 {
     use HasFactory;
 
+    protected $table = 'agricultural_produce';
+
     protected $fillable = [
         'company_id',
         'biological_asset_id',
