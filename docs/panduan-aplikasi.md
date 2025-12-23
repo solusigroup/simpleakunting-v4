@@ -36,6 +36,7 @@ SimpleAkunting V4 adalah aplikasi akuntansi modern berbasis web yang dirancang k
 | SAK Entitas Privat | Standar untuk entitas privat |
 | PSAK | Pernyataan Standar Akuntansi Keuangan |
 | **PSAK 69** | Khusus untuk Aset Biologis (pertanian, peternakan, dll.) |
+| **Kepmendesa 136/2022** | Keputusan Menteri Desa No. 136 Tahun 2022 - Pelaporan Akuntansi Keuangan khusus BUMDesa |
 
 ### 1.3 Fitur Utama
 
