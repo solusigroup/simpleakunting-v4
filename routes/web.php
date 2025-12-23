@@ -52,6 +52,13 @@ Route::middleware('auth')->group(function () {
 
     // Help / Manual
     Route::view('/help', 'help.index')->name('help');
+    Route::get('/help/panduan', function () {
+        $path = base_path('docs/panduan-aplikasi.html');
+        if (file_exists($path)) {
+            return response()->file($path, ['Content-Type' => 'text/html']);
+        }
+        return redirect()->route('help');
+    })->name('help.panduan');
     
     // Company Settings (Administrator only)
     Route::middleware(['role:Administrator'])->group(function () {

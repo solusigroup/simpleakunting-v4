@@ -22,9 +22,9 @@
                 
                 <!-- Link to Full Guide -->
                 <div class="mt-4 pt-4 border-t border-border-dark">
-                    <a href="/docs/panduan-aplikasi.md" target="_blank" class="flex items-center gap-2 text-sm text-primary hover:text-primary-light transition">
+                    <a href="{{ route('help.panduan') }}" target="_blank" class="flex items-center gap-2 text-sm text-primary hover:text-primary-light transition">
                         <span class="material-symbols-outlined text-base">open_in_new</span>
-                        Panduan Lengkap (PDF)
+                        Panduan Lengkap (HTML)
                     </a>
                 </div>
             </div>
