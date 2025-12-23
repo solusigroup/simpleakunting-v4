@@ -365,14 +365,9 @@ class ReportController extends Controller
         $endDate = $request->query('end_date', now()->format('Y-m-d'));
         $unitId = $request->query('unit_id');
 
-        // Get cash accounts
+        // Get cash accounts using category-based scope with fallback
         $cashAccounts = ChartOfAccount::where('company_id', $company->id)
-            ->where(function($q) {
-                $q->where('code', 'like', '1.1.1%')
-                  ->orWhere('code', 'like', '1100%')
-                  ->orWhere('name', 'like', '%Kas%')
-                  ->orWhere('name', 'like', '%Bank%');
-            })
+            ->cashBank()
             ->where('is_parent', false)
             ->get();
 
@@ -506,9 +501,11 @@ class ReportController extends Controller
             
             if ($account->type === 'Asset') {
                 $balances['total_assets'] += $balance;
-                if (str_starts_with($account->code, '1.1') || str_starts_with($account->code, '11')) {
+                if ($account->isCurrentAsset()) {
                     $balances['current_assets'] += $balance;
-                    if (stripos($account->name, 'persediaan') !== false || stripos($account->name, 'inventory') !== false) {
+                    if ($account->account_category === 'inventory' || 
+                        stripos($account->name, 'persediaan') !== false || 
+                        stripos($account->name, 'inventory') !== false) {
                         $balances['inventory'] += $balance;
                     }
                 } else {
@@ -516,7 +513,7 @@ class ReportController extends Controller
                 }
             } elseif ($account->type === 'Liability') {
                 $balances['total_liabilities'] += $balance;
-                if (str_starts_with($account->code, '2.1') || str_starts_with($account->code, '21')) {
+                if ($account->isCurrentLiability()) {
                     $balances['current_liabilities'] += $balance;
                 } else {
                     $balances['long_term_liabilities'] += $balance;

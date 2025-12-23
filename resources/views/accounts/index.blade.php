@@ -46,6 +46,7 @@
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Kode</th>
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Nama Akun</th>
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Tipe</th>
+                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Kategori</th>
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Laporan</th>
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Saldo Normal</th>
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Status</th>
@@ -112,6 +113,54 @@
                             </select>
                         </div>
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Kategori <span class="text-xs">(opsional)</span></label>
+                        <select id="account_category"
+                                class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="">-- Pilih Kategori --</option>
+                            <optgroup label="Assets">
+                                <option value="cash_bank">Kas & Bank</option>
+                                <option value="accounts_receivable">Piutang Usaha</option>
+                                <option value="other_receivable">Piutang Lainnya</option>
+                                <option value="inventory">Persediaan</option>
+                                <option value="prepaid_expense">Biaya Dibayar Dimuka</option>
+                                <option value="other_current_asset">Aset Lancar Lainnya</option>
+                                <option value="fixed_asset">Aset Tetap</option>
+                                <option value="accumulated_depreciation">Akumulasi Penyusutan</option>
+                                <option value="intangible_asset">Aset Tidak Berwujud</option>
+                                <option value="other_asset">Aset Lainnya</option>
+                            </optgroup>
+                            <optgroup label="Liabilities">
+                                <option value="accounts_payable">Hutang Usaha</option>
+                                <option value="other_payable">Hutang Lainnya</option>
+                                <option value="accrued_expense">Biaya Yang Masih Harus Dibayar</option>
+                                <option value="other_current_liability">Kewajiban Lancar Lainnya</option>
+                                <option value="long_term_liability">Kewajiban Jangka Panjang</option>
+                            </optgroup>
+                            <optgroup label="Equity">
+                                <option value="equity_capital">Modal</option>
+                                <option value="equity_retained">Laba Ditahan</option>
+                                <option value="equity_other">Ekuitas Lainnya</option>
+                            </optgroup>
+                            <optgroup label="Revenue">
+                                <option value="revenue_sales">Pendapatan Penjualan</option>
+                                <option value="revenue_service">Pendapatan Jasa</option>
+                                <option value="revenue_other">Pendapatan Lainnya</option>
+                                <option value="other_income">Pendapatan Lain-lain</option>
+                            </optgroup>
+                            <optgroup label="Expenses">
+                                <option value="cogs">Harga Pokok Penjualan</option>
+                                <option value="expense_operational">Beban Operasional</option>
+                                <option value="expense_administrative">Beban Administrasi</option>
+                                <option value="expense_selling">Beban Penjualan</option>
+                                <option value="expense_other">Beban Lainnya</option>
+                                <option value="other_expense">Beban Lain-lain</option>
+                            </optgroup>
+                            <optgroup label="Other">
+                                <option value="general">Umum</option>
+                            </optgroup>
+                        </select>
+                    </div>
                     <div class="flex items-center gap-2">
                         <input type="checkbox" id="is_parent" class="rounded border-border-dark bg-surface-dark text-primary focus:ring-primary">
                         <label for="is_parent" class="text-sm text-text-muted">Header Account (tidak bisa diisi transaksi)</label>
@@ -161,6 +210,9 @@
                     <td class="p-4">
                         <span class="px-2 py-1 rounded text-xs font-medium ${getTypeColor(acc.type)}">${acc.type}</span>
                     </td>
+                    <td class="p-4">
+                        ${acc.account_category ? `<span class="px-2 py-1 rounded text-xs font-medium bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">${getCategoryLabel(acc.account_category)}</span>` : '<span class="text-text-muted/50 text-xs">—</span>'}
+                    </td>
                     <td class="p-4 text-text-muted">${acc.report_type}</td>
                     <td class="p-4 text-text-muted">${acc.normal_balance}</td>
                     <td class="p-4">
@@ -203,6 +255,41 @@
             return colors[type] || 'bg-gray-500/20 text-gray-400';
         }
 
+        function getCategoryLabel(category) {
+            const labels = {
+                'cash_bank': 'Kas & Bank',
+                'accounts_receivable': 'Piutang Usaha',
+                'other_receivable': 'Piutang Lainnya',
+                'inventory': 'Persediaan',
+                'prepaid_expense': 'Biaya Dibayar Dimuka',
+                'other_current_asset': 'Aset Lancar Lainnya',
+                'fixed_asset': 'Aset Tetap',
+                'accumulated_depreciation': 'Akumulasi Penyusutan',
+                'intangible_asset': 'Aset Tidak Berwujud',
+                'other_asset': 'Aset Lainnya',
+                'accounts_payable': 'Hutang Usaha',
+                'other_payable': 'Hutang Lainnya',
+                'accrued_expense': 'Biaya YMH Dibayar',
+                'other_current_liability': 'Kewajiban Lancar',
+                'long_term_liability': 'Kewajiban Jk. Panjang',
+                'equity_capital': 'Modal',
+                'equity_retained': 'Laba Ditahan',
+                'equity_other': 'Ekuitas Lainnya',
+                'revenue_sales': 'Pend. Penjualan',
+                'revenue_service': 'Pend. Jasa',
+                'revenue_other': 'Pend. Lainnya',
+                'other_income': 'Pend. Lain-lain',
+                'cogs': 'HPP',
+                'expense_operational': 'Beban Operasional',
+                'expense_administrative': 'Beban Administrasi',
+                'expense_selling': 'Beban Penjualan',
+                'expense_other': 'Beban Lainnya',
+                'other_expense': 'Beban Lain-lain',
+                'general': 'Umum'
+            };
+            return labels[category] || category;
+        }
+
         function openCreateModal() {
             document.getElementById('modalTitle').textContent = 'Tambah Akun';
             document.getElementById('accountForm').reset();
@@ -221,6 +308,7 @@
             document.getElementById('type').value = account.type;
             document.getElementById('report_type').value = account.report_type;
             document.getElementById('normal_balance').value = account.normal_balance;
+            document.getElementById('account_category').value = account.account_category || '';
             document.getElementById('is_parent').checked = account.is_parent;
             document.getElementById('accountModal').classList.remove('hidden');
         }
@@ -273,6 +361,7 @@
                 type: document.getElementById('type').value,
                 report_type: document.getElementById('report_type').value,
                 normal_balance: document.getElementById('normal_balance').value,
+                account_category: document.getElementById('account_category').value || null,
                 is_parent: document.getElementById('is_parent').checked,
             };
 

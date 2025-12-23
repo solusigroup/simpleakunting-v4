@@ -80,6 +80,7 @@ class AccountController extends Controller
             'normal_balance' => ['required', 'in:DEBIT,KREDIT'],
             'parent_id' => ['nullable', 'exists:chart_of_accounts,id'],
             'is_parent' => ['boolean'],
+            'account_category' => ['nullable', 'string', 'in:cash_bank,accounts_receivable,other_receivable,inventory,prepaid_expense,other_current_asset,fixed_asset,accumulated_depreciation,intangible_asset,other_asset,accounts_payable,other_payable,accrued_expense,other_current_liability,long_term_liability,equity_capital,equity_retained,equity_other,revenue_sales,revenue_service,revenue_other,cogs,expense_operational,expense_administrative,expense_selling,expense_other,other_income,other_expense,general'],
         ]);
 
         // Check if code already exists
@@ -113,6 +114,7 @@ class AccountController extends Controller
             'level' => $level,
             'is_system' => false,
             'is_active' => true,
+            'account_category' => $request->account_category,
         ]);
 
         return response()->json([
@@ -157,6 +159,7 @@ class AccountController extends Controller
             'normal_balance' => ['sometimes', 'required', 'in:DEBIT,KREDIT'],
             'is_parent' => ['sometimes', 'boolean'],
             'is_active' => ['sometimes', 'boolean'],
+            'account_category' => ['nullable', 'string', 'in:cash_bank,accounts_receivable,other_receivable,inventory,prepaid_expense,other_current_asset,fixed_asset,accumulated_depreciation,intangible_asset,other_asset,accounts_payable,other_payable,accrued_expense,other_current_liability,long_term_liability,equity_capital,equity_retained,equity_other,revenue_sales,revenue_service,revenue_other,cogs,expense_operational,expense_administrative,expense_selling,expense_other,other_income,other_expense,general'],
         ]);
 
         // Check if code is being changed and if it already exists

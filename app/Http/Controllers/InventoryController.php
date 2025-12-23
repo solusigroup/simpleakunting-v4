@@ -33,12 +33,7 @@ class InventoryController extends Controller
         $accounts = ChartOfAccount::where('company_id', $company->id)
             ->where('type', 'Asset')
             ->where('is_parent', false)
-            ->where(function($q) {
-                $q->where('name', 'like', '%Persediaan%')
-                  ->orWhere('name', 'like', '%Inventory%')
-                  ->orWhere('code', 'like', '1.1.4%')
-                  ->orWhere('code', 'like', '114%');
-            })
+            ->inventoryAccounts()
             ->get();
 
         if ($request->wantsJson()) {

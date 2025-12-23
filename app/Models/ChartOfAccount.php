@@ -24,6 +24,7 @@ class ChartOfAccount extends Model
         'is_active',
         'is_system',
         'level',
+        'account_category',
     ];
 
     protected $casts = [
@@ -137,6 +138,131 @@ class ChartOfAccount extends Model
     public function scopeLabaRugi($query)
     {
         return $query->where('report_type', 'LABARUGI');
+    }
+
+    /**
+     * Scope for filtering by account category.
+     */
+    public function scopeCategory($query, string|array $category)
+    {
+        if (is_array($category)) {
+            return $query->whereIn('account_category', $category);
+        }
+        return $query->where('account_category', $category);
+    }
+
+    /**
+     * Scope for cash and bank accounts with fallback to code pattern.
+     */
+    public function scopeCashBank($query)
+    {
+        return $query->where(function($q) {
+            $q->where('account_category', 'cash_bank')
+              ->orWhere(function($q2) {
+                  // Fallback for accounts without category
+                  $q2->whereNull('account_category')
+                     ->where(function($q3) {
+                         $q3->where('code', 'like', '1.1.1%')
+                            ->orWhere('code', 'like', '1100%')
+                            ->orWhere('name', 'like', '%Kas%')
+                            ->orWhere('name', 'like', '%Bank%');
+                     });
+              });
+        });
+    }
+
+    /**
+     * Scope for inventory accounts with fallback to code pattern.
+     */
+    public function scopeInventoryAccounts($query)
+    {
+        return $query->where(function($q) {
+            $q->where('account_category', 'inventory')
+              ->orWhere(function($q2) {
+                  // Fallback for accounts without category
+                  $q2->whereNull('account_category')
+                     ->where(function($q3) {
+                         $q3->where('name', 'like', '%Persediaan%')
+                            ->orWhere('name', 'like', '%Inventory%')
+                            ->orWhere('code', 'like', '1.1.4%')
+                            ->orWhere('code', 'like', '114%');
+                     });
+              });
+        });
+    }
+
+    /**
+     * Scope for fixed asset accounts with fallback to code pattern.
+     */
+    public function scopeFixedAssetAccounts($query)
+    {
+        return $query->where(function($q) {
+            $q->where('account_category', 'fixed_asset')
+              ->orWhere(function($q2) {
+                  // Fallback for accounts without category
+                  $q2->whereNull('account_category')
+                     ->where(function($q3) {
+                         $q3->where('code', 'like', '1.2%')
+                            ->orWhere('code', 'like', '12%');
+                     });
+              });
+        });
+    }
+
+    /**
+     * Scope for accumulated depreciation accounts.
+     */
+    public function scopeAccumulatedDepreciation($query)
+    {
+        return $query->where(function($q) {
+            $q->where('account_category', 'accumulated_depreciation')
+              ->orWhere(function($q2) {
+                  // Fallback for accounts without category
+                  $q2->whereNull('account_category')
+                     ->where(function($q3) {
+                         $q3->where('name', 'like', '%Akumulasi%')
+                            ->orWhere('name', 'like', '%Accumulated%');
+                     });
+              });
+        });
+    }
+
+    /**
+     * Check if account is current asset (for financial analysis).
+     */
+    public function isCurrentAsset(): bool
+    {
+        if ($this->account_category) {
+            return in_array($this->account_category, [
+                'cash_bank',
+                'accounts_receivable',
+                'other_receivable',
+                'inventory',
+                'prepaid_expense',
+                'other_current_asset',
+            ]);
+        }
+        
+        // Fallback to code pattern
+        return str_starts_with($this->code, '1.1') || str_starts_with($this->code, '11');
+    }
+
+    /**
+     * Check if account is current liability (for financial analysis).
+     */
+    public function isCurrentLiability(): bool
+    {
+        if ($this->account_category) {
+            return in_array($this->account_category, [
+                'accounts_payable',
+                'other_payable',
+                'accrued_expense',
+                'other_current_liability',
+            ]);
+        }
+        
+        // Fallback to code pattern
+        return str_starts_with($this->code, '2.1') || str_starts_with($this->code, '21');
     }
 
     /**

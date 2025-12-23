@@ -30,24 +30,18 @@ class FixedAssetController extends Controller
             ->orderBy('code')
             ->get();
 
-        // Get asset accounts
+        // Get asset accounts using category-based scope
         $assetAccounts = ChartOfAccount::where('company_id', $company->id)
             ->where('type', 'Asset')
             ->where('is_parent', false)
-            ->where(function($q) {
-                $q->where('code', 'like', '1.2%')
-                  ->orWhere('code', 'like', '12%');
-            })
+            ->fixedAssetAccounts()
             ->get();
 
-        // Get accumulated depreciation accounts
+        // Get accumulated depreciation accounts using category-based scope
         $accumAccounts = ChartOfAccount::where('company_id', $company->id)
             ->where('type', 'Asset')
             ->where('is_parent', false)
-            ->where(function($q) {
-                $q->where('name', 'like', '%Akumulasi%')
-                  ->orWhere('name', 'like', '%Accumulated%');
-            })
+            ->accumulatedDepreciation()
             ->get();
 
         if ($request->wantsJson()) {
