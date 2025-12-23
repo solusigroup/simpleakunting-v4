@@ -73,10 +73,10 @@ class ChartOfAccount extends Model
             ->whereHas('journal', function ($q) use ($startDate, $endDate) {
                 $q->where('is_posted', true);
                 if ($startDate) {
-                    $q->where('date', '>=', $startDate);
+                    $q->whereDate('date', '>=', $startDate);
                 }
                 if ($endDate) {
-                    $q->where('date', '<=', $endDate);
+                    $q->whereDate('date', '<=', $endDate);
                 }
             });
 

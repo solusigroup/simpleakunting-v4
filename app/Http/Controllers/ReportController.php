@@ -332,10 +332,10 @@ class ReportController extends Controller
                     ->where('is_posted', true);
                 
                 if ($startDate) {
-                    $q->where('date', '>=', $startDate);
+                    $q->whereDate('date', '>=', $startDate);
                 }
                 if ($endDate) {
-                    $q->where('date', '<=', $endDate);
+                    $q->whereDate('date', '<=', $endDate);
                 }
                 if ($unitId) {
                     $q->where('business_unit_id', $unitId);
@@ -1342,7 +1342,8 @@ class ReportController extends Controller
 
         $query = \App\Models\Journal::where('company_id', $company->id)
             ->where('is_posted', true)
-            ->whereBetween('date', [$startDate, $endDate])
+            ->whereDate('date', '>=', $startDate)
+            ->whereDate('date', '<=', $endDate)
             ->with(['items.account:id,code,name', 'businessUnit:id,name'])
             ->orderBy('date', 'desc')
             ->orderBy('id', 'desc');

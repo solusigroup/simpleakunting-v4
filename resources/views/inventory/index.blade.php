@@ -6,6 +6,12 @@
                 <p class="text-text-muted text-sm mt-1">Kelola master data persediaan barang</p>
             </div>
             <div class="flex gap-2">
+                <!-- Search Box -->
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Cari barang..." oninput="filterItems()"
+                           class="w-64 px-4 py-2 pl-10 rounded-full bg-surface-dark border border-border-dark text-white placeholder-text-muted focus:border-primary focus:ring-primary">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">search</span>
+                </div>
                 <x-btn type="secondary" onclick="window.location.href='/inventory/export'">
                     <span class="material-symbols-outlined text-xl">download</span>
                     Export Excel
@@ -231,6 +237,29 @@
                 alert(result.message || 'Terjadi kesalahan');
             }
         });
+
+        // Search/Filter functionality
+        function filterItems() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                // Skip empty state row
+                if (row.querySelector('td[colspan]')) return;
+                
+                const code = row.cells[0]?.textContent.toLowerCase() || '';
+                const name = row.cells[1]?.textContent.toLowerCase() || '';
+                const unit = row.cells[2]?.textContent.toLowerCase() || '';
+                
+                const matches = code.includes(searchTerm) || 
+                              name.includes(searchTerm) || 
+                              unit.includes(searchTerm);
+                
+                row.style.display = matches ? '' : 'none';
+                if (matches) visibleCount++;
+            });
+        }
     </script>
     @endpush
 </x-app-layout>

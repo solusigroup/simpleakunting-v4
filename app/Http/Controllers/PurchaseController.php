@@ -63,7 +63,7 @@ class PurchaseController extends Controller
     {
         $user = $request->user();
         
-        if (!$user->canCreateTransactions()) {
+        if (!$user->canEdit()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki izin untuk membuat transaksi.',
