@@ -49,6 +49,7 @@
     </div>
 
     <!-- Category Filters -->
+    @if(Schema::hasColumn('inventories', 'category'))
     <div class="mb-6 flex flex-wrap gap-3">
         <a href="{{ route('inventory.index') }}" 
            class="px-4 py-2 rounded-xl text-sm transition {{ !request('category') ? 'bg-primary text-background-dark' : 'bg-surface-dark text-text-muted hover:text-white' }}">
@@ -71,6 +72,7 @@
             Supplies
         </a>
     </div>
+    @endif
 
     <!-- Items Table -->
     <div class="rounded-2xl border border-border-dark bg-surface-dark/30 overflow-hidden">
@@ -80,7 +82,7 @@
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase">Kode</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase">Nama Barang</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase">Kategori</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase">Satuan</th>
                         <th class="px-6 py-4 text-right text-xs font-medium text-text-muted uppercase">Stok</th>
                         <th class="px-6 py-4 text-right text-xs font-medium text-text-muted uppercase">Harga Beli</th>
                         <th class="px-6 py-4 text-right text-xs font-medium text-text-muted uppercase">Harga Jual</th>
@@ -95,7 +97,7 @@
                         <td class="px-6 py-4">
                             <p class="text-white font-medium">{{ $item->name }}</p>
                             <div class="flex items-center gap-2 mt-1">
-                                @if($item->is_assembly)
+                                @if($item->is_assembly ?? false)
                                 <span class="px-2 py-0.5 rounded text-xs bg-primary/20 text-primary">Assembly</span>
                                 @endif
                                 @if($item->isLowStock())
@@ -103,14 +105,7 @@
                                 @endif
                             </div>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="px-2 py-1 rounded text-xs
-                                {{ $item->category == 'finished_goods' ? 'bg-green-500/20 text-green-400' :
-                                   ($item->category == 'raw_materials' ? 'bg-blue-500/20 text-blue-400' :
-                                   ($item->category == 'work_in_process' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-purple-500/20 text-purple-400')) }}">
-                                {{ $item->getCategoryLabel() }}
-                            </span>
-                        </td>
+                        <td class="px-6 py-4 text-text-muted">{{ $item->unit }}</td>
                         <td class="px-6 py-4 text-right {{ $item->isLowStock() ? 'text-orange-400' : 'text-white' }} font-medium">
                             {{ number_format($item->stock) }}
                         </td>
@@ -122,7 +117,7 @@
                                 <button onclick="editItem({{ json_encode($item) }})" class="text-text-muted hover:text-primary" title="Edit">
                                     <span class="material-symbols-outlined">edit</span>
                                 </button>
-                                @if($item->is_assembly)
+                                @if($item->is_assembly ?? false)
                                 <a href="{{ route('assemblies.show', $item->id) }}" class="text-text-muted hover:text-green-400" title="Kelola BOM">
                                     <span class="material-symbols-outlined">precision_manufacturing</span>
                                 </a>

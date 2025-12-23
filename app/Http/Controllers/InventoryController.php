@@ -26,16 +26,21 @@ class InventoryController extends Controller
         }
 
         $query = Inventory::where('company_id', $company->id)
-            ->with(['account:id,code,name', 'components.component']);
+            ->with(['account:id,code,name']);
 
-        // Filter by category
-        if ($request->has('category') && $request->category !== 'all') {
-            $query->where('category', $request->category);
-        }
+        // Only load components if is_assembly column exists (manufacturing feature)
+        if (\Schema::hasColumn('inventories', 'is_assembly')) {
+            $query->with(['components.component']);
+            
+            // Filter by category
+            if ($request->has('category') && $request->category !== 'all') {
+                $query->where('category', $request->category);
+            }
 
-        // Filter by assembly
-        if ($request->has('is_assembly')) {
-            $query->where('is_assembly', $request->is_assembly);
+            // Filter by assembly
+            if ($request->has('is_assembly')) {
+                $query->where('is_assembly', $request->is_assembly);
+            }
         }
 
         $items = $query->orderBy('code')->get();
