@@ -59,6 +59,13 @@ Route::middleware('auth')->group(function () {
         }
         return redirect()->route('help');
     })->name('help.panduan');
+    Route::get('/help/deployment', function () {
+        $path = base_path('docs/panduan-deployment.html');
+        if (file_exists($path)) {
+            return response()->file($path, ['Content-Type' => 'text/html']);
+        }
+        return redirect()->route('help');
+    })->name('help.deployment');
     
     // Company Settings (Administrator only)
     Route::middleware(['role:Administrator'])->group(function () {
