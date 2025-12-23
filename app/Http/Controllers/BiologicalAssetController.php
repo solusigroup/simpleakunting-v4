@@ -44,17 +44,35 @@ class BiologicalAssetController extends Controller
             ->orderBy('code')
             ->get();
 
-        // Get biological asset accounts
+        // Get biological asset accounts (fallback to all Asset accounts)
         $assetAccounts = ChartOfAccount::where('company_id', $company->id)
             ->where('is_parent', false)
             ->biologicalAssets()
             ->get();
+        
+        if ($assetAccounts->isEmpty()) {
+            // Fallback: show all non-parent Asset accounts
+            $assetAccounts = ChartOfAccount::where('company_id', $company->id)
+                ->where('is_parent', false)
+                ->where('type', 'Asset')
+                ->orderBy('code')
+                ->get();
+        }
 
-        // Get fair value gain/loss accounts
+        // Get fair value gain/loss accounts (fallback to Revenue/Expense accounts)
         $fairValueAccounts = ChartOfAccount::where('company_id', $company->id)
             ->where('is_parent', false)
             ->fairValueGainLoss()
             ->get();
+            
+        if ($fairValueAccounts->isEmpty()) {
+            // Fallback: show Revenue and Expense accounts
+            $fairValueAccounts = ChartOfAccount::where('company_id', $company->id)
+                ->where('is_parent', false)
+                ->whereIn('type', ['Revenue', 'Expense'])
+                ->orderBy('code')
+                ->get();
+        }
 
         if ($request->wantsJson()) {
             return response()->json(['success' => true, 'data' => $assets]);
