@@ -27,10 +27,13 @@ class Company extends Model
         'secretary_title',
         'staff_name',
         'staff_title',
+        'enable_psak69',
+        'business_sector',
     ];
 
     protected $casts = [
         'fiscal_start' => 'date',
+        'enable_psak69' => 'boolean',
     ];
 
     /**
@@ -120,4 +123,35 @@ class Company extends Model
     {
         return $this->entity_type === 'UMKM';
     }
+
+    /**
+     * Check if company uses PSAK 69 (Biological Assets).
+     */
+    public function usesPsak69(): bool
+    {
+        return $this->enable_psak69 === true;
+    }
+
+    /**
+     * Check if company is in agriculture sector.
+     */
+    public function isAgricultureSector(): bool
+    {
+        return in_array($this->business_sector, [
+            'livestock',
+            'plantation',
+            'aquaculture',
+            'forestry',
+            'mixed_agriculture'
+        ]);
+    }
+
+    /**
+     * Get biological assets for this company (if PSAK 69 enabled).
+     */
+    public function biologicalAssets(): HasMany
+    {
+        return $this->hasMany(BiologicalAsset::class);
+    }
 }
+

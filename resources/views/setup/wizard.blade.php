@@ -125,7 +125,7 @@
                         <p class="text-text-muted">Pilih standar yang sesuai dengan jenis usaha Anda</p>
                     </div>
 
-                    <div class="grid gap-4" id="standardOptions">
+                    <div class="grid gap-4 mb-6" id="standardOptions">
                         <label class="block cursor-pointer">
                             <input type="radio" name="standard" value="SAK_EP" class="hidden peer" checked>
                             <div class="p-6 rounded-xl border-2 border-border-dark peer-checked:border-primary peer-checked:bg-primary/10 transition">
@@ -154,6 +154,35 @@
                                 </div>
                             </div>
                         </label>
+                    </div>
+
+                    <!-- Business Sector Selection -->
+                    <div class="bg-background-dark rounded-xl p-6 border border-border-dark">
+                        <h3 class="text-white font-semibold mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">business_center</span>
+                            Sektor Bisnis
+                        </h3>
+                        <p class="text-text-muted text-sm mb-4">Pilih sektor bisnis perusahaan Anda. Jika bergerak di bidang agrikultur, modul PSAK 69 (Aset Biologis) akan diaktifkan.</p>
+                        
+                        <select id="businessSector" class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary" onchange="togglePsak69Info()">
+                            <option value="general">Umum (Non-Agrikultur)</option>
+                            <option value="livestock">Peternakan</option>
+                            <option value="plantation">Perkebunan</option>
+                            <option value="aquaculture">Perikanan/Budidaya</option>
+                            <option value="forestry">Kehutanan</option>
+                            <option value="mixed_agriculture">Agrikultur Campuran</option>
+                        </select>
+
+                        <!-- PSAK 69 Info (shown when agriculture sector selected) -->
+                        <div id="psak69Info" class="hidden mt-4 p-4 bg-primary/10 border border-primary/30 rounded-xl">
+                            <div class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-primary text-2xl">info</span>
+                                <div>
+                                    <h4 class="text-white font-semibold mb-1">Modul PSAK 69 Aktif</h4>
+                                    <p class="text-text-muted text-sm">Perusahaan Anda akan menggunakan PSAK 69 (Agrikultur) untuk pencatatan aset biologis seperti ternak, tanaman, dan hasil panen dengan pengukuran nilai wajar.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex justify-between mt-8">
@@ -238,6 +267,8 @@
             btn.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-2">progress_activity</span> Menyimpan...';
 
             const standard = document.querySelector('input[name="standard"]:checked').value;
+            const businessSector = document.getElementById('businessSector').value;
+            const enablePsak69 = ['livestock', 'plantation', 'aquaculture', 'forestry', 'mixed_agriculture'].includes(businessSector);
             
             // Save company info
             const companyData = {
@@ -250,6 +281,8 @@
                 director_title: document.getElementById('directorTitle').value,
                 secretary_name: document.getElementById('secretaryName').value,
                 secretary_title: document.getElementById('secretaryTitle').value,
+                business_sector: businessSector,
+                enable_psak69: enablePsak69,
             };
 
             try {
@@ -287,6 +320,17 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = 'Simpan & Lanjutkan <span class="material-symbols-outlined align-middle ml-1">arrow_forward</span>';
+            }
+        }
+
+        function togglePsak69Info() {
+            const businessSector = document.getElementById('businessSector').value;
+            const psak69Info = document.getElementById('psak69Info');
+            
+            if (['livestock', 'plantation', 'aquaculture', 'forestry', 'mixed_agriculture'].includes(businessSector)) {
+                psak69Info.classList.remove('hidden');
+            } else {
+                psak69Info.classList.add('hidden');
             }
         }
 

@@ -272,4 +272,78 @@ class ChartOfAccount extends Model
     {
         return !$this->is_parent;
     }
+
+    /**
+     * Scope for biological asset accounts.
+     */
+    public function scopeBiologicalAssets($query)
+    {
+        return $query->where(function($q) {
+            $q->whereIn('account_category', [
+                'biological_asset',
+                'biological_asset_immature',
+                'biological_asset_mature'
+            ])
+            ->orWhere(function($q2) {
+                // Fallback for accounts without category
+                $q2->whereNull('account_category')
+                   ->where(function($q3) {
+                       $q3->where('name', 'like', '%Aset Biologis%')
+                          ->orWhere('name', 'like', '%Biological Asset%');
+                   });
+            });
+        });
+    }
+
+    /**
+     * Scope for agricultural produce accounts.
+     */
+    public function scopeAgriculturalProduce($query)
+    {
+        return $query->where(function($q) {
+            $q->where('account_category', 'agricultural_produce')
+              ->orWhere(function($q2) {
+                  $q2->whereNull('account_category')
+                     ->where(function($q3) {
+                         $q3->where('name', 'like', '%Produk Agrikultur%')
+                            ->orWhere('name', 'like', '%Agricultural Produce%');
+                     });
+              });
+        });
+    }
+
+    /**
+     * Scope for fair value gain/loss accounts.
+     */
+    public function scopeFairValueGainLoss($query)
+    {
+        return $query->where(function($q) {
+            $q->where('account_category', 'fair_value_gain_loss')
+              ->orWhere(function($q2) {
+                  $q2->whereNull('account_category')
+                     ->where(function($q3) {
+                         $q3->where('name', 'like', '%Keuntungan%Nilai Wajar%')
+                            ->orWhere('name', 'like', '%Kerugian%Nilai Wajar%')
+                            ->orWhere('name', 'like', '%Fair Value%');
+                     });
+              });
+        });
+    }
+
+    /**
+     * Check if account is for biological assets.
+     */
+    public function isBiologicalAsset(): bool
+    {
+        if ($this->account_category) {
+            return in_array($this->account_category, [
+                'biological_asset',
+                'biological_asset_immature',
+                'biological_asset_mature'
+            ]);
+        }
+        
+        return false;
+    }
 }
+

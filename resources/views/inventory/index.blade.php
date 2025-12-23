@@ -48,6 +48,30 @@
         </div>
     </div>
 
+    <!-- Category Filters -->
+    <div class="mb-6 flex flex-wrap gap-3">
+        <a href="{{ route('inventory.index') }}" 
+           class="px-4 py-2 rounded-xl text-sm transition {{ !request('category') ? 'bg-primary text-background-dark' : 'bg-surface-dark text-text-muted hover:text-white' }}">
+            Semua
+        </a>
+        <a href="{{ route('inventory.index', ['category' => 'finished_goods']) }}" 
+           class="px-4 py-2 rounded-xl text-sm transition {{ request('category') == 'finished_goods' ? 'bg-green-500 text-white' : 'bg-surface-dark text-text-muted hover:text-white' }}">
+            Barang Jadi
+        </a>
+        <a href="{{ route('inventory.index', ['category' => 'raw_materials']) }}" 
+           class="px-4 py-2 rounded-xl text-sm transition {{ request('category') == 'raw_materials' ? 'bg-blue-500 text-white' : 'bg-surface-dark text-text-muted hover:text-white' }}">
+            Bahan Baku
+        </a>
+        <a href="{{ route('inventory.index', ['category' => 'work_in_process']) }}" 
+           class="px-4 py-2 rounded-xl text-sm transition {{ request('category') == 'work_in_process' ? 'bg-yellow-500 text-black' : 'bg-surface-dark text-text-muted hover:text-white' }}">
+            WIP
+        </a>
+        <a href="{{ route('inventory.index', ['category' => 'supplies']) }}" 
+           class="px-4 py-2 rounded-xl text-sm transition {{ request('category') == 'supplies' ? 'bg-purple-500 text-white' : 'bg-surface-dark text-text-muted hover:text-white' }}">
+            Supplies
+        </a>
+    </div>
+
     <!-- Items Table -->
     <div class="rounded-2xl border border-border-dark bg-surface-dark/30 overflow-hidden">
         <div class="overflow-x-auto">
@@ -56,7 +80,7 @@
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase">Kode</th>
                         <th class="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase">Nama Barang</th>
-                        <th class="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase">Satuan</th>
+                        <th class="px-6 py-4 text-left text-xs font-medium text-text-muted uppercase">Kategori</th>
                         <th class="px-6 py-4 text-right text-xs font-medium text-text-muted uppercase">Stok</th>
                         <th class="px-6 py-4 text-right text-xs font-medium text-text-muted uppercase">Harga Beli</th>
                         <th class="px-6 py-4 text-right text-xs font-medium text-text-muted uppercase">Harga Jual</th>
@@ -70,11 +94,23 @@
                         <td class="px-6 py-4 text-white font-mono text-sm">{{ $item->code }}</td>
                         <td class="px-6 py-4">
                             <p class="text-white font-medium">{{ $item->name }}</p>
-                            @if($item->isLowStock())
-                            <span class="text-xs text-orange-400">⚠ Stok Rendah</span>
-                            @endif
+                            <div class="flex items-center gap-2 mt-1">
+                                @if($item->is_assembly)
+                                <span class="px-2 py-0.5 rounded text-xs bg-primary/20 text-primary">Assembly</span>
+                                @endif
+                                @if($item->isLowStock())
+                                <span class="text-xs text-orange-400">⚠ Stok Rendah</span>
+                                @endif
+                            </div>
                         </td>
-                        <td class="px-6 py-4 text-text-muted">{{ $item->unit }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded text-xs
+                                {{ $item->category == 'finished_goods' ? 'bg-green-500/20 text-green-400' :
+                                   ($item->category == 'raw_materials' ? 'bg-blue-500/20 text-blue-400' :
+                                   ($item->category == 'work_in_process' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-purple-500/20 text-purple-400')) }}">
+                                {{ $item->getCategoryLabel() }}
+                            </span>
+                        </td>
                         <td class="px-6 py-4 text-right {{ $item->isLowStock() ? 'text-orange-400' : 'text-white' }} font-medium">
                             {{ number_format($item->stock) }}
                         </td>
@@ -82,9 +118,16 @@
                         <td class="px-6 py-4 text-right text-primary">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
                         <td class="px-6 py-4 text-right text-white font-medium">Rp {{ number_format($item->getValue(), 0, ',', '.') }}</td>
                         <td class="px-6 py-4 text-center">
-                            <button onclick="editItem({{ json_encode($item) }})" class="text-text-muted hover:text-primary">
-                                <span class="material-symbols-outlined">edit</span>
-                            </button>
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="editItem({{ json_encode($item) }})" class="text-text-muted hover:text-primary" title="Edit">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                                @if($item->is_assembly)
+                                <a href="{{ route('assemblies.show', $item->id) }}" class="text-text-muted hover:text-green-400" title="Kelola BOM">
+                                    <span class="material-symbols-outlined">precision_manufacturing</span>
+                                </a>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -129,6 +172,24 @@
                         <label class="block text-sm font-medium text-text-muted mb-2">Nama Barang</label>
                         <input type="text" id="name" required
                                class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-text-muted mb-2">Kategori</label>
+                            <select id="category" required
+                                    class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                                <option value="finished_goods">Barang Jadi/Dagangan</option>
+                                <option value="raw_materials">Bahan Baku</option>
+                                <option value="work_in_process">Barang Dalam Proses</option>
+                                <option value="supplies">Bahan Pembantu</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end pb-1">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" id="is_assembly" class="form-checkbox rounded bg-surface-dark border-border-dark text-primary focus:ring-primary">
+                                <span class="text-white">Assembly Item</span>
+                            </label>
+                        </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -186,6 +247,8 @@
             document.getElementById('code').value = item.code;
             document.getElementById('code').disabled = true;
             document.getElementById('name').value = item.name;
+            document.getElementById('category').value = item.category || 'finished_goods';
+            document.getElementById('is_assembly').checked = item.is_assembly || false;
             document.getElementById('unit').value = item.unit;
             document.getElementById('cost').value = item.cost;
             document.getElementById('price').value = item.price;
@@ -209,6 +272,8 @@
             const data = {
                 code: document.getElementById('code').value,
                 name: document.getElementById('name').value,
+                category: document.getElementById('category').value,
+                is_assembly: document.getElementById('is_assembly').checked,
                 unit: document.getElementById('unit').value,
                 cost: parseFloat(document.getElementById('cost').value),
                 price: parseFloat(document.getElementById('price').value),

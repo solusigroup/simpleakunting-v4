@@ -25,10 +25,20 @@ class InventoryController extends Controller
             return redirect()->route('setup.wizard');
         }
 
-        $items = Inventory::where('company_id', $company->id)
-            ->with('account:id,code,name')
-            ->orderBy('code')
-            ->get();
+        $query = Inventory::where('company_id', $company->id)
+            ->with(['account:id,code,name', 'components.component']);
+
+        // Filter by category
+        if ($request->has('category') && $request->category !== 'all') {
+            $query->where('category', $request->category);
+        }
+
+        // Filter by assembly
+        if ($request->has('is_assembly')) {
+            $query->where('is_assembly', $request->is_assembly);
+        }
+
+        $items = $query->orderBy('code')->get();
 
         $accounts = ChartOfAccount::where('company_id', $company->id)
             ->where('type', 'Asset')
@@ -70,6 +80,9 @@ class InventoryController extends Controller
             $request->validate([
                 'code' => ['required', 'string', 'max:50'],
                 'name' => ['required', 'string', 'max:255'],
+                'category' => ['required', 'in:finished_goods,raw_materials,work_in_process,supplies'],
+                'is_assembly' => ['nullable', 'boolean'],
+                'description' => ['nullable', 'string'],
                 'unit' => ['required', 'string', 'max:20'],
                 'cost' => ['required', 'numeric', 'min:0'],
                 'price' => ['required', 'numeric', 'min:0'],
@@ -94,6 +107,9 @@ class InventoryController extends Controller
                 'coa_id' => $request->coa_id,
                 'code' => $request->code,
                 'name' => $request->name,
+                'category' => $request->category ?? 'finished_goods',
+                'is_assembly' => $request->is_assembly ?? false,
+                'description' => $request->description,
                 'unit' => $request->unit,
                 'cost' => $request->cost,
                 'price' => $request->price,
@@ -154,6 +170,9 @@ class InventoryController extends Controller
 
         $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
+            'category' => ['sometimes', 'in:finished_goods,raw_materials,work_in_process,supplies'],
+            'is_assembly' => ['sometimes', 'boolean'],
+            'description' => ['nullable', 'string'],
             'unit' => ['sometimes', 'string', 'max:20'],
             'cost' => ['sometimes', 'numeric', 'min:0'],
             'price' => ['sometimes', 'numeric', 'min:0'],
@@ -162,7 +181,7 @@ class InventoryController extends Controller
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
-        $item->update($request->only(['name', 'unit', 'cost', 'price', 'stock', 'min_stock', 'is_active']));
+        $item->update($request->only(['name', 'category', 'is_assembly', 'description', 'unit', 'cost', 'price', 'stock', 'min_stock', 'is_active']));
 
         return response()->json([
             'success' => true,

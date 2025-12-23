@@ -16,6 +16,9 @@ class Inventory extends Model
         'coa_id',
         'code',
         'name',
+        'category',
+        'is_assembly',
+        'description',
         'unit',
         'cost',
         'price',
@@ -28,6 +31,7 @@ class Inventory extends Model
         'cost' => 'decimal:2',
         'price' => 'decimal:2',
         'is_active' => 'boolean',
+        'is_assembly' => 'boolean',
     ];
 
     /**
@@ -76,5 +80,124 @@ class Inventory extends Model
     public function scopeLowStock($query)
     {
         return $query->whereColumn('stock', '<=', 'min_stock');
+    }
+
+    /**
+     * Get assembly components (if this is an assembly item).
+     */
+    public function components()
+    {
+        return $this->hasMany(AssemblyComponent::class, 'assembly_id');
+    }
+
+    /**
+     * Get assemblies that use this item as a component.
+     */
+    public function usedInAssemblies()
+    {
+        return $this->hasMany(AssemblyComponent::class, 'component_id');
+    }
+
+    /**
+     * Get productions of this item.
+     */
+    public function productions()
+    {
+        return $this->hasMany(Production::class, 'assembly_id');
+    }
+
+    /**
+     * Scope for finished goods.
+     */
+    public function scopeFinishedGoods($query)
+    {
+        return $query->where('category', 'finished_goods');
+    }
+
+    /**
+     * Scope for raw materials.
+     */
+    public function scopeRawMaterials($query)
+    {
+        return $query->where('category', 'raw_materials');
+    }
+
+    /**
+     * Scope for work in process.
+     */
+    public function scopeWorkInProcess($query)
+    {
+        return $query->where('category', 'work_in_process');
+    }
+
+    /**
+     * Scope for supplies.
+     */
+    public function scopeSupplies($query)
+    {
+        return $query->where('category', 'supplies');
+    }
+
+    /**
+     * Scope for assembly items.
+     */
+    public function scopeAssembly($query)
+    {
+        return $query->where('is_assembly', true);
+    }
+
+    /**
+     * Get category label in Indonesian.
+     */
+    public function getCategoryLabel(): string
+    {
+        return match($this->category) {
+            'finished_goods' => 'Barang Jadi/Dagangan',
+            'raw_materials' => 'Bahan Baku',
+            'work_in_process' => 'Barang Dalam Proses',
+            'supplies' => 'Bahan Pembantu',
+            default => '-',
+        };
+    }
+
+    /**
+     * Calculate total component cost for assembly.
+     */
+    public function getComponentsCost(): float
+    {
+        if (!$this->is_assembly) {
+            return 0;
+        }
+
+        return $this->components->sum(function($component) {
+            return $component->quantity * $component->component->cost;
+        });
+    }
+
+    /**
+     * Check if can be assembled (has components defined).
+     */
+    public function canBeAssembled(): bool
+    {
+        return $this->is_assembly && $this->components()->count() > 0;
+    }
+
+    /**
+     * Check if has sufficient components in stock.
+     */
+    public function hasSufficientComponents(int $quantity = 1): bool
+    {
+        if (!$this->is_assembly) {
+            return false;
+        }
+
+        foreach ($this->components as $component) {
+            $requiredQty = $component->quantity * $quantity;
+            if ($component->component->stock < $requiredQty) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

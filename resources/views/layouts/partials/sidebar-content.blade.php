@@ -17,7 +17,8 @@
 <!-- Navigation -->
 <nav class="flex-1 p-4 space-y-1 overflow-y-auto" x-data="{ 
     transaksi: true, 
-    masterData: true, 
+    masterData: true,
+    manufaktur: true,
     laporan: true,
     pengaturan: true 
 }">
@@ -83,6 +84,29 @@
         <x-sidebar-item href="{{ route('assets.index') }}" icon="precision_manufacturing" :active="request()->routeIs('assets.*')">
             Aset Tetap
         </x-sidebar-item>
+        @if(auth()->user()->company?->usesPsak69())
+        <x-sidebar-item href="{{ route('biological-assets.index') }}" icon="eco" :active="request()->routeIs('biological-assets.*')">
+            Aset Biologis (PSAK 69)
+        </x-sidebar-item>
+        @endif
+    </div>
+
+    <!-- Manufacturing Group -->
+    <div class="pt-4">
+        <button @click="manufaktur = !manufaktur" 
+                class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
+            <span class="sidebar-group-label">Manufaktur</span>
+            <span class="material-symbols-outlined text-sm transition-transform sidebar-group-label" 
+                  :class="manufaktur ? 'rotate-0' : '-rotate-90'">expand_more</span>
+        </button>
+    </div>
+    <div x-show="manufaktur" x-collapse>
+        <x-sidebar-item href="{{ route('assemblies.index') }}" icon="precision_manufacturing" :active="request()->routeIs('assemblies.*')">
+            Bill of Materials
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('productions.index') }}" icon="factory" :active="request()->routeIs('productions.*')">
+            Produksi
+        </x-sidebar-item>
     </div>
 
     <!-- Laporan Group -->
@@ -125,6 +149,24 @@
         <x-sidebar-item href="{{ route('reports.financial-analysis') }}" icon="analytics" :active="request()->routeIs('reports.financial-analysis')">
             Analisa Keuangan
         </x-sidebar-item>
+        
+        @if(auth()->user()->company?->usesPsak69())
+        <div class="pt-2 pb-1 px-4">
+            <p class="text-xs font-semibold text-text-muted uppercase tracking-wider">PSAK 69</p>
+        </div>
+        <x-sidebar-item href="{{ route('reports.biological-reconciliation') }}" icon="eco" :active="request()->routeIs('reports.biological-reconciliation')">
+            Rekonsiliasi Aset Biologis
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('reports.biological-fair-value') }}" icon="trending_up" :active="request()->routeIs('reports.biological-fair-value')">
+            Perubahan Nilai Wajar
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('reports.biological-production') }}" icon="agriculture" :active="request()->routeIs('reports.biological-production')">
+            Produksi & Panen
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('reports.biological-disclosure') }}" icon="description" :active="request()->routeIs('reports.biological-disclosure')">
+            Pengungkapan PSAK 69
+        </x-sidebar-item>
+        @endif
     </div>
 
     <!-- Pengaturan Group (Admin access) -->

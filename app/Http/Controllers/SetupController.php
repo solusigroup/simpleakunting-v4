@@ -116,9 +116,19 @@ class SetupController extends Controller
             'npwp' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string'],
             'fiscal_start' => ['nullable', 'date'],
+            'business_sector' => ['nullable', 'in:general,livestock,plantation,aquaculture,forestry,mixed_agriculture'],
+            'enable_psak69' => ['nullable', 'boolean'],
         ]);
 
-        $company->update($request->only(['phone', 'email', 'npwp', 'address', 'fiscal_start']));
+        $company->update($request->only([
+            'phone', 
+            'email', 
+            'npwp', 
+            'address', 
+            'fiscal_start',
+            'business_sector',
+            'enable_psak69',
+        ]));
 
         return response()->json([
             'success' => true,

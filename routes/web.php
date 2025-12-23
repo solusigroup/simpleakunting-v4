@@ -21,6 +21,10 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\BiologicalAssetController;
+use App\Http\Controllers\BiologicalReportController;
+use App\Http\Controllers\AssemblyController;
+use App\Http\Controllers\ProductionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -126,6 +130,45 @@ Route::middleware('auth')->group(function () {
     Route::put('/assets/{id}', [FixedAssetController::class, 'update'])->name('assets.update');
     
     // ==========================================
+    // BIOLOGICAL ASSETS (PSAK 69)
+    // ==========================================
+    
+    // Biological Assets (Aset Biologis) - Only for companies with PSAK 69 enabled
+    // TODO: Add proper middleware after creating CheckPsak69Enabled middleware
+    // Biological Assets CRUD
+    Route::get('/biological-assets', [BiologicalAssetController::class, 'index'])->name('biological-assets.index');
+    Route::post('/biological-assets', [BiologicalAssetController::class, 'store'])->name('biological-assets.store');
+    Route::get('/biological-assets/{id}', [BiologicalAssetController::class, 'show'])->name('biological-assets.show');
+    Route::put('/biological-assets/{id}', [BiologicalAssetController::class, 'update'])->name('biological-assets.update');
+    Route::delete('/biological-assets/{id}', [BiologicalAssetController::class, 'destroy'])->name('biological-assets.destroy');
+    
+    // Biological Assets Special Actions
+    Route::post('/biological-assets/{id}/valuate', [BiologicalAssetController::class, 'valuate'])->name('biological-assets.valuate');
+    Route::post('/biological-assets/{id}/transform', [BiologicalAssetController::class, 'transform'])->name('biological-assets.transform');
+    Route::post('/biological-assets/{id}/harvest', [BiologicalAssetController::class, 'harvest'])->name('biological-assets.harvest');
+    
+    // ==========================================
+    // MANUFACTURING (Assembly & Production)
+    // ==========================================
+    
+    // Assembly / BOM Management
+    Route::get('/assemblies', [AssemblyController::class, 'index'])->name('assemblies.index');
+    Route::get('/assemblies/{id}', [AssemblyController::class, 'show'])->name('assemblies.show');
+    Route::post('/assemblies/{id}/components', [AssemblyController::class, 'addComponent'])->name('assemblies.add-component');
+    Route::put('/assemblies/components/{id}', [AssemblyController::class, 'updateComponent'])->name('assemblies.update-component');
+    Route::delete('/assemblies/components/{id}', [AssemblyController::class, 'removeComponent'])->name('assemblies.remove-component');
+    Route::get('/assemblies/{id}/cost', [AssemblyController::class, 'calculateCost'])->name('assemblies.calculate-cost');
+    
+    // Production / Manufacturing
+    Route::get('/productions', [ProductionController::class, 'index'])->name('productions.index');
+    Route::get('/productions/create', [ProductionController::class, 'create'])->name('productions.create');
+    Route::post('/productions', [ProductionController::class, 'store'])->name('productions.store');
+    Route::get('/productions/{id}', [ProductionController::class, 'show'])->name('productions.show');
+    Route::post('/productions/{id}/start', [ProductionController::class, 'start'])->name('productions.start');
+    Route::post('/productions/{id}/complete', [ProductionController::class, 'complete'])->name('productions.complete');
+    Route::post('/productions/{id}/cancel', [ProductionController::class, 'cancel'])->name('productions.cancel');
+    
+    // ==========================================
     // TRANSACTIONS
     // ==========================================
     
@@ -228,6 +271,17 @@ Route::middleware('auth')->group(function () {
         
         // Purchase Report
         Route::get('/purchases', [ReportController::class, 'purchaseReport'])->name('purchases');
+        
+        // ==========================================
+        // BIOLOGICAL ASSETS REPORTS (PSAK 69)
+        // ==========================================
+        
+        // PSAK 69 Reports - Only for companies with PSAK 69 enabled
+        // TODO: Add proper middleware
+        Route::get('/biological-reconciliation', [BiologicalReportController::class, 'reconciliation'])->name('biological-reconciliation');
+        Route::get('/biological-fair-value', [BiologicalReportController::class, 'fairValueChanges'])->name('biological-fair-value');
+        Route::get('/biological-production', [BiologicalReportController::class, 'production'])->name('biological-production');
+        Route::get('/biological-disclosure', [BiologicalReportController::class, 'disclosure'])->name('biological-disclosure');
     });
 });
 
