@@ -194,35 +194,51 @@ class BiologicalAssetController extends Controller
      */
     public function show(Request $request, int $id): JsonResponse
     {
-        $user = $request->user();
-        $company = $user->company;
+        try {
+            $user = $request->user();
+            $company = $user->company;
 
-        $asset = BiologicalAsset::where('company_id', $company->id)
-            ->with([
-                'account:id,code,name',
-                'fairValueAccount:id,code,name',
-                'transformations' => function($query) {
-                    $query->orderBy('transaction_date', 'desc')->limit(10);
-                },
-                'valuations' => function($query) {
-                    $query->orderBy('valuation_date', 'desc')->limit(10);
-                },
-                'produce' => function($query) {
-                    $query->orderBy('harvest_date', 'desc')->limit(10);
-                }
-            ])
-            ->findOrFail($id);
+            $asset = BiologicalAsset::where('company_id', $company->id)
+                ->with(['account:id,code,name', 'fairValueAccount:id,code,name'])
+                ->findOrFail($id);
+            
+            // Conditionally load relationships if tables exist
+            $data = $asset->toArray();
+            
+            if (\Schema::hasTable('biological_transformations')) {
+                $data['transformations'] = $asset->transformations()->orderBy('transaction_date', 'desc')->limit(10)->get();
+            } else {
+                $data['transformations'] = [];
+            }
+            
+            if (\Schema::hasTable('biological_valuations')) {
+                $data['valuations'] = $asset->valuations()->orderBy('valuation_date', 'desc')->limit(10)->get();
+            } else {
+                $data['valuations'] = [];
+            }
+            
+            if (\Schema::hasTable('agricultural_produce')) {
+                $data['produce'] = $asset->produce()->orderBy('harvest_date', 'desc')->limit(10)->get();
+            } else {
+                $data['produce'] = [];
+            }
 
-        return response()->json([
-            'success' => true,
-            'data' => array_merge($asset->toArray(), [
-                'unit_value' => $asset->getUnitValue(),
-                'total_harvested' => $asset->getTotalHarvested(),
-                'category_label' => $asset->getCategoryLabel(),
-                'asset_type_label' => $asset->getAssetTypeLabel(),
-                'maturity_status_label' => $asset->getMaturityStatusLabel(),
-            ]),
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => array_merge($data, [
+                    'unit_value' => $asset->getUnitValue(),
+                    'total_harvested' => \Schema::hasTable('biological_transformations') ? $asset->getTotalHarvested() : 0,
+                    'category_label' => $asset->getCategoryLabel(),
+                    'asset_type_label' => $asset->getAssetTypeLabel(),
+                    'maturity_status_label' => $asset->getMaturityStatusLabel(),
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
