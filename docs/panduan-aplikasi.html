@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panduan Aplikasi SimpleAkunting V4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f1419;
+            --surface-dark: #1a1f2e;
+            --surface-highlight: #252b3d;
+            --border-dark: #2d3548;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --text-white: #ffffff;
+            --text-muted: #94a3b8;
+            --emerald: #10b981;
+            --blue: #3b82f6;
+            --purple: #a855f7;
+            --amber: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.1rem;
+        }
+
+        /* Navigation */
+        .toc {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .toc h2 {
+            color: var(--primary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .toc ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .toc a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            display: block;
+            transition: all 0.2s;
+        }
+
+        .toc a:hover {
+            background: var(--surface-highlight);
+            color: var(--text-white);
+        }
+
+        /* Sections */
+        section {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        section h3 {
+            font-size: 1.25rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--primary-light);
+        }
+
+        section h4 {
+            font-size: 1rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            color: var(--text-muted);
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.25rem;
+        }
+
+        strong {
+            color: var(--text-white);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        th {
+            background: var(--surface-highlight);
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--text-muted);
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-dark);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+        }
+
+        .card h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card .icon {
+            color: var(--primary);
+        }
+
+        /* Screenshots */
+        .screenshot {
+            margin: 1.5rem 0;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid var(--border-dark);
+        }
+
+        .screenshot img {
+            width: 100%;
+            display: block;
+        }
+
+        .screenshot-caption {
+            background: var(--surface-highlight);
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .alert-info {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .alert .icon {
+            flex-shrink: 0;
+        }
+
+        .alert-info .icon { color: var(--primary); }
+        .alert-success .icon { color: var(--emerald); }
+
+        /* Feature List */
+        .feature-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .feature-list span {
+            background: var(--surface-highlight);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            
+            section {
+                break-inside: avoid;
+                border: 1px solid #ccc;
+            }
+
+            header {
+                background: #6366f1;
+            }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-dark);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📊 Panduan Aplikasi SimpleAkunting V4</h1>
+        <p>Sistem Akuntansi Modern untuk UMKM, Koperasi, dan BUMDesa</p>
+    </header>
+
+    <div class="container">
+        <!-- Table of Contents -->
+        <nav class="toc">
+            <h2>Daftar Isi</h2>
+            <ul>
+                <li><a href="#pendahuluan">1. Pendahuluan</a></li>
+                <li><a href="#memulai">2. Memulai</a></li>
+                <li><a href="#master-data">3. Master Data</a></li>
+                <li><a href="#transaksi">4. Transaksi</a></li>
+                <li><a href="#psak69">5. Aset Biologis (PSAK 69)</a></li>
+                <li><a href="#manufacturing">6. Manufaktur</a></li>
+                <li><a href="#anggaran">7. Anggaran</a></li>
+                <li><a href="#laporan">8. Laporan Keuangan</a></li>
+                <li><a href="#pengaturan">9. Pengaturan</a></li>
+            </ul>
+        </nav>
+
+        <!-- 1. Pendahuluan -->
+        <section id="pendahuluan">
+            <h2>
+                <span class="material-symbols-outlined" style="color: var(--primary)">menu_book</span>
+                1. Pendahuluan
+            </h2>
+            
+            <h3>1.1 Tentang SimpleAkunting V4</h3>
+            <p>SimpleAkunting V4 adalah aplikasi akuntansi modern berbasis web yang dirancang khusus untuk:</p>
+            <div class="feature-list">
+                <span>🏪 UMKM</span>
+                <span>🤝 Koperasi</span>
+                <span>🏘️ BUMDesa</span>
+                <span>🏛️ Yayasan</span>
+            </div>
+
+            <h3>1.2 Standar Akuntansi yang Didukung</h3>
+            <table>
+                <tr>
+                    <th>Standar</th>
+                    <th>Keterangan</th>
+                </tr>
+                <tr>
+                    <td>SAK ETAP</td>
+                    <td>Standar Akuntansi Keuangan untuk Entitas Tanpa Akuntabilitas Publik</td>
+                </tr>
+                <tr>
+                    <td>SAK Entitas Privat</td>
+                    <td>Standar untuk entitas privat</td>
+                </tr>
+                <tr>
+                    <td>PSAK</td>
+                    <td>Pernyataan Standar Akuntansi Keuangan</td>
+                </tr>
+                <tr>
+                    <td><strong>PSAK 69</strong></td>
+                    <td>Khusus untuk Aset Biologis (pertanian, peternakan)</td>
+                </tr>
+            </table>
+
+            <h3>1.3 Fitur Utama</h3>
+            <ul>
+                <li>✅ Multi-entitas dan multi-user</li>
+                <li>✅ Chart of Accounts fleksibel</li>
+                <li>✅ Transaksi penjualan & pembelian</li>
+                <li>✅ Kas & bank management</li>
+                <li>✅ Aset tetap dengan depresiasi</li>
+                <li>✅ <strong>Aset Biologis (PSAK 69)</strong> - penilaian nilai wajar</li>
+                <li>✅ <strong>Manufacturing</strong> - BOM & production orders</li>
+                <li>✅ Laporan keuangan lengkap</li>
+                <li>✅ Export PDF & Excel</li>
+                <li>✅ Audit trail</li>
+            </ul>
+        </section>
+
+        <!-- 2. Memulai -->
+        <section id="memulai">
+            <h2>
+                <span class="material-symbols-outlined" style="color: var(--primary)">rocket_launch</span>
+                2. Memulai
+            </h2>
+
+            <h3>2.1 Dashboard</h3>
+            <p>Setelah login, Anda akan melihat Dashboard yang menampilkan ringkasan keuangan perusahaan.</p>
+            
+            <div class="screenshot">
+                <img src="screenshots/dashboard_overview_1766527267515.png" alt="Dashboard Overview">
+                <div class="screenshot-caption">Dashboard menampilkan Total Pendapatan, Beban, Laba Bersih, dan Saldo Kas</div>
+            </div>
+
+            <h3>2.2 Setup Wizard</h3>
+            <p>Untuk perusahaan baru, gunakan Setup Wizard untuk:</p>
+            <ol>
+                <li>Mengisi informasi perusahaan</li>
+                <li>Memilih jenis entitas (UMKM, Koperasi, BUMDesa, Yayasan)</li>
+                <li>Memilih standar akuntansi</li>
+                <li>Inisialisasi Chart of Accounts standar</li>
+            </ol>
+        </section>
+
+        <!-- 3. Master Data -->
+        <section id="master-data">
+            <h2>
+                <span class="material-symbols-outlined" style="color: var(--primary)">database</span>
+                3. Master Data
+            </h2>
+
+            <h3>3.1 Chart of Accounts (Bagan Akun)</h3>
+            <p>Menu: <strong>Master Data → Bagan Akun</strong></p>
+            
+            <div class="screenshot">
+                <img src="screenshots/coa_list_1766527280383.png" alt="Chart of Accounts">
+                <div class="screenshot-caption">Daftar Chart of Accounts dengan struktur hierarkis</div>
+            </div>
+
+            <h4>Import dari Excel</h4>
+            <div class="screenshot">
+                <img src="screenshots/coa_import_1766527294970.png" alt="COA Import">
+                <div class="screenshot-caption">Form import Chart of Accounts dari Excel</div>
+            </div>
+
+            <p><strong>Format Template COA:</strong></p>
+            <table>
+                <tr>
+                    <th>Kolom</th>
+                    <th>Wajib</th>
+                    <th>Keterangan</th>
+                </tr>
+                <tr>
+                    <td>code</td>
+                    <td>Ya</td>
+                    <td>Kode akun (contoh: 1100, 2100)</td>
+                </tr>
+                <tr>
+                    <td>name</td>
+                    <td>Ya</td>
+                    <td>Nama akun</td>
+                </tr>
+                <tr>
+                    <td>type</td>
+                    <td>Ya</td>
+                    <td>Asset, Liability, Equity, Revenue, Expense</td>
+                </tr>
+                <tr>
+                    <td>normal_balance</td>
+                    <td>Ya</td>
+                    <td>DEBIT atau CREDIT</td>
+                </tr>
+                <tr>
+                    <td>report_type</td>
+                    <td>Ya</td>
+                    <td>NERACA atau LABARUGI</td>
+                </tr>
+            </table>
+
+            <h3>3.2 Kontak (Pelanggan & Supplier)</h3>
+            <div class="screenshot">
+                <img src="screenshots/contacts_list_1766527311302.png" alt="Contacts List">
+                <div class="screenshot-caption">Daftar kontak pelanggan dan supplier</div>
+            </div>
+
+            <h3>3.3 Persediaan (Inventory)</h3>
+            <div class="screenshot">
+                <img src="screenshots/inventory_list_1766527344261.png" alt="Inventory List">
+                <div class="screenshot-caption">Daftar persediaan dengan fitur pencarian</div>
+            </div>
+
+            <h3>3.4 Aset Tetap</h3>
+            <div class="screenshot">
+                <img src="screenshots/assets_list_1766527375203.png" alt="Fixed Assets">
+                <div class="screenshot-caption">Kelola aset tetap perusahaan</div>
+            </div>
+        </section>
+
+        <!-- 4. Transaksi -->
+        <section id="transaksi">
+            <h2>
+                <span class="material-symbols-outlined" style="color: var(--primary)">receipt_long</span>
+                4. Transaksi
+            </h2>
+
+            <h3>4.1 Penjualan</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="screenshot">
+                        <img src="screenshots/sales_list_1766527410022.png" alt="Sales List">
+                    </div>
+                    <p>Daftar invoice penjualan</p>
+                </div>
+                <div class="card">
+                    <div class="screenshot">
+                        <img src="screenshots/sales_create_1766527422002.png" alt="Sales Create">
+                    </div>
+                    <p>Form buat penjualan baru</p>
+                </div>
+            </div>
+
+            <h3>4.2 Pembelian</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="screenshot">
+                        <img src="screenshots/purchases_list_1766527434519.png" alt="Purchases List">
+                    </div>
+                    <p>Daftar pembelian</p>
+                </div>
+                <div class="card">
+                    <div class="screenshot">
+                        <img src="screenshots/purchases_create_1766527446552.png" alt="Purchases Create">
+                    </div>
+                    <p>Form buat pembelian baru</p>
+                </div>
+            </div>
+
+            <h3>4.3 Kas</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="screenshot">
+                        <img src="screenshots/cash_receive_1766527459745.png" alt="Cash Receive">
+                    </div>
+                    <p>Penerimaan Kas</p>
+                </div>
+                <div class="card">
+                    <div class="screenshot">
+                        <img src="screenshots/cash_spend_1766527472495.png" alt="Cash Spend">
+                    </div>
+                    <p>Pengeluaran Kas</p>
+                </div>
+            </div>
+
+            <h3>4.4 Jurnal</h3>
+            <div class="screenshot">
+                <img src="screenshots/journals_list_1766527485391.png" alt="Journals List">
+                <div class="screenshot-caption">Daftar semua jurnal transaksi</div>
+            </div>
+        </section>
+
+        <!-- 5. PSAK 69 -->
+        <section id="psak69">
+            <h2>
+                <span style="font-size: 1.5rem">🌿</span>
+                5. Aset Biologis (PSAK 69)
+            </h2>
+
+            <div class="alert alert-success">
+                <span class="icon">ℹ️</span>
+                <div>
+                    <strong>Catatan:</strong> Fitur ini harus diaktifkan di <strong>Pengaturan Perusahaan → Aktifkan PSAK 69</strong>
+                </div>
+            </div>
+
+            <h3>5.1 Daftar Aset Biologis</h3>
+            <div class="screenshot">
+                <img src="screenshots/biological_assets_list_fixed_1766528240070.png" alt="Biological Assets">
+                <div class="screenshot-caption">Daftar aset biologis perusahaan</div>
+            </div>
+
+            <h3>5.2 Kategori Aset Biologis</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>🌴 Tanaman Produktif</h4>
+                    <p>Kelapa sawit, karet, teh, kopi</p>
+                </div>
+                <div class="card">
+                    <h4>🌾 Tanaman Semusim</h4>
+                    <p>Padi, jagung, sayuran</p>
+                </div>
+                <div class="card">
+                    <h4>🐄 Hewan Ternak</h4>
+                    <p>Sapi, kambing, ayam potong</p>
+                </div>
+                <div class="card">
+                    <h4>🥛 Hewan Produksi</h4>
+                    <p>Sapi perah, ayam petelur</p>
+                </div>
+            </div>
+
+            <h3>5.3 Fitur Utama</h3>
+            <table>
+                <tr>
+                    <th>Fitur</th>
+                    <th>Keterangan</th>
+                </tr>
+                <tr>
+                    <td><strong>Valuasi</strong></td>
+                    <td>Penilaian nilai wajar (fair value)</td>
+                </tr>
+                <tr>
+                    <td><strong>Transformasi</strong></td>
+                    <td>Perubahan biologis (pertumbuhan, penuaan)</td>
+                </tr>
+                <tr>
+                    <td><strong>Panen</strong></td>
+                    <td>Catat hasil panen masuk ke persediaan</td>
+                </tr>
+            </table>
+
+            <h3>5.4 Laporan PSAK 69</h3>
+            <div class="screenshot">
+                <img src="screenshots/biological_report_reconciliation_1766528254001.png" alt="Biological Report">
+                <div class="screenshot-caption">Laporan Rekonsiliasi Aset Biologis</div>
+            </div>
+        </section>
+
+        <!-- 6. Manufacturing -->
+        <section id="manufacturing">
+            <h2>
+                <span style="font-size: 1.5rem">🏭</span>
+                6. Manufaktur
+            </h2>
+
+            <h3>6.1 Assembly / Bill of Materials (BOM)</h3>
+            <div class="screenshot">
+                <img src="screenshots/assemblies_list_1766527712954.png" alt="Assemblies">
+                <div class="screenshot-caption">Daftar BOM / Resep Produksi</div>
+            </div>
+
+            <p>BOM mendefinisikan:</p>
+            <ul>
+                <li>Produk jadi yang dihasilkan</li>
+                <li>Komponen/bahan baku yang dibutuhkan</li>
+                <li>Kuantitas setiap komponen</li>
+                <li>Biaya produksi</li>
+            </ul>
+
+            <h3>6.2 Production Order</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="screenshot">
+                        <img src="screenshots/productions_list_1766527684981.png" alt="Productions List">
+                    </div>
+                    <p>Daftar Production Order</p>
+                </div>
+                <div class="card">
+                    <div class="screenshot">
+                        <img src="screenshots/productions_create_1766527697460.png" alt="Productions Create">
+                    </div>
+                    <p>Buat Production Order baru</p>
+                </div>
+            </div>
+
+            <h3>6.3 Proses Produksi</h3>
+            <table>
+                <tr>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                    <th>Keterangan</th>
+                </tr>
+                <tr>
+                    <td><span style="background: #6b7280; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem;">Draft</span></td>
+                    <td>Start</td>
+                    <td>Mulai produksi (bahan baku dikurangi)</td>
+                </tr>
+                <tr>
+                    <td><span style="background: #eab308; color: #000; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem;">In Progress</span></td>
+                    <td>Complete</td>
+                    <td>Selesai produksi (produk jadi masuk stok)</td>
+                </tr>
+                <tr>
+                    <td><span style="background: #22c55e; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem;">Completed</span></td>
+                    <td>-</td>
+                    <td>Produksi selesai</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- 7. Anggaran -->
+        <section id="anggaran">
+            <h2>
+                <span class="material-symbols-outlined" style="color: var(--primary)">calculate</span>
+                7. Anggaran
+            </h2>
+
+            <div class="screenshot">
+                <img src="screenshots/budgets_list_1766527744122.png" alt="Budgets">
+                <div class="screenshot-caption">Halaman manajemen anggaran</div>
+            </div>
+
+            <h3>Fitur Anggaran</h3>
+            <ul>
+                <li>Buat anggaran per akun per periode</li>
+                <li>Bandingkan anggaran vs aktual</li>
+                <li>Analisis varian</li>
+            </ul>
+        </section>
+
+        <!-- 8. Laporan Keuangan -->
+        <section id="laporan">
+            <h2>
+                <span class="material-symbols-outlined" style="color: var(--primary)">analytics</span>
+                8. Laporan Keuangan
+            </h2>
+
+            <h3>8.1 Neraca (Balance Sheet)</h3>
+            <div class="screenshot">
+                <img src="screenshots/report_balance_sheet_1766527579122.png" alt="Balance Sheet">
+                <div class="screenshot-caption">Laporan Neraca: Aset = Kewajiban + Ekuitas</div>
+            </div>
+
+            <h3>8.2 Laba Rugi (Profit & Loss)</h3>
+            <div class="screenshot">
+                <img src="screenshots/report_profit_loss_1766527596814.png" alt="Profit Loss">
+                <div class="screenshot-caption">Laporan Laba Rugi: Pendapatan - Beban</div>
+            </div>
+
+            <h3>8.3 Arus Kas (Cash Flow)</h3>
+            <div class="screenshot">
+                <img src="screenshots/report_cash_flow_1766527613357.png" alt="Cash Flow">
+                <div class="screenshot-caption">Laporan Arus Kas: Operasional, Investasi, Pendanaan</div>
+            </div>
+
+            <h3>8.4 Laporan Lainnya</h3>
+            <table>
+                <tr>
+                    <th>Laporan</th>
+                    <th>Keterangan</th>
+                </tr>
+                <tr>
+                    <td>Neraca Saldo</td>
+                    <td>Trial Balance semua akun</td>
+                </tr>
+                <tr>
+                    <td>Buku Besar</td>
+                    <td>Ledger per akun</td>
+                </tr>
+                <tr>
+                    <td>Perubahan Ekuitas</td>
+                    <td>Mutasi modal</td>
+                </tr>
+                <tr>
+                    <td>Daftar Jurnal</td>
+                    <td>Semua transaksi jurnal</td>
+                </tr>
+                <tr>
+                    <td>Analisis Keuangan</td>
+                    <td>Rasio-rasio keuangan</td>
+                </tr>
+            </table>
+
+            <div class="alert alert-info">
+                <span class="icon">📄</span>
+                <div>Semua laporan dapat diekspor ke format <strong>PDF</strong> untuk keperluan arsip atau pelaporan.</div>
+            </div>
+        </section>
+
+        <!-- 9. Pengaturan -->
+        <section id="pengaturan">
+            <h2>
+                <span class="material-symbols-outlined" style="color: var(--primary)">settings</span>
+                9. Pengaturan & Administrasi
+            </h2>
+
+            <h3>9.1 Manajemen Pengguna</h3>
+            <div class="screenshot">
+                <img src="screenshots/users_list_1766527756140.png" alt="Users">
+                <div class="screenshot-caption">Halaman manajemen pengguna</div>
+            </div>
+
+            <p><strong>Peran yang tersedia:</strong></p>
+            <ul>
+                <li><strong>Administrator</strong> - Akses penuh ke semua fitur</li>
+                <li><strong>Accountant</strong> - Akses transaksi & laporan</li>
+                <li><strong>Viewer</strong> - Hanya lihat data</li>
+            </ul>
+
+            <h3>9.2 Audit Trail</h3>
+            <div class="screenshot">
+                <img src="screenshots/audit_logs_1766527770128.png" alt="Audit Logs">
+                <div class="screenshot-caption">Log aktivitas pengguna</div>
+            </div>
+
+            <p>Mencatat:</p>
+            <ul>
+                <li>Setiap perubahan data</li>
+                <li>Siapa yang melakukan</li>
+                <li>Kapan dilakukan</li>
+                <li>Nilai sebelum & sesudah</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <p><strong>SimpleAkunting V4</strong></p>
+        <p>Dokumentasi ini dibuat untuk SimpleAkunting V4</p>
+        <p>Terakhir diperbarui: Desember 2024</p>
+    </footer>
+</body>
+</html>
