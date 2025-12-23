@@ -192,7 +192,7 @@ class BiologicalAssetController extends Controller
      * GET /biological-assets/{id}
      * Get biological asset detail.
      */
-    public function show(Request $request, int $id): JsonResponse
+    public function show(Request $request, int $id)
     {
         try {
             $user = $request->user();
@@ -202,42 +202,57 @@ class BiologicalAssetController extends Controller
                 ->with(['account:id,code,name', 'fairValueAccount:id,code,name'])
                 ->findOrFail($id);
             
-            // Conditionally load relationships if tables exist
-            $data = $asset->toArray();
+            // Load relationships if tables exist
+            $transformations = collect([]);
+            $valuations = collect([]);
+            $produce = collect([]);
+            $totalHarvested = 0;
             
             if (\Schema::hasTable('biological_transformations')) {
-                $data['transformations'] = $asset->transformations()->orderBy('transaction_date', 'desc')->limit(10)->get();
-            } else {
-                $data['transformations'] = [];
+                $transformations = $asset->transformations()->orderBy('transaction_date', 'desc')->limit(10)->get();
+                $totalHarvested = $asset->getTotalHarvested();
             }
             
             if (\Schema::hasTable('biological_valuations')) {
-                $data['valuations'] = $asset->valuations()->orderBy('valuation_date', 'desc')->limit(10)->get();
-            } else {
-                $data['valuations'] = [];
+                $valuations = $asset->valuations()->orderBy('valuation_date', 'desc')->limit(10)->get();
             }
             
             if (\Schema::hasTable('agricultural_produce')) {
-                $data['produce'] = $asset->produce()->orderBy('harvest_date', 'desc')->limit(10)->get();
-            } else {
-                $data['produce'] = [];
+                $produce = $asset->produce()->orderBy('harvest_date', 'desc')->limit(10)->get();
             }
 
-            return response()->json([
-                'success' => true,
-                'data' => array_merge($data, [
-                    'unit_value' => $asset->getUnitValue(),
-                    'total_harvested' => \Schema::hasTable('biological_transformations') ? $asset->getTotalHarvested() : 0,
-                    'category_label' => $asset->getCategoryLabel(),
-                    'asset_type_label' => $asset->getAssetTypeLabel(),
-                    'maturity_status_label' => $asset->getMaturityStatusLabel(),
-                ]),
-            ]);
+            // Return JSON for API requests
+            if ($request->wantsJson()) {
+                $data = $asset->toArray();
+                $data['transformations'] = $transformations;
+                $data['valuations'] = $valuations;
+                $data['produce'] = $produce;
+
+                return response()->json([
+                    'success' => true,
+                    'data' => array_merge($data, [
+                        'unit_value' => $asset->getUnitValue(),
+                        'total_harvested' => $totalHarvested,
+                        'category_label' => $asset->getCategoryLabel(),
+                        'asset_type_label' => $asset->getAssetTypeLabel(),
+                        'maturity_status_label' => $asset->getMaturityStatusLabel(),
+                    ]),
+                ]);
+            }
+
+            // Return HTML view for browser
+            return view('biological-assets.show', compact(
+                'asset', 'transformations', 'valuations', 'produce', 'totalHarvested'
+            ));
+            
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
-            ], 500);
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                ], 500);
+            }
+            return redirect()->route('biological-assets.index')->with('error', 'Aset tidak ditemukan.');
         }
     }
 
