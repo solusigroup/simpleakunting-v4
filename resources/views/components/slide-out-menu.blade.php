@@ -79,7 +79,7 @@
                         </div>
                         <span class="text-xs font-medium text-white text-center">Pembelian</span>
                     </a>
-                    <a href="{{ route('journals.create') }}" 
+                    <a href="{{ route('journals.index') }}" 
                        class="group flex flex-col items-center gap-2 p-4 rounded-2xl bg-surface-dark border border-border-dark hover:border-orange-400 hover:bg-orange-500/10 transition-all duration-200">
                         <div class="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                             <span class="material-symbols-outlined text-orange-400 text-2xl">edit_note</span>
