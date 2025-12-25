@@ -6,6 +6,9 @@
                 <p class="text-text-muted text-sm mt-1">{{ $company->name }} • Periode {{ \Carbon\Carbon::parse($startDate)->format('d M') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</p>
             </div>
             <div class="flex items-center gap-3">
+                <!-- Slide-Out Menu Button -->
+                <x-slide-out-menu :todayRevenue="$todayRevenue" :todayExpense="$todayExpense" />
+                
                 <!-- Date Filter Button -->
                 <x-btn type="secondary" onclick="document.getElementById('dateFilterModal').classList.remove('hidden')">
                     <span class="material-symbols-outlined text-xl">calendar_today</span>

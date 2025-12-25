@@ -64,6 +64,11 @@ class DashboardController extends Controller
                 ->where('due_date', '<', now())
                 ->count();
 
+            // Today's stats for slide-out menu
+            $today = now()->format('Y-m-d');
+            $todayRevenue = $this->getTotalRevenue($company->id, $today, $today);
+            $todayExpense = $this->getTotalExpense($company->id, $today, $today);
+
             return compact(
                 'totalRevenue',
                 'totalExpense',
@@ -73,7 +78,9 @@ class DashboardController extends Controller
                 'recentPurchases',
                 'totalCustomers',
                 'totalSuppliers',
-                'pendingInvoices'
+                'pendingInvoices',
+                'todayRevenue',
+                'todayExpense'
             );
         });
 
