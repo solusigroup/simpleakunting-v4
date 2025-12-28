@@ -224,4 +224,52 @@ class PurchaseController extends Controller
 
         return view('purchases.show', compact('invoice'));
     }
+
+    /**
+     * DELETE /purchases/{id}
+     * Hapus Pembelian dengan reversal stok dan jurnal.
+     */
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        $user = $request->user();
+        
+        if (!$user->canEdit()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk menghapus transaksi.',
+            ], 403);
+        }
+
+        $invoice = Invoice::where('company_id', $user->company_id)
+            ->where('type', 'Purchase')
+            ->with(['items', 'journal'])
+            ->findOrFail($id);
+
+        DB::transaction(function () use ($invoice) {
+            // Reverse Inventory Stock (decrease for deleted purchases)
+            foreach ($invoice->items as $item) {
+                if ($item->inventory_id) {
+                    $inventory = Inventory::find($item->inventory_id);
+                    if ($inventory) {
+                        $inventory->decrement('stock', $item->quantity);
+                    }
+                }
+            }
+
+            // Delete related journal
+            if ($invoice->journal) {
+                $invoice->journal->items()->delete();
+                $invoice->journal->delete();
+            }
+
+            // Delete invoice items and invoice
+            $invoice->items()->delete();
+            $invoice->delete();
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tagihan pembelian berhasil dihapus.',
+        ]);
+    }
 }
