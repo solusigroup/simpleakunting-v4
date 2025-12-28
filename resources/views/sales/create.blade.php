@@ -45,6 +45,20 @@
                         <label class="block text-sm font-medium text-text-muted mb-2">Jatuh Tempo *</label>
                         <input type="date" id="due_date" required class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Akun HPP</label>
+                        <select id="cogs_account_id" class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="">Pilih Akun HPP...</option>
+                        </select>
+                        <p class="text-xs text-text-muted mt-1">Harga Pokok Penjualan (untuk barang dagangan)</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Akun Persediaan</label>
+                        <select id="inventory_account_id" class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="">Pilih Akun Persediaan...</option>
+                        </select>
+                        <p class="text-xs text-text-muted mt-1">Persediaan Barang Dagangan</p>
+                    </div>
                 </div>
                 <div class="mt-4">
                     <label class="block text-sm font-medium text-text-muted mb-2">Catatan</label>
@@ -162,6 +176,25 @@
             const receivableSelect = document.getElementById('receivable_account_id');
             accounts.filter(a => a.type === 'Asset').forEach(a => {
                 receivableSelect.innerHTML += `<option value="${a.id}">${a.code} - ${a.name}</option>`;
+            });
+
+            // Expense accounts for COGS (HPP)
+            const cogsSelect = document.getElementById('cogs_account_id');
+            accounts.filter(a => a.type === 'Expense').forEach(a => {
+                // Auto-select if name contains HPP or Harga Pokok
+                const isHPP = a.name.toLowerCase().includes('harga pokok') || 
+                              a.name.toLowerCase().includes('hpp') ||
+                              a.name.toLowerCase().includes('beban pokok');
+                cogsSelect.innerHTML += `<option value="${a.id}" ${isHPP ? 'selected' : ''}>${a.code} - ${a.name}</option>`;
+            });
+
+            // Asset accounts for Inventory
+            const inventoryAccountSelect = document.getElementById('inventory_account_id');
+            accounts.filter(a => a.type === 'Asset').forEach(a => {
+                // Auto-select if name contains Persediaan
+                const isPersediaan = a.name.toLowerCase().includes('persediaan') || 
+                                     a.name.toLowerCase().includes('inventory');
+                inventoryAccountSelect.innerHTML += `<option value="${a.id}" ${isPersediaan ? 'selected' : ''}>${a.code} - ${a.name}</option>`;
             });
             
             // Revenue accounts for items
@@ -301,12 +334,17 @@
             });
 
             const unitId = document.getElementById('unit_id').value;
+            const cogsAccountId = document.getElementById('cogs_account_id').value;
+            const inventoryAccountId = document.getElementById('inventory_account_id').value;
+            
             const data = {
                 contact_id: parseInt(document.getElementById('contact_id').value),
                 date: document.getElementById('date').value,
                 due_date: document.getElementById('due_date').value,
                 unit_id: unitId ? parseInt(unitId) : null,
                 receivable_account_id: parseInt(document.getElementById('receivable_account_id').value),
+                cogs_account_id: cogsAccountId ? parseInt(cogsAccountId) : null,
+                inventory_account_id: inventoryAccountId ? parseInt(inventoryAccountId) : null,
                 notes: document.getElementById('notes').value,
                 items
             };

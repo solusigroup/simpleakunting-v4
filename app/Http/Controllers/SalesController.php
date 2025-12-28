@@ -57,9 +57,13 @@ class SalesController extends Controller
      * POST /sales
      * Buat Invoice Penjualan dengan auto-journaling.
      * 
-     * Auto Journal:
+     * Auto Journal 1 (Penjualan):
      * - Debit: Piutang Usaha (atau Kas jika tunai)
      * - Kredit: Pendapatan (dari account_id di items)
+     * 
+     * Auto Journal 2 (Harga Pokok - jika ada inventory):
+     * - Debit: HPP (Harga Pokok Penjualan)
+     * - Kredit: Persediaan Barang Dagangan
      */
     public function store(Request $request): JsonResponse
     {
@@ -80,6 +84,8 @@ class SalesController extends Controller
             'due_date' => ['required', 'date', 'after_or_equal:date'],
             'unit_id' => ['nullable', 'exists:business_units,id'],
             'receivable_account_id' => ['required', 'exists:chart_of_accounts,id'], // Akun Piutang/Kas
+            'cogs_account_id' => ['nullable', 'exists:chart_of_accounts,id'], // Akun HPP
+            'inventory_account_id' => ['nullable', 'exists:chart_of_accounts,id'], // Akun Persediaan
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.account_id' => ['required', 'exists:chart_of_accounts,id'],
@@ -196,6 +202,54 @@ class SalesController extends Controller
                 ]);
             }
 
+            // =============================================
+            // AUTO-JOURNALING 2: Harga Pokok Penjualan (HPP)
+            // Debit: HPP, Kredit: Persediaan
+            // Hanya jika ada item inventory dan akun HPP/Persediaan dipilih
+            // =============================================
+            if ($request->cogs_account_id && $request->inventory_account_id) {
+                $totalCOGS = 0;
+                $cogsItems = [];
+                
+                foreach ($request->items as $item) {
+                    if (!empty($item['inventory_id'])) {
+                        $inventory = Inventory::find($item['inventory_id']);
+                        if ($inventory) {
+                            // Hitung HPP berdasarkan harga pokok (cost) dari inventory
+                            $cogsAmount = $item['qty'] * $inventory->cost;
+                            $totalCOGS += $cogsAmount;
+                            $cogsItems[] = [
+                                'name' => $inventory->name,
+                                'qty' => $item['qty'],
+                                'cost' => $inventory->cost,
+                                'amount' => $cogsAmount,
+                            ];
+                        }
+                    }
+                }
+
+                // Buat jurnal HPP jika ada item inventory
+                if ($totalCOGS > 0) {
+                    // Debit: HPP (Harga Pokok Penjualan)
+                    JournalItem::create([
+                        'journal_id' => $journal->id,
+                        'coa_id' => $request->cogs_account_id,
+                        'debit' => $totalCOGS,
+                        'credit' => 0,
+                        'memo' => 'HPP dari ' . $invoiceNumber,
+                    ]);
+
+                    // Kredit: Persediaan Barang Dagangan
+                    JournalItem::create([
+                        'journal_id' => $journal->id,
+                        'coa_id' => $request->inventory_account_id,
+                        'debit' => 0,
+                        'credit' => $totalCOGS,
+                        'memo' => 'Pengurangan persediaan dari ' . $invoiceNumber,
+                    ]);
+                }
+            }
+
             // Link journal to invoice
             $invoice->update(['journal_id' => $journal->id]);
 
@@ -213,7 +267,7 @@ class SalesController extends Controller
      * GET /sales/{id}
      * Detail Invoice Penjualan.
      */
-    public function show(Request $request, int $id): JsonResponse
+    public function show(Request $request, int $id)
     {
         $user = $request->user();
         
@@ -222,10 +276,14 @@ class SalesController extends Controller
             ->with(['items.account', 'items.inventory', 'contact', 'businessUnit', 'journal.items.account'])
             ->findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => $invoice,
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $invoice,
+            ]);
+        }
+
+        return view('sales.show', compact('invoice'));
     }
 
     /**

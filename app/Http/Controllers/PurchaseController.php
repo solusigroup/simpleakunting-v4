@@ -206,7 +206,7 @@ class PurchaseController extends Controller
      * GET /purchases/{id}
      * Detail Pembelian.
      */
-    public function show(Request $request, int $id): JsonResponse
+    public function show(Request $request, int $id)
     {
         $user = $request->user();
         
@@ -215,9 +215,13 @@ class PurchaseController extends Controller
             ->with(['items.account', 'items.inventory', 'contact', 'businessUnit', 'journal.items.account'])
             ->findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => $invoice,
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $invoice,
+            ]);
+        }
+
+        return view('purchases.show', compact('invoice'));
     }
 }
