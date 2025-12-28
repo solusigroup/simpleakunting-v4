@@ -67,11 +67,44 @@ class ReportController extends Controller
             }
         }
 
+        // Calculate Net Income (Laba/Rugi) from LABARUGI accounts
+        // Period: from beginning of year to endDate
+        $startOfYear = date('Y-01-01', strtotime($endDate));
+        $labaRugiAccounts = ChartOfAccount::where('company_id', $company->id)
+            ->where('report_type', 'LABARUGI')
+            ->where('is_parent', false)
+            ->get();
+
+        $totalRevenue = 0;
+        $totalExpense = 0;
+
+        foreach ($labaRugiAccounts as $account) {
+            $balance = $this->getAccountBalance($account, $startOfYear, $endDate, $unitId);
+            
+            if ($account->type === 'Revenue') {
+                $totalRevenue += abs($balance);
+            } elseif ($account->type === 'Expense') {
+                $totalExpense += abs($balance);
+            }
+        }
+
+        $netIncome = $totalRevenue - $totalExpense;
+
+        // Add Net Income to Ekuitas section
+        $report['Ekuitas'][] = [
+            'account_code' => '',
+            'account_name' => 'Laba (Rugi) Periode Berjalan',
+            'balance' => $netIncome,
+            'is_net_income' => true, // Flag to style differently in view
+        ];
+        $totals['Ekuitas'] += $netIncome;
+
         $data = [
             'report_date' => $endDate,
             'unit_id' => $unitId,
             'sections' => $report,
             'totals' => $totals,
+            'net_income' => $netIncome,
             'is_balanced' => abs($totals['Aset'] - ($totals['Kewajiban'] + $totals['Ekuitas'])) < 0.01,
         ];
 
@@ -633,9 +666,41 @@ class ReportController extends Controller
             }
         }
 
+        // Calculate Net Income (Laba/Rugi) from LABARUGI accounts
+        $startOfYear = date('Y-01-01', strtotime($endDate));
+        $labaRugiAccounts = ChartOfAccount::where('company_id', $company->id)
+            ->where('report_type', 'LABARUGI')
+            ->where('is_parent', false)
+            ->get();
+
+        $totalRevenue = 0;
+        $totalExpense = 0;
+
+        foreach ($labaRugiAccounts as $account) {
+            $balance = $this->getAccountBalance($account, $startOfYear, $endDate, $unitId);
+            
+            if ($account->type === 'Revenue') {
+                $totalRevenue += abs($balance);
+            } elseif ($account->type === 'Expense') {
+                $totalExpense += abs($balance);
+            }
+        }
+
+        $netIncome = $totalRevenue - $totalExpense;
+
+        // Add Net Income to Ekuitas section
+        $report['Ekuitas'][] = [
+            'account_code' => '',
+            'account_name' => 'Laba (Rugi) Periode Berjalan',
+            'balance' => $netIncome,
+            'is_net_income' => true,
+        ];
+        $totals['Ekuitas'] += $netIncome;
+
         $data = [
             'sections' => $report,
             'totals' => $totals,
+            'net_income' => $netIncome,
             'is_balanced' => abs($totals['Aset'] - ($totals['Kewajiban'] + $totals['Ekuitas'])) < 0.01,
         ];
 
@@ -793,6 +858,53 @@ class ReportController extends Controller
                     }
                     break;
                 }
+            }
+        }
+
+        // For NERACA: Calculate Net Income for each period and add to Ekuitas
+        if ($reportType === 'NERACA') {
+            $labaRugiAccounts = ChartOfAccount::where('company_id', $company->id)
+                ->where('report_type', 'LABARUGI')
+                ->where('is_parent', false)
+                ->get();
+
+            $netIncomeValues = [];
+            
+            foreach ($periods as $period) {
+                $endDate = $period['end_date'];
+                $startOfYear = date('Y-01-01', strtotime($endDate));
+                
+                $totalRevenue = 0;
+                $totalExpense = 0;
+                
+                foreach ($labaRugiAccounts as $account) {
+                    $balance = $this->getAccountBalance($account, $startOfYear, $endDate, $unitId);
+                    
+                    if ($account->type === 'Revenue') {
+                        $totalRevenue += abs($balance);
+                    } elseif ($account->type === 'Expense') {
+                        $totalExpense += abs($balance);
+                    }
+                }
+                
+                $netIncomeValues[] = $totalRevenue - $totalExpense;
+            }
+
+            // Calculate variance for net income
+            $netIncomeVariance = ReportHelper::calculateVariance($netIncomeValues[0], end($netIncomeValues));
+
+            // Add Net Income to Ekuitas section
+            $report['Ekuitas'][] = [
+                'account_code' => '',
+                'account_name' => 'Laba (Rugi) Periode Berjalan',
+                'values' => $netIncomeValues,
+                'variance' => $netIncomeVariance,
+                'is_net_income' => true
+            ];
+
+            // Add Net Income to Ekuitas totals
+            foreach ($netIncomeValues as $index => $value) {
+                $totals['Ekuitas'][$index] += $value;
             }
         }
 
