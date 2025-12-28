@@ -58,14 +58,11 @@ fi
 
 # 3. Install/update NPM dependencies and build assets
 step "Installing NPM dependencies..."
-npm ci --silent
+export NODE_OPTIONS="--max-old-space-size=512"
+npm install --legacy-peer-deps --no-audit --no-fund
 
 step "Building assets..."
-if [ "$ENVIRONMENT" == "production" ]; then
-    npm run build
-else
-    npm run build
-fi
+npm run build
 
 # 4. Run database migrations
 step "Running database migrations..."
