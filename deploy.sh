@@ -50,10 +50,19 @@ git pull origin main
 
 # 2. Install/update Composer dependencies
 step "Installing Composer dependencies..."
+
+# Clean vendor if corrupted (check if --clean flag is passed)
+if [ "$2" == "--clean" ] || [ ! -f "vendor/autoload.php" ]; then
+    warn "Cleaning vendor directory..."
+    rm -rf vendor
+fi
+
 if [ "$ENVIRONMENT" == "production" ]; then
-    composer install --no-dev --optimize-autoloader --no-interaction
+    composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+    composer dump-autoload --optimize
 else
-    composer install --no-interaction
+    composer install --no-interaction --no-scripts
+    composer dump-autoload
 fi
 
 # 3. Install/update NPM dependencies and build assets
