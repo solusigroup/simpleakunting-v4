@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChartOfAccount;
+use App\Models\Inventory;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Journal;
@@ -82,10 +83,24 @@ class SalesController extends Controller
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.account_id' => ['required', 'exists:chart_of_accounts,id'],
+            'items.*.inventory_id' => ['nullable', 'exists:inventories,id'],
             'items.*.description' => ['required', 'string'],
             'items.*.qty' => ['required', 'numeric', 'min:0.01'],
             'items.*.amount' => ['required', 'numeric', 'min:0'],
         ]);
+
+        // Validate stock availability for inventory items
+        foreach ($request->items as $index => $item) {
+            if (!empty($item['inventory_id'])) {
+                $inventory = Inventory::find($item['inventory_id']);
+                if ($inventory && $inventory->stock < $item['qty']) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Stok {$inventory->name} tidak mencukupi. Stok tersedia: {$inventory->stock}, diminta: {$item['qty']}",
+                    ], 422);
+                }
+            }
+        }
 
         $invoice = DB::transaction(function () use ($request, $company, $user) {
             // Calculate totals
@@ -124,8 +139,10 @@ class SalesController extends Controller
                 'notes' => $request->notes,
             ]);
 
-            // Create Invoice Items
+            // Create Invoice Items and Update Inventory Stock
             foreach ($request->items as $item) {
+                $itemTotal = $item['qty'] * $item['amount'];
+                
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'coa_id' => $item['account_id'],
@@ -133,8 +150,16 @@ class SalesController extends Controller
                     'description' => $item['description'],
                     'quantity' => $item['qty'],
                     'unit_price' => $item['amount'],
-                    'total' => $item['qty'] * $item['amount'],
+                    'total' => $itemTotal,
                 ]);
+
+                // Update Inventory Stock (decrease for sales)
+                if (!empty($item['inventory_id'])) {
+                    $inventory = Inventory::find($item['inventory_id']);
+                    if ($inventory) {
+                        $inventory->decrement('stock', $item['qty']);
+                    }
+                }
             }
 
             // =============================================
@@ -194,12 +219,60 @@ class SalesController extends Controller
         
         $invoice = Invoice::where('company_id', $user->company_id)
             ->where('type', 'Sales')
-            ->with(['items.account', 'contact', 'businessUnit', 'journal.items.account'])
+            ->with(['items.account', 'items.inventory', 'contact', 'businessUnit', 'journal.items.account'])
             ->findOrFail($id);
 
         return response()->json([
             'success' => true,
             'data' => $invoice,
+        ]);
+    }
+
+    /**
+     * DELETE /sales/{id}
+     * Hapus Penjualan dengan reversal stok dan jurnal.
+     */
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        $user = $request->user();
+        
+        if (!$user->canEdit()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk menghapus transaksi.',
+            ], 403);
+        }
+
+        $invoice = Invoice::where('company_id', $user->company_id)
+            ->where('type', 'Sales')
+            ->with(['items', 'journal'])
+            ->findOrFail($id);
+
+        DB::transaction(function () use ($invoice) {
+            // Reverse Inventory Stock (increase for deleted sales)
+            foreach ($invoice->items as $item) {
+                if ($item->inventory_id) {
+                    $inventory = Inventory::find($item->inventory_id);
+                    if ($inventory) {
+                        $inventory->increment('stock', $item->quantity);
+                    }
+                }
+            }
+
+            // Delete related journal
+            if ($invoice->journal) {
+                $invoice->journal->items()->delete();
+                $invoice->journal->delete();
+            }
+
+            // Delete invoice items and invoice
+            $invoice->items()->delete();
+            $invoice->delete();
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Invoice penjualan berhasil dihapus.',
         ]);
     }
 }

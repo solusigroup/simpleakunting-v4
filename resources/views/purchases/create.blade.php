@@ -82,8 +82,11 @@
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-border-dark">
+                            <th class="p-3 text-left text-xs font-bold text-text-muted uppercase w-48">Barang</th>
                             <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Akun Biaya/Aset</th>
                             <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Deskripsi</th>
+                            <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-20">Qty</th>
+                            <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-32">Harga</th>
                             <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-36">Jumlah</th>
                             <th class="p-3 w-12"></th>
                         </tr>
@@ -113,6 +116,7 @@
         let accounts = [];
         let expenseAccounts = [];
         let businessUnits = [];
+        let inventoryItems = [];
         let itemCount = 0;
 
         async function loadData() {
@@ -154,6 +158,58 @@
             
             // Expense and Asset accounts for items
             expenseAccounts = accounts.filter(a => a.type === 'Expense' || a.type === 'Asset');
+
+            // Load inventory items (raw materials, supplies, finished goods for trading)
+            try {
+                const inventoryRes = await fetch('/inventory', { headers: { 'Accept': 'application/json' } });
+                const inventoryData = await inventoryRes.json();
+                if (inventoryData.success) {
+                    inventoryItems = inventoryData.data || [];
+                }
+            } catch (error) {
+                console.log('Inventory not available:', error);
+            }
+        }
+
+        function getInventoryOptions() {
+            let options = '<option value="">-- Manual / Jasa --</option>';
+            const categories = {
+                'raw_materials': 'Bahan Baku',
+                'supplies': 'Bahan Pembantu',
+                'finished_goods': 'Barang Jadi/Dagangan',
+                'work_in_process': 'Barang Dalam Proses'
+            };
+            
+            // Group by category
+            Object.entries(categories).forEach(([cat, label]) => {
+                const items = inventoryItems.filter(i => i.category === cat);
+                if (items.length > 0) {
+                    options += `<optgroup label="${label}">`;
+                    items.forEach(i => {
+                        options += `<option value="${i.id}" data-cost="${i.cost}" data-name="${i.name}" data-coa="${i.coa_id || ''}">${i.code} - ${i.name}</option>`;
+                    });
+                    options += '</optgroup>';
+                }
+            });
+            return options;
+        }
+
+        function onInventoryChange(selectEl, itemId) {
+            const selected = selectEl.options[selectEl.selectedIndex];
+            if (selected.value) {
+                const cost = selected.dataset.cost || 0;
+                const name = selected.dataset.name || '';
+                const coaId = selected.dataset.coa || '';
+                
+                document.querySelector(`[name="desc_${itemId}"]`).value = name;
+                document.querySelector(`[name="price_${itemId}"]`).value = parseFloat(cost).toFixed(0);
+                
+                if (coaId) {
+                    document.querySelector(`[name="account_${itemId}"]`).value = coaId;
+                }
+                
+                calculateTotals();
+            }
         }
 
         function addItem() {
@@ -163,6 +219,11 @@
             tr.id = `item-${itemCount}`;
             tr.className = 'border-b border-border-dark/50';
             tr.innerHTML = `
+                <td class="p-2">
+                    <select name="inventory_${itemCount}" onchange="onInventoryChange(this, ${itemCount})" class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm focus:border-primary">
+                        ${getInventoryOptions()}
+                    </select>
+                </td>
                 <td class="p-2">
                     <select name="account_${itemCount}" required class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm focus:border-primary">
                         <option value="">Pilih...</option>
@@ -174,10 +235,16 @@
                            class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm placeholder-text-muted focus:border-primary">
                 </td>
                 <td class="p-2">
-                    <input type="number" name="amount_${itemCount}" value="0" min="0" step="1" required
+                    <input type="number" name="qty_${itemCount}" value="1" min="0.01" step="0.01" required
                            onchange="calculateTotals()"
                            class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm text-right focus:border-primary">
                 </td>
+                <td class="p-2">
+                    <input type="number" name="price_${itemCount}" value="0" min="0" step="1" required
+                           onchange="calculateTotals()"
+                           class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm text-right focus:border-primary">
+                </td>
+                <td class="p-2 text-right font-mono text-white" id="total_${itemCount}">Rp 0</td>
                 <td class="p-2">
                     <button type="button" onclick="removeItem(${itemCount})" class="text-text-muted hover:text-accent-red">
                         <span class="material-symbols-outlined">delete</span>
@@ -194,8 +261,16 @@
 
         function calculateTotals() {
             let subtotal = 0;
-            document.querySelectorAll('[name^="amount_"]').forEach(input => {
-                subtotal += parseFloat(input.value) || 0;
+            document.querySelectorAll('[name^="qty_"]').forEach(qtyInput => {
+                const id = qtyInput.name.replace('qty_', '');
+                const qty = parseFloat(qtyInput.value) || 0;
+                const price = parseFloat(document.querySelector(`[name="price_${id}"]`)?.value) || 0;
+                const total = qty * price;
+                subtotal += total;
+                const totalEl = document.getElementById(`total_${id}`);
+                if (totalEl) {
+                    totalEl.textContent = 'Rp ' + total.toLocaleString('id-ID');
+                }
             });
             
             document.getElementById('subtotal').textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
@@ -213,10 +288,15 @@
             document.querySelectorAll('[name^="account_"]').forEach(sel => {
                 const id = sel.name.replace('account_', '');
                 if (sel.value) {
+                    const inventoryId = document.querySelector(`[name="inventory_${id}"]`)?.value;
+                    const qty = parseFloat(document.querySelector(`[name="qty_${id}"]`)?.value) || 1;
+                    const price = parseFloat(document.querySelector(`[name="price_${id}"]`)?.value) || 0;
                     items.push({
                         account_id: parseInt(sel.value),
+                        inventory_id: inventoryId ? parseInt(inventoryId) : null,
                         description: document.querySelector(`[name="desc_${id}"]`)?.value || '',
-                        amount: parseFloat(document.querySelector(`[name="amount_${id}"]`)?.value) || 0,
+                        quantity: qty,
+                        amount: price,
                     });
                 }
             });

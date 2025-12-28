@@ -90,9 +90,10 @@
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-border-dark">
+                            <th class="p-3 text-left text-xs font-bold text-text-muted uppercase w-48">Barang</th>
                             <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Akun Pendapatan</th>
                             <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Deskripsi</th>
-                            <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-24">Qty</th>
+                            <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-20">Qty</th>
                             <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-32">Harga</th>
                             <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-36">Jumlah</th>
                             <th class="p-3 w-12"></th>
@@ -123,6 +124,7 @@
         let accounts = [];
         let revenueAccounts = [];
         let businessUnits = [];
+        let inventoryItems = [];
         let itemCount = 0;
 
         async function loadData() {
@@ -164,6 +166,54 @@
             
             // Revenue accounts for items
             revenueAccounts = accounts.filter(a => a.type === 'Revenue');
+
+            // Load inventory items (primarily finished goods for sales)
+            try {
+                const inventoryRes = await fetch('/inventory', { headers: { 'Accept': 'application/json' } });
+                const inventoryData = await inventoryRes.json();
+                if (inventoryData.success) {
+                    inventoryItems = inventoryData.data || [];
+                }
+            } catch (error) {
+                console.log('Inventory not available:', error);
+            }
+        }
+
+        function getInventoryOptions() {
+            let options = '<option value="">-- Manual / Jasa --</option>';
+            const categories = {
+                'finished_goods': 'Barang Jadi/Dagangan',
+                'raw_materials': 'Bahan Baku',
+                'supplies': 'Bahan Pembantu',
+                'work_in_process': 'Barang Dalam Proses'
+            };
+            
+            // Group by category - prioritize finished goods for sales
+            Object.entries(categories).forEach(([cat, label]) => {
+                const items = inventoryItems.filter(i => i.category === cat);
+                if (items.length > 0) {
+                    options += `<optgroup label="${label}">`;
+                    items.forEach(i => {
+                        const stockInfo = i.stock !== undefined ? ` (Stok: ${i.stock})` : '';
+                        options += `<option value="${i.id}" data-price="${i.price}" data-name="${i.name}" data-coa="${i.coa_id || ''}" data-stock="${i.stock || 0}">${i.code} - ${i.name}${stockInfo}</option>`;
+                    });
+                    options += '</optgroup>';
+                }
+            });
+            return options;
+        }
+
+        function onInventoryChange(selectEl, itemId) {
+            const selected = selectEl.options[selectEl.selectedIndex];
+            if (selected.value) {
+                const price = selected.dataset.price || 0;
+                const name = selected.dataset.name || '';
+                
+                document.querySelector(`[name="desc_${itemId}"]`).value = name;
+                document.querySelector(`[name="amount_${itemId}"]`).value = parseFloat(price).toFixed(0);
+                
+                calculateTotals();
+            }
         }
 
         function addItem() {
@@ -173,6 +223,11 @@
             tr.id = `item-${itemCount}`;
             tr.className = 'border-b border-border-dark/50';
             tr.innerHTML = `
+                <td class="p-2">
+                    <select name="inventory_${itemCount}" onchange="onInventoryChange(this, ${itemCount})" class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm focus:border-primary">
+                        ${getInventoryOptions()}
+                    </select>
+                </td>
                 <td class="p-2">
                     <select name="account_${itemCount}" required class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm focus:border-primary">
                         <option value="">Pilih...</option>
@@ -234,8 +289,10 @@
             document.querySelectorAll('[name^="account_"]').forEach(sel => {
                 const id = sel.name.replace('account_', '');
                 if (sel.value) {
+                    const inventoryId = document.querySelector(`[name="inventory_${id}"]`)?.value;
                     items.push({
                         account_id: parseInt(sel.value),
+                        inventory_id: inventoryId ? parseInt(inventoryId) : null,
                         description: document.querySelector(`[name="desc_${id}"]`)?.value || '',
                         qty: parseFloat(document.querySelector(`[name="qty_${id}"]`)?.value) || 0,
                         amount: parseFloat(document.querySelector(`[name="amount_${id}"]`)?.value) || 0,

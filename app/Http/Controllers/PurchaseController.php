@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventory;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Journal;
@@ -81,13 +82,17 @@ class PurchaseController extends Controller
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.account_id' => ['required', 'exists:chart_of_accounts,id'],
+            'items.*.inventory_id' => ['nullable', 'exists:inventories,id'],
             'items.*.description' => ['required', 'string'],
+            'items.*.quantity' => ['required', 'numeric', 'min:0.01'],
             'items.*.amount' => ['required', 'numeric', 'min:0'],
         ]);
 
         $invoice = DB::transaction(function () use ($request, $company) {
             // Calculate totals
-            $subtotal = collect($request->items)->sum('amount');
+            $subtotal = collect($request->items)->sum(function ($item) {
+                return ($item['quantity'] ?? 1) * $item['amount'];
+            });
 
             // Generate invoice number
             $lastInvoice = Invoice::where('company_id', $company->id)
@@ -120,16 +125,32 @@ class PurchaseController extends Controller
                 'notes' => $request->notes,
             ]);
 
-            // Create Invoice Items
+            // Create Invoice Items and Update Inventory Stock
             foreach ($request->items as $item) {
+                $quantity = $item['quantity'] ?? 1;
+                $itemTotal = $quantity * $item['amount'];
+                
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'coa_id' => $item['account_id'],
+                    'inventory_id' => $item['inventory_id'] ?? null,
                     'description' => $item['description'],
-                    'quantity' => 1,
+                    'quantity' => $quantity,
                     'unit_price' => $item['amount'],
-                    'total' => $item['amount'],
+                    'total' => $itemTotal,
                 ]);
+
+                // Update Inventory Stock (increase for purchases)
+                if (!empty($item['inventory_id'])) {
+                    $inventory = Inventory::find($item['inventory_id']);
+                    if ($inventory) {
+                        $inventory->increment('stock', $quantity);
+                        // Update cost if needed (weighted average or latest cost)
+                        if ($item['amount'] > 0) {
+                            $inventory->update(['cost' => $item['amount']]);
+                        }
+                    }
+                }
             }
 
             // =============================================
@@ -147,10 +168,13 @@ class PurchaseController extends Controller
 
             // Debit: Biaya/Aset (per item)
             foreach ($request->items as $item) {
+                $quantity = $item['quantity'] ?? 1;
+                $itemTotal = $quantity * $item['amount'];
+                
                 JournalItem::create([
                     'journal_id' => $journal->id,
                     'coa_id' => $item['account_id'],
-                    'debit' => $item['amount'],
+                    'debit' => $itemTotal,
                     'credit' => 0,
                     'memo' => $item['description'],
                 ]);
@@ -188,7 +212,7 @@ class PurchaseController extends Controller
         
         $invoice = Invoice::where('company_id', $user->company_id)
             ->where('type', 'Purchase')
-            ->with(['items.account', 'contact', 'businessUnit', 'journal.items.account'])
+            ->with(['items.account', 'items.inventory', 'contact', 'businessUnit', 'journal.items.account'])
             ->findOrFail($id);
 
         return response()->json([

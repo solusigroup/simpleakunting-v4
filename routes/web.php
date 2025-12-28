@@ -199,6 +199,7 @@ Route::middleware('auth')->group(function () {
     })->name('sales.create');
     Route::post('/sales', [SalesController::class, 'store'])->name('sales.store');
     Route::get('/sales/{id}', [SalesController::class, 'show'])->name('sales.show');
+    Route::delete('/sales/{id}', [SalesController::class, 'destroy'])->name('sales.destroy');
     
     // Purchases (Pembelian)
     Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
@@ -207,6 +208,7 @@ Route::middleware('auth')->group(function () {
     })->name('purchases.create');
     Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
     Route::get('/purchases/{id}', [PurchaseController::class, 'show'])->name('purchases.show');
+    Route::delete('/purchases/{id}', [PurchaseController::class, 'destroy'])->name('purchases.destroy');
     
     // ==========================================
     // CASH TRANSACTIONS

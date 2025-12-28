@@ -154,14 +154,19 @@ class ContactController extends Controller
 
     /**
      * GET /contacts/{id}
-     * Detail kontak.
+     * Detail kontak dengan riwayat transaksi.
      */
     public function show(Request $request, int $id): JsonResponse
     {
         $user = $request->user();
         
         $contact = Contact::where('company_id', $user->company_id)
+            ->with(['invoices' => function($query) {
+                $query->orderBy('date', 'desc')
+                    ->with(['items.inventory', 'items.account']);
+            }])
             ->withCount('invoices')
+            ->withSum('invoices', 'total')
             ->findOrFail($id);
 
         return response()->json([
