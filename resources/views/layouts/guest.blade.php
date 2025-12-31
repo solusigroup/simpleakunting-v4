@@ -95,7 +95,9 @@
             <!-- Footer -->
             <div class="text-center mt-6">
                 <p class="text-text-muted text-sm">
-                    © {{ date('Y') }} Simple Akunting. All rights reserved.
+                    <a href="https://simpleakunting.my.id/riwayathidupku.html" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
+                        © {{ date('Y') }} Simple Akunting. All rights reserved.
+                    </a>
                 </p>
             </div>
         </div>
