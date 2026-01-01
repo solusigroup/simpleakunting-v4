@@ -80,8 +80,8 @@
         <div class="w-full max-w-md animate-fadeInUp">
             <!-- Logo & Branding -->
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl logo-glow mb-4">
-                    <span class="material-symbols-outlined text-3xl text-background-dark">account_balance</span>
+                <div class="inline-flex items-center justify-center w-24 h-24 bg-surface-dark rounded-2xl logo-glow mb-4 overflow-hidden border border-border-dark">
+                    <img src="{{ asset('images/logo_apartement.jpg') }}" alt="Logo" class="w-full h-full object-contain p-2">
                 </div>
                 <h1 class="text-3xl font-bold text-white mb-2">Simple Akunting</h1>
                 <p class="text-text-muted text-sm">Sistem Akuntansi Modern untuk UMKM & BUMDesa</p>
