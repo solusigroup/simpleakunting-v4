@@ -245,7 +245,7 @@ php artisan test --coverage
 
 ## 📄 Lisensi
 
-Hak Cipta © 2025-2026 **Mentari Commsindo**. All rights reserved.
+Hak Cipta © 2025-2026 **SimpleAkunting by Solusi Consult**. All rights reserved.
 
 ---
 
