@@ -6,109 +6,126 @@
     <title>@yield('title', 'Laporan Keuangan')</title>
     <style>
         @page {
-            margin: 15mm 15mm 20mm 15mm;
+            margin: 20mm 15mm 25mm 15mm;
         }
         
         body {
             font-family: 'Arial', 'Helvetica', sans-serif;
             font-size: 10pt;
-            color: #000000;
+            color: #333333;
             line-height: 1.4;
         }
         
-        /* Simple Header */
+        /* Header Styles */
         .header-section {
+            display: table;
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #000000;
+            border-bottom: 2px solid #333333;
         }
         
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .header-table td {
+        .header-logo {
+            display: table-cell;
+            width: 100px;
             vertical-align: middle;
         }
         
-        .logo-cell {
-            width: 80px;
+        .header-logo img {
+            max-height: 60px;
+            max-width: 90px;
         }
         
-        .logo-cell img {
-            max-height: 50px;
-            max-width: 70px;
-        }
-        
-        .company-info {
-            text-align: center;
-            padding-left: 10px;
+        .header-info {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: right;
+            padding-left: 20px;
         }
         
         .company-name {
             font-size: 14pt;
             font-weight: bold;
-            margin-bottom: 2px;
+            color: #1a1a1a;
+            margin-bottom: 3px;
         }
         
-        .company-address {
+        .company-details {
             font-size: 9pt;
-            color: #333333;
+            color: #666666;
+            line-height: 1.3;
         }
         
-        /* Report Title - Simple */
+       /* Report Title */
         .report-title {
             text-align: center;
-            margin: 15px 0;
+            margin: 25px 0;
+            padding: 15px 0;
+            background-color: #F5F5F5;
         }
         
         .report-title h1 {
-            font-size: 14pt;
+            font-size: 18pt;
             font-weight: bold;
+            color: #2C5F2D;
+            margin: 0 0 8px 0;
+            letter-spacing: 1px;
+        }
+        
+        .report-title h2 {
+            font-size: 12pt;
+            font-weight: normal;
+            color: #333333;
             margin: 0 0 5px 0;
-            text-transform: uppercase;
         }
         
         .report-title .period {
-            font-size: 10pt;
+            font-size: 11pt;
+            font-weight: bold;
+            color: #555555;
             margin: 0;
         }
         
-        /* Simple Table */
+        /* Table Styles */
         .financial-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
-            font-size: 9pt;
+            margin: 20px 0;
+            font-size: 9.5pt;
+        }
+        
+        .financial-table thead tr {
+            background-color: #2C5F2D;
+            color: white;
         }
         
         .financial-table thead th {
-            padding: 8px 6px;
+            padding: 10px 8px;
             text-align: left;
             font-weight: bold;
-            border-top: 1px solid #000000;
-            border-bottom: 1px solid #000000;
-            background-color: #f5f5f5;
+            border: 1px solid #2C5F2D;
         }
         
         .financial-table thead th.amount-col {
             text-align: right;
         }
         
+        .financial-table tbody tr:nth-child(even) {
+            background-color: #F9F9F9;
+        }
+        
         .financial-table tbody td {
-            padding: 4px 6px;
-            border-bottom: 0.5px solid #cccccc;
+            padding: 6px 8px;
+            border: 0.5px solid #CCCCCC;
         }
         
         .financial-table tbody td.code {
-            width: 12%;
+            width: 15%;
             font-family: 'Courier New', monospace;
         }
         
         .financial-table tbody td.account-name {
-            width: 58%;
+            width: 55%;
         }
         
         .financial-table tbody td.amount {
@@ -119,50 +136,58 @@
         
         /* Section Headers */
         .section-header {
-            background-color: #eeeeee !important;
+            background-color: #E8F5E9 !important;
+            border-top: 2px solid #2C5F2D !important;
         }
         
         .section-header td {
             font-weight: bold;
-            font-size: 10pt;
-            padding: 6px !important;
+            font-size: 11pt;
+            padding: 8px !important;
+            color: #2C5F2D;
+            letter-spacing: 0.5px;
         }
         
         /* Subtotal Rows */
+        .subtotal-row {
+            background-color: #F5F5F5 !important;
+            border-top: 1px solid #999999 !important;
+        }
+        
         .subtotal-row td {
             font-weight: bold;
-            border-top: 1px solid #999999;
-            padding: 5px 6px !important;
+            font-style: italic;
+            padding: 7px 8px !important;
         }
         
         /* Grand Total */
         .grand-total-row {
-            background-color: #eeeeee !important;
+            background-color: #2C5F2D !important;
+            color: white !important;
+            border: 2px solid #2C5F2D !important;
         }
         
         .grand-total-row td {
             font-weight: bold;
-            font-size: 10pt;
-            padding: 8px 6px !important;
-            border-top: 2px solid #000000;
-            border-bottom: 2px solid #000000;
+            font-size: 11pt;
+            padding: 10px 8px !important;
+            color: white !important;
         }
         
         /* Negative Values */
         .negative {
-            color: #cc0000;
+            color: #D32F2F;
         }
         
-        /* Simple Signature Section */
+        /* Signature Section */
         .signature-section {
             margin-top: 40px;
-            page-break-inside: avoid;
+            padding-top: 20px;
         }
         
         .signature-location {
             margin-bottom: 20px;
             font-size: 10pt;
-            text-align: right;
         }
         
         .signature-table {
@@ -174,138 +199,142 @@
             width: 50%;
             text-align: center;
             vertical-align: top;
-            padding: 10px 20px;
+            padding: 15px;
+            border: 1px solid #999999;
+        }
+        
+        .signature-role {
+            font-size: 10pt;
+            font-weight: normal;
+            margin-bottom: 5px;
         }
         
         .signature-title {
             font-size: 9pt;
-            margin-bottom: 60px;
+            color: #666666;
+            margin-bottom: 50px;
         }
         
         .signature-line {
-            border-bottom: 1px solid #000000;
-            width: 70%;
+            border-bottom: 1px solid #333333;
+            width: 60%;
             margin: 0 auto 5px auto;
         }
         
         .signature-name {
             font-size: 10pt;
             font-weight: bold;
+            margin-top: 5px;
         }
         
         .signature-position {
             font-size: 9pt;
+            color: #666666;
         }
         
-        /* Footer - Minimal */
+        /* Footer */
         .report-footer {
             position: fixed;
             bottom: 0;
             width: 100%;
             text-align: center;
             font-size: 8pt;
-            color: #666666;
-            padding-top: 5px;
+            color: #999999;
+            border-top: 0.5pt solid #CCCCCC;
+            padding-top: 8px;
+        }
+        
+        /* Page Numbers */
+        .page-number:before {
+            content: counter(page);
+        }
+        
+        .page-total:before {
+            content: counter(pages);
         }
         
         /* Comparative Tables */
         .comparative-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
+            margin: 20px 0;
             font-size: 9pt;
         }
         
-        .comparative-table thead th {
-            padding: 6px;
+        .comparative-table thead tr.header-row-1 th {
+            background-color: #2C5F2D;
+            color: white;
+            padding: 8px;
+            border: 1px solid #2C5F2D;
             text-align: center;
-            font-weight: bold;
-            border: 1px solid #000000;
-            background-color: #f5f5f5;
+        }
+        
+        .comparative-table thead tr.header-row-2 th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 6px;
+            border: 1px solid #4CAF50;
+            font-size: 8.5pt;
         }
         
         .comparative-table tbody td {
-            padding: 4px 6px;
-            border: 0.5px solid #cccccc;
+            padding: 5px 6px;
+            border: 0.5px solid #CCCCCC;
         }
         
         .comparative-table tbody td.variance-positive {
-            color: #006600;
+            color: #2C5F2D;
+            font-weight: bold;
         }
         
         .comparative-table tbody td.variance-negative {
-            color: #cc0000;
+            color: #D32F2F;
+            font-weight: bold;
+        }
+        
+        /* Summary Box */
+        .summary-box {
+            border: 1px solid #999999;
+            padding: 15px;
+            margin: 25px 0;
+            background-color: #F9F9F9;
+        }
+        
+        .summary-box h3 {
+            font-size: 11pt;
+            margin: 0 0 10px 0;
+            color: #2C5F2D;
+            border-bottom: 1px solid #CCCCCC;
+            padding-bottom: 5px;
+        }
+        
+        .summary-box p {
+            margin: 5px 0;
+            font-size: 9.5pt;
         }
     </style>
 </head>
 <body>
-    {{-- Simple Header with Logo --}}
-    <div class="header-section">
-        <table class="header-table">
-            <tr>
-                <td class="logo-cell">
-                    @if(!empty($company->logo) && file_exists(public_path('storage/' . $company->logo)))
-                        <img src="{{ public_path('storage/' . $company->logo) }}" alt="{{ $company->name }}">
-                    @else
-                        <div style="width: 50px; height: 50px; background-color: #333333; border-radius: 5px; text-align: center; line-height: 50px; color: white; font-size: 20pt; font-weight: bold;">
-                            {{ substr($company->name, 0, 1) }}
-                        </div>
-                    @endif
-                </td>
-                <td class="company-info">
-                    <div class="company-name">{{ $company->name ?? 'Nama Perusahaan' }}</div>
-                    <div class="company-address">
-                        @if($company->address){{ $company->address }}@endif
-                        @if($company->phone || $company->email)
-                            <br>
-                            @if($company->phone)Telp: {{ $company->phone }}@endif
-                            @if($company->phone && $company->email) | @endif
-                            @if($company->email)Email: {{ $company->email }}@endif
-                        @endif
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
+    @include('reports.pdf.partials.header')
     
-    {{-- Report Title --}}
     <div class="report-title">
         @yield('report-title')
     </div>
     
-    {{-- Report Content (Table) --}}
     <div class="report-content">
         @yield('content')
     </div>
     
     @yield('summary')
     
-    {{-- Simple Signature Section --}}
-    <div class="signature-section">
-        <div class="signature-location">
-            {{ $company->address ? explode(',', $company->address)[0] : 'Tempat' }}, {{ now()->translatedFormat('d F Y') }}
-        </div>
-        <table class="signature-table">
-            <tr>
-                <td>
-                    <div class="signature-title">Mengetahui,</div>
-                    <div class="signature-line"></div>
-                    <div class="signature-name">(...............................)</div>
-                    <div class="signature-position">Direktur</div>
-                </td>
-                <td>
-                    <div class="signature-title">Dibuat oleh,</div>
-                    <div class="signature-line"></div>
-                    <div class="signature-name">(...............................)</div>
-                    <div class="signature-position">Bagian Keuangan</div>
-                </td>
-            </tr>
-        </table>
-    </div>
+    @include('reports.pdf.partials.signature')
     
-    {{-- Minimal Footer --}}
     <div class="report-footer">
-        Dicetak: {{ now()->format('d/m/Y H:i') }}
+        Halaman <span class="page-number"></span> dari <span class="page-total"></span> 
+        &nbsp;|&nbsp; 
+        Dicetak: {{ $timestamp ?? now()->format('d M Y H:i') }} WIB
+        <br>
+        <small>Laporan ini dibuat oleh Simple Akunting V4</small>
     </div>
 </body>
 </html>
