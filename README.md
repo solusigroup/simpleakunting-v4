@@ -19,7 +19,7 @@
 
 ## 📋 Tentang Aplikasi
 
-**Simple Akunting V4** adalah aplikasi akuntansi berbasis web yang dirancang khusus untuk memenuhi kebutuhan pencatatan keuangan **UMKM** dan **BUMDesa** di Indonesia. Aplikasi ini mendukung standar akuntansi Indonesia termasuk **PSAK 69** untuk aset biologis.
+**Simple Akunting V4** adalah aplikasi akuntansi berbasis web yang dirancang khusus untuk memenuhi kebutuhan pencatatan keuangan **UMKM** dan **BUMDesa** di Indonesia. Aplikasi ini mendukung standar akuntansi Indonesia termasuk **PSAK 69** untuk aset biologis atau BUMDesa yang mengelola usaha ketahanan pangan di sektor Peternakan, Perkebunan, Pertanian dan sebagainya yang berhubungan dengan makhluk hidup.
 
 ### Keunggulan
 - 🎯 **Sederhana & Mudah Digunakan** - Antarmuka modern dan intuitif
