@@ -13,7 +13,7 @@
     </x-slot>
 
     <!-- Filters -->
-    <div class="flex items-center gap-4 mb-6">
+    <div class="flex items-center gap-4 mb-6 flex-wrap">
         <div class="flex items-center gap-2 px-4 py-2 rounded-full border border-border-dark bg-surface-dark/30">
             <select id="sourceFilter" class="bg-transparent border-0 text-white text-sm focus:ring-0">
                 <option value="">Semua Sumber</option>
@@ -21,6 +21,12 @@
                 <option value="sales">Penjualan</option>
                 <option value="purchase">Pembelian</option>
                 <option value="cash_bank">Kas & Bank</option>
+            </select>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 rounded-full border border-border-dark bg-surface-dark/30">
+            <span class="material-symbols-outlined text-text-muted">business</span>
+            <select id="unitFilter" class="bg-transparent border-0 text-white text-sm focus:ring-0">
+                <option value="">Semua Unit Usaha</option>
             </select>
         </div>
         <div class="flex items-center gap-2 px-4 py-2 rounded-full border border-border-dark bg-surface-dark/30">
@@ -52,11 +58,17 @@
                     </button>
                 </div>
                 <form id="journalForm" class="p-6 space-y-4 overflow-y-auto max-h-[70vh]">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-text-muted mb-2">Tanggal</label>
                             <input type="date" id="date" required
                                    class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-muted mb-2">Unit Usaha</label>
+                            <select id="unitId" class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                                <option value="">-- Tidak Ada --</option>
+                            </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-text-muted mb-2">Deskripsi</label>
@@ -113,6 +125,7 @@
     @push('scripts')
     <script>
         let accounts = [];
+        let businessUnits = [];
         let lineCount = 0;
 
         async function loadAccounts() {
@@ -123,13 +136,33 @@
             accounts = data.data || [];
         }
 
+        async function loadBusinessUnits() {
+            const response = await fetch('/units', {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await response.json();
+            businessUnits = data.data || [];
+            
+            // Populate filter dropdown
+            const filterSelect = document.getElementById('unitFilter');
+            filterSelect.innerHTML = '<option value="">Semua Unit Usaha</option>' +
+                businessUnits.map(u => `<option value="${u.id}">${u.code} - ${u.name}</option>`).join('');
+            
+            // Populate form dropdown
+            const formSelect = document.getElementById('unitId');
+            formSelect.innerHTML = '<option value="">-- Tidak Ada --</option>' +
+                businessUnits.map(u => `<option value="${u.id}">${u.code} - ${u.name}</option>`).join('');
+        }
+
         async function loadJournals() {
             const source = document.getElementById('sourceFilter').value;
+            const unitId = document.getElementById('unitFilter').value;
             const start = document.getElementById('dateStart').value;
             const end = document.getElementById('dateEnd').value;
             
             let url = '/journals?';
             if (source) url += `source=${source}&`;
+            if (unitId) url += `unit_id=${unitId}&`;
             if (start) url += `date_start=${start}&`;
             if (end) url += `date_end=${end}`;
             
@@ -162,7 +195,10 @@
                             </div>
                             <div>
                                 <p class="text-white font-medium">${journal.description}</p>
-                                <p class="text-text-muted text-sm">${journal.reference} • ${new Date(journal.date).toLocaleDateString('id-ID')}</p>
+                                <p class="text-text-muted text-sm">
+                                    ${journal.reference} • ${new Date(journal.date).toLocaleDateString('id-ID')}
+                                    ${journal.business_unit ? `<span class="ml-2 px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-xs">${journal.business_unit.name}</span>` : ''}
+                                </p>
                             </div>
                         </div>
                         <span class="px-2 py-1 rounded text-xs font-medium ${getSourceBadge(journal.source)}">${getSourceLabel(journal.source)}</span>
@@ -291,6 +327,7 @@
                 }
             });
             
+            const unitId = document.getElementById('unitId').value;
             const response = await fetch('/journals/manual', {
                 method: 'POST',
                 headers: {
@@ -301,6 +338,7 @@
                 body: JSON.stringify({
                     date: document.getElementById('date').value,
                     description: document.getElementById('description').value,
+                    unit_id: unitId || null,
                     lines
                 })
             });
@@ -324,11 +362,13 @@
         document.getElementById('dateEnd').value = `${year}-${month}-${day}`; // Today
 
         document.getElementById('sourceFilter').addEventListener('change', loadJournals);
+        document.getElementById('unitFilter').addEventListener('change', loadJournals);
         document.getElementById('dateStart').addEventListener('change', loadJournals);
         document.getElementById('dateEnd').addEventListener('change', loadJournals);
 
         // Initial load
         loadAccounts();
+        loadBusinessUnits();
         loadJournals();
     </script>
     @endpush
