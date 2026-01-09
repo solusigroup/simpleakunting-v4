@@ -1,7 +1,7 @@
 # Simple Akunting V4
 
 <p align="center">
-  <img src="public/images/logo-baru.jpg" alt="Simple Akunting" width="300">
+  <img src="public/images/logo_baru.jpg" alt="Simple Akunting" width="300">
 </p>
 
 <p align="center">
