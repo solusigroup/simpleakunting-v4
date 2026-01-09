@@ -252,4 +252,4 @@ Hak Cipta © 2025-2026 **SimpleAkunting by Solusi Consult**. All rights reserved
 ## 🤝 Kontak
 
 - **Website**: [simpleakunting.my.id](https://simpleakunting.my.id)
-- **Email**: info@mentaricommsindo.com
+- **Email**: kurniawan@petalmail.com
