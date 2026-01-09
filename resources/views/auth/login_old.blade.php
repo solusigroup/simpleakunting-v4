@@ -2,13 +2,8 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <!-- Logo Mentari Commsindo -->
-    <div class="flex justify-center mb-6">
-        <img src="{{ asset('images/logo-mentari.png') }}" alt="Mentari Commsindo" class="h-16 object-contain">
-    </div>
-
     <!-- Header -->
-    <div class="mb-6 text-center">
+    <div class="mb-6">
         <h2 class="text-2xl font-bold text-white mb-2">Masuk ke Akun Anda</h2>
         <p class="text-text-muted text-sm">Silakan masukkan kredensial Anda untuk melanjutkan</p>
     </div>
