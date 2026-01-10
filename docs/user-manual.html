@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Manual - SimpleAkunting V4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f1419;
+            --surface-dark: #1a1f2e;
+            --surface-highlight: #252b3d;
+            --border-dark: #2d3548;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --text-white: #ffffff;
+            --text-muted: #94a3b8;
+            --emerald: #10b981;
+            --blue: #3b82f6;
+            --purple: #a855f7;
+            --amber: #f59e0b;
+            --red: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            line-height: 1.7;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        header p { color: rgba(255,255,255,0.85); font-size: 1.1rem; }
+        header .version { 
+            display: inline-block; 
+            background: rgba(255,255,255,0.2); 
+            padding: 0.25rem 1rem; 
+            border-radius: 2rem; 
+            font-size: 0.875rem; 
+            margin-top: 1rem; 
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 1rem;
+        }
+
+        .toc h2 {
+            color: var(--primary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .toc a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .toc a:hover {
+            background: var(--surface-highlight);
+            color: var(--text-white);
+        }
+
+        .toc .material-symbols-outlined { font-size: 1.25rem; color: var(--primary); }
+
+        /* Sections */
+        section {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        section h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        section h3 {
+            font-size: 1.25rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary-light);
+        }
+
+        section h4 {
+            font-size: 1.1rem;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text-white);
+        }
+
+        p { color: var(--text-muted); margin-bottom: 1rem; }
+        
+        ul, ol { color: var(--text-muted); margin-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.5rem; }
+        strong { color: var(--text-white); }
+
+        /* Steps */
+        .steps {
+            counter-reset: step-counter;
+            list-style: none;
+            margin-left: 0;
+            padding-left: 0;
+        }
+
+        .steps li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 3.5rem;
+            padding-bottom: 1.5rem;
+            border-left: 2px solid var(--border-dark);
+            margin-left: 1rem;
+        }
+
+        .steps li:last-child { border-left-color: transparent; padding-bottom: 0; }
+
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: -1rem;
+            top: 0;
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .steps li strong { display: block; color: var(--text-white); margin-bottom: 0.25rem; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-dark); }
+        th { background: var(--surface-highlight); font-weight: 600; color: var(--text-white); }
+        td { color: var(--text-muted); }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-dark);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .card:hover { border-color: var(--primary); }
+
+        .card h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0 0 0.75rem 0;
+        }
+
+        .card .icon { color: var(--primary); font-size: 1.5rem; }
+        .card p { margin-bottom: 0; font-size: 0.95rem; }
+
+        /* Alerts */
+        .alert {
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .alert-info { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); }
+        .alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); }
+        .alert-warning { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); }
+        .alert-danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); }
+
+        .alert .icon { flex-shrink: 0; font-size: 1.5rem; }
+        .alert-info .icon { color: var(--primary); }
+        .alert-success .icon { color: var(--emerald); }
+        .alert-warning .icon { color: var(--amber); }
+        .alert-danger .icon { color: var(--red); }
+
+        /* Code/Path */
+        code {
+            background: var(--surface-highlight);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--primary-light);
+        }
+
+        .menu-path {
+            background: linear-gradient(90deg, var(--primary)/20, transparent);
+            padding: 0.75rem 1rem;
+            border-left: 3px solid var(--primary);
+            border-radius: 0 0.5rem 0.5rem 0;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        /* Keyboard */
+        kbd {
+            background: var(--surface-highlight);
+            border: 1px solid var(--border-dark);
+            border-radius: 0.25rem;
+            padding: 0.2rem 0.5rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        /* Feature List */
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .feature-tags span {
+            background: var(--surface-highlight);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+        }
+
+        /* Workflow */
+        .workflow {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .workflow-step {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 1.25rem;
+            background: var(--surface-highlight);
+            border-radius: 0.75rem;
+            position: relative;
+        }
+
+        .workflow-step::after {
+            content: "→";
+            position: absolute;
+            right: -1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        .workflow-step:last-child::after { display: none; }
+
+        .workflow-step .material-symbols-outlined {
+            font-size: 2rem;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .workflow-step span { font-size: 0.875rem; font-weight: 500; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-dark);
+        }
+
+        /* Print */
+        @media print {
+            body { background: white; color: black; }
+            section { break-inside: avoid; border: 1px solid #ccc; }
+            header { background: var(--primary); -webkit-print-color-adjust: exact; }
+            .toc { position: static; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📘 User Manual SimpleAkunting V4</h1>
+        <p>Panduan Lengkap Penggunaan Aplikasi Step-by-Step</p>
+        <span class="version">Versi 4.0 • Januari 2026</span>
+    </header>
+
+    <div class="container">
+        <!-- Table of Contents -->
+        <nav class="toc">
+            <h2>📑 Daftar Isi</h2>
+            <div class="toc-grid">
+                <a href="#intro"><span class="material-symbols-outlined">info</span> Pendahuluan</a>
+                <a href="#login"><span class="material-symbols-outlined">login</span> Login & Registrasi</a>
+                <a href="#dashboard"><span class="material-symbols-outlined">dashboard</span> Dashboard</a>
+                <a href="#setup"><span class="material-symbols-outlined">tune</span> Setup Awal</a>
+                <a href="#coa"><span class="material-symbols-outlined">account_tree</span> Bagan Akun</a>
+                <a href="#contacts"><span class="material-symbols-outlined">contacts</span> Kontak</a>
+                <a href="#inventory"><span class="material-symbols-outlined">inventory_2</span> Persediaan</a>
+                <a href="#assets"><span class="material-symbols-outlined">domain</span> Aset Tetap</a>
+                <a href="#sales"><span class="material-symbols-outlined">point_of_sale</span> Penjualan</a>
+                <a href="#purchases"><span class="material-symbols-outlined">shopping_cart</span> Pembelian</a>
+                <a href="#cash"><span class="material-symbols-outlined">payments</span> Kas & Bank</a>
+                <a href="#journals"><span class="material-symbols-outlined">edit_note</span> Jurnal</a>
+                <a href="#biological"><span class="material-symbols-outlined">eco</span> Aset Biologis</a>
+                <a href="#manufacturing"><span class="material-symbols-outlined">precision_manufacturing</span> Manufaktur</a>
+                <a href="#budgets"><span class="material-symbols-outlined">calculate</span> Anggaran</a>
+                <a href="#reports"><span class="material-symbols-outlined">analytics</span> Laporan</a>
+                <a href="#users"><span class="material-symbols-outlined">group</span> Manajemen User</a>
+                <a href="#settings"><span class="material-symbols-outlined">settings</span> Pengaturan</a>
+            </div>
+        </nav>
+
+        <!-- 1. Pendahuluan -->
+        <section id="intro">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">info</span> 1. Pendahuluan</h2>
+            
+            <p><strong>SimpleAkunting V4</strong> adalah aplikasi akuntansi berbasis web yang dirancang untuk UMKM, Koperasi, dan BUMDesa di Indonesia. Aplikasi ini mendukung standar akuntansi Indonesia termasuk SAK ETAP dan PSAK 69 untuk aset biologis.</p>
+
+            <h3>Fitur Utama</h3>
+            <div class="feature-tags">
+                <span>🏢 Multi-Entity</span>
+                <span>👥 Multi-User</span>
+                <span>📊 Laporan Lengkap</span>
+                <span>🌿 PSAK 69</span>
+                <span>🏭 Manufacturing</span>
+                <span>📱 Responsive</span>
+                <span>📄 Export PDF</span>
+                <span>📥 Import Excel</span>
+            </div>
+
+            <h3>Jenis Entitas yang Didukung</h3>
+            <table>
+                <tr><th>Entitas</th><th>Keterangan</th></tr>
+                <tr><td>UMKM</td><td>Usaha Mikro, Kecil, dan Menengah</td></tr>
+                <tr><td>Koperasi</td><td>Koperasi berbagai jenis</td></tr>
+                <tr><td>BUMDesa</td><td>Badan Usaha Milik Desa dengan multi unit usaha</td></tr>
+                <tr><td>Yayasan</td><td>Organisasi nirlaba</td></tr>
+            </table>
+
+            <h3>Role Pengguna</h3>
+            <table>
+                <tr><th>Role</th><th>Hak Akses</th></tr>
+                <tr><td><strong>Administrator</strong></td><td>Akses penuh ke semua fitur termasuk manajemen user</td></tr>
+                <tr><td><strong>Manajer</strong></td><td>Dapat approve, delete, dan edit semua data</td></tr>
+                <tr><td><strong>Operator</strong></td><td>Dapat create dan edit data transaksi</td></tr>
+                <tr><td><strong>Peninjau</strong></td><td>Hanya dapat melihat data (read-only)</td></tr>
+            </table>
+        </section>
+
+        <!-- 2. Login & Registrasi -->
+        <section id="login">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">login</span> 2. Login & Registrasi</h2>
+            
+            <h3>Cara Login</h3>
+            <ol class="steps">
+                <li><strong>Buka Aplikasi</strong>
+                    Akses URL aplikasi melalui browser (Chrome/Firefox/Edge)</li>
+                <li><strong>Masukkan Email</strong>
+                    Ketik alamat email yang terdaftar</li>
+                <li><strong>Masukkan Password</strong>
+                    Ketik password Anda</li>
+                <li><strong>Klik Tombol Login</strong>
+                    Anda akan diarahkan ke Dashboard</li>
+            </ol>
+
+            <div class="alert alert-info">
+                <span class="icon">💡</span>
+                <div><strong>Tips:</strong> Centang "Remember me" untuk tetap login di perangkat yang sama.</div>
+            </div>
+
+            <h3>Lupa Password</h3>
+            <ol class="steps">
+                <li><strong>Klik "Lupa Password"</strong>
+                    Link tersedia di halaman login</li>
+                <li><strong>Masukkan Email</strong>
+                    Email terdaftar akan menerima link reset</li>
+                <li><strong>Cek Email</strong>
+                    Buka email dan klik link reset password</li>
+                <li><strong>Buat Password Baru</strong>
+                    Masukkan password baru minimal 8 karakter</li>
+            </ol>
+        </section>
+
+        <!-- 3. Dashboard -->
+        <section id="dashboard">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">dashboard</span> 3. Dashboard</h2>
+            
+            <p>Dashboard adalah halaman utama yang menampilkan ringkasan keuangan perusahaan Anda.</p>
+
+            <h3>Informasi yang Ditampilkan</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4><span class="icon material-symbols-outlined">trending_up</span> Total Pendapatan</h4>
+                    <p>Jumlah total pendapatan dalam periode yang dipilih</p>
+                </div>
+                <div class="card">
+                    <h4><span class="icon material-symbols-outlined">trending_down</span> Total Pengeluaran</h4>
+                    <p>Jumlah total pengeluaran dalam periode yang dipilih</p>
+                </div>
+                <div class="card">
+                    <h4><span class="icon material-symbols-outlined">account_balance_wallet</span> Laba Bersih</h4>
+                    <p>Selisih pendapatan dan pengeluaran</p>
+                </div>
+                <div class="card">
+                    <h4><span class="icon material-symbols-outlined">payments</span> Saldo Kas</h4>
+                    <p>Total saldo kas dan bank saat ini</p>
+                </div>
+            </div>
+
+            <h3>Cara Filter Tanggal</h3>
+            <ol class="steps">
+                <li><strong>Klik Tombol "Filter Tanggal"</strong>
+                    Tombol berada di pojok kanan atas Dashboard</li>
+                <li><strong>Pilih Rentang Tanggal</strong>
+                    Isi Tanggal Mulai dan Tanggal Akhir, atau gunakan preset: Bulan Ini, Bulan Lalu, Tahun Ini</li>
+                <li><strong>Klik Terapkan Filter</strong>
+                    Data di Dashboard akan diperbarui sesuai periode</li>
+            </ol>
+
+            <h3>Menu Cepat</h3>
+            <p>Klik tombol <strong>"Menu Cepat"</strong> untuk akses cepat ke:</p>
+            <ul>
+                <li>Buat Penjualan Baru</li>
+                <li>Buat Pembelian Baru</li>
+                <li>Buat Jurnal Manual</li>
+                <li>Penerimaan Kas</li>
+                <li>Pengeluaran Kas</li>
+                <li>Laporan-laporan</li>
+            </ul>
+        </section>
+
+        <!-- 4. Setup Awal -->
+        <section id="setup">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">tune</span> 4. Setup Awal Perusahaan</h2>
+            
+            <div class="alert alert-warning">
+                <span class="icon">⚠️</span>
+                <div><strong>Penting:</strong> Lakukan setup awal sebelum mulai mencatat transaksi.</div>
+            </div>
+
+            <h3>Langkah Setup Wizard</h3>
+            <div class="menu-path">Menu: Dashboard → Setup Wizard</div>
+            
+            <ol class="steps">
+                <li><strong>Isi Informasi Perusahaan</strong>
+                    Nama perusahaan, alamat, telepon, email, NPWP</li>
+                <li><strong>Pilih Jenis Entitas</strong>
+                    UMKM, Koperasi, BUMDesa, atau Yayasan</li>
+                <li><strong>Pilih Jenis Usaha</strong>
+                    Dagang, Manufaktur, Jasa, atau Lainnya</li>
+                <li><strong>Pilih Standar Akuntansi</strong>
+                    SAK ETAP, SAK Entitas Privat, atau PSAK</li>
+                <li><strong>Inisialisasi Chart of Accounts</strong>
+                    Klik "Inisialisasi COA" untuk membuat bagan akun standar</li>
+                <li><strong>Aktifkan Fitur Opsional</strong>
+                    Centang PSAK 69 jika memiliki aset biologis</li>
+            </ol>
+
+            <h3>Pengaturan Perusahaan Lanjutan</h3>
+            <div class="menu-path">Menu: Pengaturan → Pengaturan Perusahaan (khusus Administrator)</div>
+            <ul>
+                <li>Upload logo perusahaan</li>
+                <li>Atur tahun fiskal</li>
+                <li>Pilih akun default untuk transaksi</li>
+                <li>Aktifkan/nonaktifkan modul</li>
+            </ul>
+        </section>
+
+        <!-- 5. Bagan Akun -->
+        <section id="coa">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">account_tree</span> 5. Bagan Akun (Chart of Accounts)</h2>
+            
+            <div class="menu-path">Menu: Master Data → Bagan Akun</div>
+
+            <h3>Struktur Akun</h3>
+            <table>
+                <tr><th>Kode</th><th>Tipe</th><th>Contoh</th></tr>
+                <tr><td>1xxx</td><td>Aset (Asset)</td><td>Kas, Bank, Piutang, Persediaan</td></tr>
+                <tr><td>2xxx</td><td>Kewajiban (Liability)</td><td>Utang Usaha, Utang Bank</td></tr>
+                <tr><td>3xxx</td><td>Ekuitas (Equity)</td><td>Modal, Laba Ditahan</td></tr>
+                <tr><td>4xxx</td><td>Pendapatan (Revenue)</td><td>Penjualan, Pendapatan Lain</td></tr>
+                <tr><td>5xxx</td><td>Beban (Expense)</td><td>HPP, Beban Operasional</td></tr>
+            </table>
+
+            <h3>Cara Menambah Akun Baru</h3>
+            <ol class="steps">
+                <li><strong>Klik Tombol "Tambah Akun"</strong>
+                    Tombol berwarna primary di pojok kanan</li>
+                <li><strong>Isi Kode Akun</strong>
+                    Contoh: 1101 untuk Kas Kecil</li>
+                <li><strong>Isi Nama Akun</strong>
+                    Nama deskriptif untuk akun</li>
+                <li><strong>Pilih Tipe Akun</strong>
+                    Asset, Liability, Equity, Revenue, atau Expense</li>
+                <li><strong>Pilih Saldo Normal</strong>
+                    DEBIT atau CREDIT</li>
+                <li><strong>Pilih Parent Akun (opsional)</strong>
+                    Untuk membuat struktur hierarkis</li>
+                <li><strong>Klik Simpan</strong>
+                    Akun baru akan muncul di daftar</li>
+            </ol>
+
+            <h3>Import Akun dari Excel</h3>
+            <ol class="steps">
+                <li><strong>Download Template</strong>
+                    Klik "Download Template" untuk mendapat format Excel</li>
+                <li><strong>Isi Template</strong>
+                    Isi kolom: code, name, type, normal_balance, report_type</li>
+                <li><strong>Upload File</strong>
+                    Klik "Import" dan pilih file Excel</li>
+                <li><strong>Verifikasi</strong>
+                    Sistem akan memvalidasi dan mengimpor data</li>
+            </ol>
+        </section>
+
+        <!-- 6. Kontak -->
+        <section id="contacts">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">contacts</span> 6. Kontak (Pelanggan & Supplier)</h2>
+            
+            <div class="menu-path">Menu: Master Data → Kontak</div>
+
+            <h3>Jenis Kontak</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4><span class="icon material-symbols-outlined">person</span> Pelanggan</h4>
+                    <p>Pihak yang membeli produk/jasa dari Anda</p>
+                </div>
+                <div class="card">
+                    <h4><span class="icon material-symbols-outlined">local_shipping</span> Supplier</h4>
+                    <p>Pihak yang memasok barang/jasa kepada Anda</p>
+                </div>
+                <div class="card">
+                    <h4><span class="icon material-symbols-outlined">sync_alt</span> Keduanya</h4>
+                    <p>Kontak yang berfungsi sebagai pelanggan dan supplier</p>
+                </div>
+            </div>
+
+            <h3>Cara Menambah Kontak</h3>
+            <ol class="steps">
+                <li><strong>Klik "Tambah Kontak"</strong></li>
+                <li><strong>Isi Nama</strong>
+                    Nama lengkap atau nama perusahaan</li>
+                <li><strong>Pilih Tipe</strong>
+                    Customer, Supplier, atau Both</li>
+                <li><strong>Isi Kontak</strong>
+                    Email, telepon, alamat (opsional)</li>
+                <li><strong>Klik Simpan</strong></li>
+            </ol>
+
+            <h3>Import & Export</h3>
+            <ul>
+                <li><strong>Import:</strong> Upload file Excel dengan kolom name, type, email, phone, address</li>
+                <li><strong>Export:</strong> Klik "Export" untuk download semua kontak ke Excel</li>
+            </ul>
+        </section>
+
+        <!-- 7. Persediaan -->
+        <section id="inventory">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">inventory_2</span> 7. Persediaan (Inventory)</h2>
+            
+            <div class="menu-path">Menu: Master Data → Persediaan</div>
+
+            <h3>Kategori Persediaan</h3>
+            <table>
+                <tr><th>Kategori</th><th>Keterangan</th></tr>
+                <tr><td>Barang Dagangan</td><td>Barang yang dibeli untuk dijual kembali</td></tr>
+                <tr><td>Bahan Baku</td><td>Material untuk proses produksi</td></tr>
+                <tr><td>Barang Dalam Proses</td><td>Work in Progress (WIP)</td></tr>
+                <tr><td>Barang Jadi</td><td>Produk hasil produksi</td></tr>
+                <tr><td>Bahan Penolong</td><td>Material pendukung produksi</td></tr>
+            </table>
+
+            <h3>Cara Menambah Item Persediaan</h3>
+            <ol class="steps">
+                <li><strong>Klik "Tambah Persediaan"</strong></li>
+                <li><strong>Isi Kode/SKU</strong>
+                    Kode unik untuk identifikasi barang</li>
+                <li><strong>Isi Nama Barang</strong></li>
+                <li><strong>Pilih Kategori</strong>
+                    Sesuai jenis persediaan</li>
+                <li><strong>Isi Satuan</strong>
+                    Unit, Pcs, Kg, Liter, dll</li>
+                <li><strong>Isi Harga Beli</strong>
+                    Harga perolehan per unit</li>
+                <li><strong>Isi Harga Jual</strong>
+                    Harga jual per unit</li>
+                <li><strong>Isi Stok Awal</strong>
+                    Jumlah stok saat ini</li>
+                <li><strong>Pilih Akun Persediaan</strong>
+                    Akun neraca untuk aset persediaan</li>
+                <li><strong>Pilih Akun HPP</strong>
+                    Akun beban untuk Harga Pokok Penjualan</li>
+                <li><strong>Klik Simpan</strong></li>
+            </ol>
+
+            <div class="alert alert-info">
+                <span class="icon">💡</span>
+                <div><strong>Stok Otomatis:</strong> Stok akan berkurang saat penjualan dan bertambah saat pembelian secara otomatis.</div>
+            </div>
+        </section>
+
+        <!-- 8. Aset Tetap -->
+        <section id="assets">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">domain</span> 8. Aset Tetap (Fixed Assets)</h2>
+            
+            <div class="menu-path">Menu: Master Data → Aset Tetap</div>
+
+            <h3>Informasi Aset Tetap</h3>
+            <ul>
+                <li><strong>Nama Aset:</strong> Deskripsi aset</li>
+                <li><strong>Tanggal Perolehan:</strong> Kapan aset dibeli</li>
+                <li><strong>Harga Perolehan:</strong> Nilai pembelian</li>
+                <li><strong>Umur Ekonomis:</strong> Masa pakai dalam bulan</li>
+                <li><strong>Nilai Residu:</strong> Nilai sisa di akhir umur ekonomis</li>
+                <li><strong>Metode Depresiasi:</strong> Garis Lurus (Straight Line)</li>
+            </ul>
+
+            <h3>Cara Menambah Aset Tetap</h3>
+            <ol class="steps">
+                <li><strong>Klik "Tambah Aset"</strong></li>
+                <li><strong>Isi Data Aset</strong>
+                    Nama, tanggal perolehan, harga</li>
+                <li><strong>Isi Depresiasi</strong>
+                    Umur ekonomis dan nilai residu</li>
+                <li><strong>Pilih Akun</strong>
+                    Akun Aset Tetap, Akumulasi Depresiasi, Beban Depresiasi</li>
+                <li><strong>Simpan</strong>
+                    Depresiasi akan dihitung otomatis setiap bulan</li>
+            </ol>
+
+            <h3>Rumus Depresiasi Garis Lurus</h3>
+            <div class="alert alert-info">
+                <span class="icon">📐</span>
+                <div>
+                    <strong>Depresiasi per Bulan = (Harga Perolehan - Nilai Residu) / Umur Ekonomis</strong><br>
+                    Contoh: (10.000.000 - 1.000.000) / 60 bulan = Rp 150.000/bulan
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. Penjualan -->
+        <section id="sales">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">point_of_sale</span> 9. Penjualan (Sales)</h2>
+            
+            <div class="menu-path">Menu: Transaksi → Penjualan → Buat Penjualan</div>
+
+            <h3>Alur Proses Penjualan</h3>
+            <div class="workflow">
+                <div class="workflow-step">
+                    <span class="material-symbols-outlined">edit_document</span>
+                    <span>Buat Invoice</span>
+                </div>
+                <div class="workflow-step">
+                    <span class="material-symbols-outlined">save</span>
+                    <span>Simpan</span>
+                </div>
+                <div class="workflow-step">
+                    <span class="material-symbols-outlined">inventory</span>
+                    <span>Stok Berkurang</span>
+                </div>
+                <div class="workflow-step">
+                    <span class="material-symbols-outlined">receipt</span>
+                    <span>Jurnal Terbit</span>
+                </div>
+            </div>
+
+            <h3>Cara Membuat Invoice Penjualan</h3>
+            <ol class="steps">
+                <li><strong>Buka Form Penjualan Baru</strong>
+                    Klik "Penjualan Baru" atau akses via Dashboard</li>
+                <li><strong>Pilih Pelanggan</strong>
+                    Pilih dari dropdown atau ketik untuk mencari</li>
+                <li><strong>Isi Tanggal</strong>
+                    Tanggal invoice (default: hari ini)</li>
+                <li><strong>Pilih Item Persediaan</strong>
+                    Pilih barang yang dijual dari dropdown</li>
+                <li><strong>Isi Quantity</strong>
+                    Jumlah barang yang dijual</li>
+                <li><strong>Cek Harga</strong>
+                    Harga otomatis terisi dari master, bisa diedit</li>
+                <li><strong>Tambah Item Lain (opsional)</strong>
+                    Ulangi langkah 4-6 untuk item tambahan</li>
+                <li><strong>Isi Keterangan</strong>
+                    Catatan untuk invoice (opsional)</li>
+                <li><strong>Klik Simpan</strong>
+                    Invoice tersimpan dan jurnal otomatis dibuat</li>
+            </ol>
+
+            <h3>Jurnal Otomatis Penjualan</h3>
+            <table>
+                <tr><th>Akun</th><th>Debit</th><th>Credit</th></tr>
+                <tr><td>Kas/Piutang</td><td>Rp xxx</td><td>-</td></tr>
+                <tr><td>Penjualan</td><td>-</td><td>Rp xxx</td></tr>
+                <tr><td>HPP</td><td>Rp xxx</td><td>-</td></tr>
+                <tr><td>Persediaan</td><td>-</td><td>Rp xxx</td></tr>
+            </table>
+        </section>
+
+        <!-- 10. Pembelian -->
+        <section id="purchases">
+            <h2><span class="material-symbols-outlined" style="color: var(--blue)">shopping_cart</span> 10. Pembelian (Purchases)</h2>
+            
+            <div class="menu-path">Menu: Transaksi → Pembelian → Buat Pembelian</div>
+
+            <h3>Cara Membuat Transaksi Pembelian</h3>
+            <ol class="steps">
+                <li><strong>Buka Form Pembelian Baru</strong></li>
+                <li><strong>Pilih Supplier</strong>
+                    Pilih pemasok dari daftar kontak</li>
+                <li><strong>Isi Tanggal</strong>
+                    Tanggal transaksi pembelian</li>
+                <li><strong>Pilih Item Persediaan</strong>
+                    Pilih barang yang dibeli</li>
+                <li><strong>Isi Quantity</strong>
+                    Jumlah barang yang dibeli</li>
+                <li><strong>Isi Harga Beli</strong>
+                    Harga per unit (otomatis dari master)</li>
+                <li><strong>Klik Simpan</strong>
+                    Stok otomatis bertambah</li>
+            </ol>
+
+            <h3>Jurnal Otomatis Pembelian</h3>
+            <table>
+                <tr><th>Akun</th><th>Debit</th><th>Credit</th></tr>
+                <tr><td>Persediaan</td><td>Rp xxx</td><td>-</td></tr>
+                <tr><td>Kas/Utang</td><td>-</td><td>Rp xxx</td></tr>
+            </table>
+        </section>
+
+        <!-- 11. Kas & Bank -->
+        <section id="cash">
+            <h2><span class="material-symbols-outlined" style="color: var(--emerald)">payments</span> 11. Kas & Bank</h2>
+
+            <h3>11.1 Penerimaan Kas</h3>
+            <div class="menu-path">Menu: Transaksi → Penerimaan Kas</div>
+            <ol class="steps">
+                <li><strong>Pilih Akun Kas/Bank</strong>
+                    Ke mana uang diterima</li>
+                <li><strong>Isi Tanggal</strong></li>
+                <li><strong>Pilih Akun Lawan</strong>
+                    Sumber penerimaan (Pendapatan, Piutang, dll)</li>
+                <li><strong>Isi Jumlah</strong></li>
+                <li><strong>Isi Keterangan</strong></li>
+                <li><strong>Simpan</strong></li>
+            </ol>
+
+            <h3>11.2 Pengeluaran Kas</h3>
+            <div class="menu-path">Menu: Transaksi → Pengeluaran Kas</div>
+            <ol class="steps">
+                <li><strong>Pilih Akun Kas/Bank</strong>
+                    Dari mana uang dikeluarkan</li>
+                <li><strong>Isi Tanggal</strong></li>
+                <li><strong>Pilih Akun Lawan</strong>
+                    Tujuan pengeluaran (Beban, Utang, dll)</li>
+                <li><strong>Isi Jumlah</strong></li>
+                <li><strong>Isi Keterangan</strong></li>
+                <li><strong>Simpan</strong></li>
+            </ol>
+        </section>
+
+        <!-- 12. Jurnal -->
+        <section id="journals">
+            <h2><span class="material-symbols-outlined" style="color: var(--amber)">edit_note</span> 12. Jurnal</h2>
+            
+            <div class="menu-path">Menu: Transaksi → Jurnal</div>
+
+            <h3>Jenis Jurnal</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4><span class="icon material-symbols-outlined">edit_note</span> Jurnal Umum</h4>
+                    <p>Entri manual untuk transaksi non-standar</p>
+                </div>
+                <div class="card">
+                    <h4><span class="icon material-symbols-outlined">tune</span> Jurnal Penyesuaian</h4>
+                    <p>Koreksi saldo di akhir periode</p>
+                </div>
+                <div class="card">
+                    <h4><span class="icon material-symbols-outlined">lock</span> Jurnal Penutup</h4>
+                    <p>Menutup akun pendapatan/beban ke laba ditahan</p>
+                </div>
+            </div>
+
+            <h3>Cara Membuat Jurnal Manual</h3>
+            <ol class="steps">
+                <li><strong>Buka Jurnal → Jurnal Manual</strong></li>
+                <li><strong>Isi Tanggal</strong></li>
+                <li><strong>Isi Keterangan</strong>
+                    Deskripsi transaksi</li>
+                <li><strong>Tambah Baris Debit</strong>
+                    Pilih akun dan isi jumlah di kolom Debit</li>
+                <li><strong>Tambah Baris Credit</strong>
+                    Pilih akun dan isi jumlah di kolom Credit</li>
+                <li><strong>Pastikan Balance</strong>
+                    Total Debit = Total Credit</li>
+                <li><strong>Simpan</strong></li>
+            </ol>
+
+            <div class="alert alert-danger">
+                <span class="icon">⚠️</span>
+                <div><strong>Penting:</strong> Total Debit harus sama dengan Total Credit. Jika tidak balance, jurnal tidak bisa disimpan.</div>
+            </div>
+        </section>
+
+        <!-- 13. Aset Biologis -->
+        <section id="biological">
+            <h2><span class="material-symbols-outlined" style="color: var(--emerald)">eco</span> 13. Aset Biologis (PSAK 69)</h2>
+            
+            <div class="menu-path">Menu: Master Data → Aset Biologis</div>
+
+            <div class="alert alert-warning">
+                <span class="icon">⚙️</span>
+                <div><strong>Persyaratan:</strong> Aktifkan PSAK 69 di Pengaturan Perusahaan terlebih dahulu.</div>
+            </div>
+
+            <h3>Kategori Aset Biologis</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>🌴 Tanaman Produktif</h4>
+                    <p>Kelapa sawit, karet, kopi, teh</p>
+                </div>
+                <div class="card">
+                    <h4>🌾 Tanaman Semusim</h4>
+                    <p>Padi, jagung, sayuran</p>
+                </div>
+                <div class="card">
+                    <h4>🐄 Hewan Ternak</h4>
+                    <p>Sapi potong, kambing, ayam potong</p>
+                </div>
+                <div class="card">
+                    <h4>🥛 Hewan Produksi</h4>
+                    <p>Sapi perah, ayam petelur</p>
+                </div>
+            </div>
+
+            <h3>Fitur Utama</h3>
+            <table>
+                <tr><th>Fitur</th><th>Fungsi</th></tr>
+                <tr><td><strong>Valuasi</strong></td><td>Penilaian ulang nilai wajar (fair value)</td></tr>
+                <tr><td><strong>Transformasi</strong></td><td>Perubahan biologis: pertumbuhan, kelahiran, kematian</td></tr>
+                <tr><td><strong>Panen</strong></td><td>Hasil panen masuk ke persediaan</td></tr>
+            </table>
+
+            <h3>Cara Menambah Aset Biologis</h3>
+            <ol class="steps">
+                <li><strong>Klik "Tambah Aset Biologis"</strong></li>
+                <li><strong>Pilih Kategori</strong>
+                    Tanaman Produktif, Semusim, Hewan Ternak, atau Hewan Produksi</li>
+                <li><strong>Isi Nama</strong>
+                    Contoh: Kebun Kelapa Sawit Blok A</li>
+                <li><strong>Isi Kuantitas</strong>
+                    Jumlah hewan atau luas area (hektar)</li>
+                <li><strong>Isi Nilai Perolehan</strong>
+                    Biaya awal perolehan</li>
+                <li><strong>Isi Nilai Wajar</strong>
+                    Nilai pasar saat ini</li>
+                <li><strong>Simpan</strong></li>
+            </ol>
+
+            <h3>Laporan PSAK 69</h3>
+            <ul>
+                <li>Laporan Rekonsiliasi Aset Biologis</li>
+                <li>Laporan Perubahan Nilai Wajar</li>
+                <li>Laporan Produksi</li>
+                <li>Laporan Pengungkapan PSAK 69</li>
+            </ul>
+        </section>
+
+        <!-- 14. Manufaktur -->
+        <section id="manufacturing">
+            <h2><span class="material-symbols-outlined" style="color: var(--purple)">precision_manufacturing</span> 14. Manufaktur</h2>
+
+            <h3>14.1 Assembly / Bill of Materials (BOM)</h3>
+            <div class="menu-path">Menu: Manufaktur → Assembly</div>
+            <p>BOM mendefinisikan resep produksi: bahan apa saja yang dibutuhkan untuk menghasilkan produk jadi.</p>
+            
+            <ol class="steps">
+                <li><strong>Pilih Produk Jadi</strong>
+                    Item persediaan kategori "Barang Jadi"</li>
+                <li><strong>Tambah Komponen</strong>
+                    Pilih bahan baku dan tentukan kuantitas</li>
+                <li><strong>Simpan BOM</strong>
+                    Resep siap digunakan untuk produksi</li>
+            </ol>
+
+            <h3>14.2 Production Order</h3>
+            <div class="menu-path">Menu: Manufaktur → Produksi</div>
+            
+            <h4>Status Produksi</h4>
+            <div class="workflow">
+                <div class="workflow-step">
+                    <span class="material-symbols-outlined">draft</span>
+                    <span>Draft</span>
+                </div>
+                <div class="workflow-step">
+                    <span class="material-symbols-outlined">play_arrow</span>
+                    <span>In Progress</span>
+                </div>
+                <div class="workflow-step">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <span>Completed</span>
+                </div>
+            </div>
+
+            <h4>Cara Membuat Production Order</h4>
+            <ol class="steps">
+                <li><strong>Klik "Buat Produksi"</strong></li>
+                <li><strong>Pilih Assembly/BOM</strong>
+                    Produk yang akan diproduksi</li>
+                <li><strong>Isi Quantity</strong>
+                    Jumlah yang akan diproduksi</li>
+                <li><strong>Simpan (Draft)</strong></li>
+                <li><strong>Klik "Start"</strong>
+                    Status menjadi In Progress, bahan baku dikurangi dari stok</li>
+                <li><strong>Klik "Complete"</strong>
+                    Status menjadi Completed, produk jadi masuk stok</li>
+            </ol>
+        </section>
+
+        <!-- 15. Anggaran -->
+        <section id="budgets">
+            <h2><span class="material-symbols-outlined" style="color: var(--amber)">calculate</span> 15. Anggaran (Budget)</h2>
+            
+            <div class="menu-path">Menu: Keuangan → Anggaran</div>
+
+            <h3>Cara Membuat Anggaran</h3>
+            <ol class="steps">
+                <li><strong>Klik "Tambah Anggaran"</strong></li>
+                <li><strong>Pilih Akun</strong>
+                    Akun yang ingin dianggarkan</li>
+                <li><strong>Pilih Periode</strong>
+                    Bulan dan tahun</li>
+                <li><strong>Isi Jumlah Anggaran</strong></li>
+                <li><strong>Simpan</strong></li>
+            </ol>
+
+            <h3>Laporan Perbandingan</h3>
+            <p>Lihat perbandingan Anggaran vs Aktual di menu <strong>Anggaran → Perbandingan</strong>. Menampilkan:</p>
+            <ul>
+                <li>Anggaran per akun</li>
+                <li>Realisasi/Aktual</li>
+                <li>Selisih (varian)</li>
+                <li>Persentase pencapaian</li>
+            </ul>
+        </section>
+
+        <!-- 16. Laporan -->
+        <section id="reports">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">analytics</span> 16. Laporan Keuangan</h2>
+            
+            <div class="menu-path">Menu: Laporan</div>
+
+            <h3>Laporan Utama</h3>
+            <table>
+                <tr><th>Laporan</th><th>Fungsi</th><th>Akses</th></tr>
+                <tr><td><strong>Neraca</strong></td><td>Posisi keuangan: Aset = Liabilitas + Ekuitas</td><td>Laporan → Neraca</td></tr>
+                <tr><td><strong>Laba Rugi</strong></td><td>Kinerja: Pendapatan - Beban = Laba/Rugi</td><td>Laporan → Laba Rugi</td></tr>
+                <tr><td><strong>Arus Kas</strong></td><td>Aliran kas: Operasional, Investasi, Pendanaan</td><td>Laporan → Arus Kas</td></tr>
+                <tr><td><strong>Perubahan Ekuitas</strong></td><td>Mutasi modal/ekuitas</td><td>Laporan → Perubahan Ekuitas</td></tr>
+                <tr><td><strong>Neraca Saldo</strong></td><td>Trial Balance semua akun</td><td>Laporan → Neraca Saldo</td></tr>
+                <tr><td><strong>Buku Besar</strong></td><td>Ledger per akun</td><td>Laporan → Buku Besar</td></tr>
+                <tr><td><strong>Daftar Jurnal</strong></td><td>Semua transaksi jurnal</td><td>Laporan → Daftar Jurnal</td></tr>
+                <tr><td><strong>Analisis Keuangan</strong></td><td>Rasio-rasio keuangan</td><td>Laporan → Analisis</td></tr>
+            </table>
+
+            <h3>Cara Melihat Laporan</h3>
+            <ol class="steps">
+                <li><strong>Pilih Jenis Laporan</strong>
+                    Dari menu Laporan</li>
+                <li><strong>Pilih Periode</strong>
+                    Filter berdasarkan tanggal</li>
+                <li><strong>Klik Tampilkan</strong>
+                    Laporan akan ditampilkan di layar</li>
+                <li><strong>Export PDF (opsional)</strong>
+                    Klik tombol "Export PDF" untuk download</li>
+            </ol>
+
+            <h3>Laporan Komparatif</h3>
+            <p>Bandingkan laporan 2 periode berbeda:</p>
+            <ol class="steps">
+                <li><strong>Buka Laporan</strong> (Neraca atau Laba Rugi)</li>
+                <li><strong>Klik "Komparatif"</strong></li>
+                <li><strong>Pilih 2 Periode</strong>
+                    Periode 1 dan Periode 2</li>
+                <li><strong>Tampilkan</strong>
+                    Melihat perbandingan side-by-side</li>
+            </ol>
+        </section>
+
+        <!-- 17. Manajemen User -->
+        <section id="users">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">group</span> 17. Manajemen User</h2>
+            
+            <div class="menu-path">Menu: Pengaturan → Pengguna (khusus Administrator)</div>
+
+            <h3>Cara Menambah User Baru</h3>
+            <ol class="steps">
+                <li><strong>Klik "Tambah User"</strong></li>
+                <li><strong>Isi Nama</strong></li>
+                <li><strong>Isi Email</strong>
+                    Akan digunakan untuk login</li>
+                <li><strong>Buat Password</strong>
+                    Minimal 8 karakter</li>
+                <li><strong>Pilih Role</strong>
+                    Administrator, Manajer, Operator, atau Peninjau</li>
+                <li><strong>Simpan</strong></li>
+            </ol>
+
+            <h3>Audit Trail</h3>
+            <div class="menu-path">Menu: Pengaturan → Audit Trail</div>
+            <p>Melihat log aktivitas semua pengguna:</p>
+            <ul>
+                <li>Siapa yang melakukan perubahan</li>
+                <li>Kapan perubahan dilakukan</li>
+                <li>Data apa yang berubah</li>
+                <li>Nilai sebelum dan sesudah</li>
+            </ul>
+        </section>
+
+        <!-- 18. Pengaturan -->
+        <section id="settings">
+            <h2><span class="material-symbols-outlined" style="color: var(--primary)">settings</span> 18. Pengaturan Sistem</h2>
+            
+            <h3>Pengaturan Perusahaan</h3>
+            <div class="menu-path">Menu: Pengaturan → Pengaturan Perusahaan</div>
+            <ul>
+                <li>Informasi perusahaan (nama, alamat, telepon)</li>
+                <li>Logo perusahaan</li>
+                <li>Tahun fiskal</li>
+                <li>Akun default</li>
+                <li>Aktifasi PSAK 69</li>
+            </ul>
+
+            <h3>Profil Pengguna</h3>
+            <div class="menu-path">Menu: Profil (klik nama di pojok kanan)</div>
+            <ul>
+                <li>Update nama</li>
+                <li>Update email</li>
+                <li>Ganti password</li>
+            </ul>
+
+            <h3>Bantuan</h3>
+            <div class="menu-path">Menu: Bantuan</div>
+            <ul>
+                <li>Panduan Aplikasi</li>
+                <li>Panduan Deployment</li>
+                <li>FAQ</li>
+            </ul>
+        </section>
+
+        <!-- Tips & Tricks -->
+        <section>
+            <h2><span class="material-symbols-outlined" style="color: var(--amber)">lightbulb</span> Tips & Trik</h2>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h4>⌨️ Keyboard Shortcut</h4>
+                    <p>Tekan <kbd>Ctrl</kbd> + <kbd>K</kbd> untuk membuka pencarian cepat</p>
+                </div>
+                <div class="card">
+                    <h4>📝 Backup Rutin</h4>
+                    <p>Lakukan backup database secara berkala untuk keamanan data</p>
+                </div>
+                <div class="card">
+                    <h4>📊 Cek Neraca</h4>
+                    <p>Pastikan Aset = Liabilitas + Ekuitas secara rutin</p>
+                </div>
+                <div class="card">
+                    <h4>🔐 Password Kuat</h4>
+                    <p>Gunakan kombinasi huruf, angka, dan simbol</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p><strong>User Manual SimpleAkunting V4</strong></p>
+        <p>Sistem Akuntansi Modern untuk UMKM, Koperasi, dan BUMDesa</p>
+        <p>© 2025-2026 Mentari Commsindo. All rights reserved.</p>
+        <p style="margin-top: 1rem; font-size: 0.875rem;">Terakhir diperbarui: Januari 2026</p>
+    </footer>
+</body>
+</html>
