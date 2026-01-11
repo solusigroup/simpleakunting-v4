@@ -16,6 +16,7 @@ class FixedAsset extends Model
         'company_id',
         'coa_id',
         'accum_coa_id',
+        'expense_coa_id',
         'code',
         'name',
         'acquisition_date',
@@ -57,6 +58,14 @@ class FixedAsset extends Model
     public function accumulatedAccount(): BelongsTo
     {
         return $this->belongsTo(ChartOfAccount::class, 'accum_coa_id');
+    }
+
+    /**
+     * Get the depreciation expense account.
+     */
+    public function expenseAccount(): BelongsTo
+    {
+        return $this->belongsTo(ChartOfAccount::class, 'expense_coa_id');
     }
 
     /**

@@ -22,7 +22,7 @@ class JournalController extends Controller
         $company = $user->company;
 
         $query = Journal::where('company_id', $company->id)
-            ->with(['businessUnit:id,name', 'items:id,journal_id,coa_id,debit,credit'])
+            ->with(['businessUnit:id,name', 'contact:id,name,type', 'items:id,journal_id,coa_id,debit,credit'])
             ->orderBy('date', 'desc');
 
         // Date filters
@@ -80,6 +80,7 @@ class JournalController extends Controller
             'date' => ['required', 'date'],
             'description' => ['required', 'string', 'max:255'],
             'unit_id' => ['nullable', 'exists:business_units,id'],
+            'contact_id' => ['nullable', 'exists:contacts,id'],
             'lines' => ['required', 'array', 'min:2'],
             'lines.*.account_id' => ['required', 'exists:chart_of_accounts,id'],
             'lines.*.debit' => ['required', 'numeric', 'min:0'],
@@ -148,6 +149,7 @@ class JournalController extends Controller
             $journal = Journal::create([
                 'company_id' => $company->id,
                 'business_unit_id' => $request->unit_id,
+                'contact_id' => $request->contact_id,
                 'date' => $request->date,
                 'reference' => $reference,
                 'description' => $request->description,
@@ -185,7 +187,7 @@ class JournalController extends Controller
         $user = $request->user();
         
         $journal = Journal::where('company_id', $user->company_id)
-            ->with(['items.account', 'businessUnit'])
+            ->with(['items.account', 'businessUnit', 'contact'])
             ->findOrFail($id);
 
         return response()->json([

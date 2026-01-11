@@ -255,4 +255,64 @@ class AccountImportController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Load Default COA (BUMDesa Structure)
+     */
+    public function loadDefault(Request $request)
+    {
+        $user = $request->user();
+        $company = $user->company;
+
+        if (!$company) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Company not found',
+            ], 400);
+        }
+
+        if (!$user->canEdit()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk mengelola akun.',
+            ], 403);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Attempt to delete existing accounts
+            // This will fail if accounts are referenced by other tables (journals, etc.)
+            try {
+                // Delete detail accounts first, then headers? 
+                // Alternatively, just delete all for this company. 
+                // Dependent on how FKs are set up (CASCADE or RESTRICT). Usually RESTRICT for integrity.
+                ChartOfAccount::where('company_id', $company->id)->delete();
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Check code '23000' for Integrity constraint violation
+                if ($e->getCode() === '23000') {
+                    throw new \Exception('Gagal menghapus akun lama karena sedang digunakan dalam transaksi atau master data lain. Hapus data terkait terlebih dahulu.');
+                }
+                throw $e;
+            }
+            
+            // Run the seeder
+            $seeder = new \Database\Seeders\CoaCustomSeeder();
+            $seeder->run($company);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil! Akun lama telah dihapus dan Default COA berhasil dimuat.',
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memuat COA: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

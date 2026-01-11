@@ -23,6 +23,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BiologicalAssetController;
 use App\Http\Controllers\BiologicalReportController;
+use App\Http\Controllers\ClosingController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ManufacturingReportController;
@@ -92,6 +93,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/accounts/import', [AccountImportController::class, 'showForm'])->name('accounts.import.form');
     Route::get('/accounts/import/template', [AccountImportController::class, 'downloadTemplate'])->name('accounts.import.template');
     Route::post('/accounts/import', [AccountImportController::class, 'import'])->name('accounts.import');
+    Route::post('/accounts/import/default', [AccountImportController::class, 'loadDefault'])->name('accounts.import.default');
     
     // Chart of Accounts - parameterized routes (must be after specific routes)
     Route::put('/accounts/{id}', [AccountController::class, 'update'])->name('accounts.update');
@@ -133,6 +135,7 @@ Route::middleware('auth')->group(function () {
     // Fixed Assets (Aset Tetap)
     Route::get('/assets', [FixedAssetController::class, 'index'])->name('assets.index');
     Route::post('/assets', [FixedAssetController::class, 'store'])->name('assets.store');
+    Route::post('/assets/depreciate', [FixedAssetController::class, 'runDepreciation'])->name('assets.depreciate');
     
     // Fixed Assets Import (before {id} routes)
     Route::get('/assets/import', [FixedAssetImportController::class, 'showForm'])->name('assets.import.form');
@@ -229,19 +232,11 @@ Route::middleware('auth')->group(function () {
     // Journal (Manual Entry)
     Route::get('/journals', [JournalController::class, 'index'])->name('journals.index');
     Route::post('/journals/manual', [JournalController::class, 'storeManual'])->name('journals.manual');
-    Route::get('/journals/{id}', [JournalController::class, 'show'])->name('journals.show');
     
-    // Budgets (Anggaran)
-    Route::get('/budgets', [BudgetController::class, 'index'])->name('budgets.index');
-    Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store');
-    Route::put('/budgets/{budget}', [BudgetController::class, 'update'])->name('budgets.update');
-    Route::delete('/budgets/{budget}', [BudgetController::class, 'destroy'])->name('budgets.destroy');
-    Route::get('/budgets/comparison', [BudgetController::class, 'comparison'])->name('budgets.comparison');
-    
-    // Closing & Adjustment
-    Route::get('/journals/closing', function () {
-        return view('journals.closing');
-    })->name('journals.closing');
+    // Closing & Adjustment (must be before {id} route)
+    Route::get('/journals/closing', [ClosingController::class, 'index'])->name('journals.closing');
+    Route::post('/journals/closing/preview', [ClosingController::class, 'preview'])->name('journals.closing.preview');
+    Route::post('/journals/closing/execute', [ClosingController::class, 'execute'])->name('journals.closing.execute');
     Route::get('/journals/adjustment', function () {
         $accounts = \App\Models\ChartOfAccount::where('company_id', auth()->user()->company_id)
             ->where('is_parent', false)
@@ -253,6 +248,16 @@ Route::middleware('auth')->group(function () {
             ->get();
         return view('journals.adjustment', compact('accounts', 'businessUnits'));
     })->name('journals.adjustment');
+    
+    // Journals parameterized route (must be after specific routes)
+    Route::get('/journals/{id}', [JournalController::class, 'show'])->name('journals.show');
+    
+    // Budgets (Anggaran)
+    Route::get('/budgets', [BudgetController::class, 'index'])->name('budgets.index');
+    Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store');
+    Route::put('/budgets/{budget}', [BudgetController::class, 'update'])->name('budgets.update');
+    Route::delete('/budgets/{budget}', [BudgetController::class, 'destroy'])->name('budgets.destroy');
+    Route::get('/budgets/comparison', [BudgetController::class, 'comparison'])->name('budgets.comparison');
     
     // ==========================================
     // REPORTS

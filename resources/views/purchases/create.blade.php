@@ -169,6 +169,11 @@
             } catch (error) {
                 console.log('Inventory not available:', error);
             }
+            
+            // Initialize searchable select for payable account
+            if (typeof makeSearchable === 'function') {
+                makeSearchable(payableSelect);
+            }
         }
 
         function getInventoryOptions() {
@@ -252,6 +257,12 @@
                 </td>
             `;
             tbody.appendChild(tr);
+            
+            // Initialize searchable select for the account dropdown
+            const accountSelect = tr.querySelector('[name^="account_"]');
+            if (typeof makeSearchable === 'function' && accountSelect) {
+                makeSearchable(accountSelect);
+            }
         }
 
         function removeItem(id) {

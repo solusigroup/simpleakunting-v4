@@ -2,8 +2,13 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
+    <!-- Logo Mentari Commsindo -->
+    <div class="flex justify-center mb-6">
+        <img src="{{ asset('images/logo-mentari.png') }}" alt="Mentari Commsindo" class="h-16 object-contain">
+    </div>
+
     <!-- Header -->
-    <div class="mb-6">
+    <div class="mb-6 text-center">
         <h2 class="text-2xl font-bold text-white mb-2">Masuk ke Akun Anda</h2>
         <p class="text-text-muted text-sm">Silakan masukkan kredensial Anda untuk melanjutkan</p>
     </div>
@@ -39,15 +44,37 @@
                     Password
                 </span>
             </label>
-            <input id="password" 
-                   type="password" 
-                   name="password" 
-                   required 
-                   autocomplete="current-password"
-                   class="auth-input w-full px-4 py-3 rounded-xl text-white placeholder-text-muted focus:outline-none"
-                   placeholder="Masukkan password Anda">
+            <div class="relative">
+                <input id="password" 
+                       type="password" 
+                       name="password" 
+                       required 
+                       autocomplete="current-password"
+                       class="auth-input w-full px-4 py-3 pr-12 rounded-xl text-white placeholder-text-muted focus:outline-none"
+                       placeholder="Masukkan password Anda">
+                <button type="button" 
+                        onclick="togglePassword()"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-white transition-colors focus:outline-none">
+                    <span id="eyeIcon" class="material-symbols-outlined text-xl">visibility_off</span>
+                </button>
+            </div>
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
+
+        <script>
+            function togglePassword() {
+                const passwordInput = document.getElementById('password');
+                const eyeIcon = document.getElementById('eyeIcon');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    eyeIcon.textContent = 'visibility';
+                } else {
+                    passwordInput.type = 'password';
+                    eyeIcon.textContent = 'visibility_off';
+                }
+            }
+        </script>
 
         <!-- Remember Me & Forgot Password -->
         <div class="flex items-center justify-between">

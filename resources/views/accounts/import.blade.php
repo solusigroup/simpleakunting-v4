@@ -42,6 +42,23 @@
         </div>
     </div>
 
+    <!-- Load Default -->
+    <div class="bg-surface-dark/30 border border-border-dark rounded-2xl p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-bold text-white mb-2">Opsi Alternatif: Reset & Load Default COA</h3>
+                <p class="text-text-muted text-sm">Hapus SEMUA akun yang ada dan ganti dengan struktur standar BUMDesa.</p>
+                <p class="text-red-400 text-xs mt-1 font-bold"><span class="material-symbols-outlined text-sm align-bottom">dangerous</span> PERINGATAN: Semua akun yang ada saat ini akan DIHAPUS. Proses ini tidak dapat dibatalkan!</p>
+            </div>
+            <x-btn type="secondary" onclick="loadDefaultCoa()" id="loadDefaultBtn" class="border-red-500/50 text-red-500 hover:bg-red-500/10">
+                <span class="material-symbols-outlined text-xl">delete_forever</span>
+                Reset & Load COA
+            </x-btn>
+        </div>
+    </div>
+
+
+
     <!-- Upload File -->
     <div class="bg-surface-dark/30 border border-border-dark rounded-2xl p-6 mb-6">
         <h3 class="text-lg font-bold text-white mb-4">Step 2: Upload File</h3>
@@ -293,6 +310,42 @@
 
             // Scroll to results
             document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function loadDefaultCoa() {
+            if (!confirm('PERINGATAN KERAS:\n\nTindakan ini akan MENGHAPUS SEMUA akun yang ada saat ini dan menggantinya dengan Default COA.\n\nAkun tidak dapat dihapus jika sudah digunakan dalam transaksi.\n\nApakah Anda yakin ingin melanjutkan?')) {
+                return;
+            }
+
+            const btn = document.getElementById('loadDefaultBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined text-xl animate-spin">progress_activity</span> Deleting & Seeding...';
+
+            try {
+                const response = await fetch('/accounts/import/default', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(result.message);
+                    window.location.href = '/accounts';
+                } else {
+                    alert(result.message || 'Gagal memuat COA');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat memuat COA');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
     </script>
     @endpush

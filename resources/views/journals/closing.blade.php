@@ -11,7 +11,7 @@
         <span class="material-symbols-outlined text-blue-400 mt-0.5">info</span>
         <div class="text-sm text-blue-400">
             <p class="font-medium mb-1">Tentang Tutup Buku</p>
-            <p class="text-blue-400/80">Proses tutup buku akan memindahkan saldo akun Pendapatan dan Beban ke akun Laba Ditahan. Pastikan semua transaksi periode berjalan sudah dicatat sebelum melakukan tutup buku.</p>
+            <p class="text-blue-400/80">Proses tutup buku akan memindahkan saldo akun Pendapatan dan Beban ke akun Ikhtisar Laba-Rugi, lalu ke Laba Ditahan. Pastikan semua transaksi periode berjalan sudah dicatat sebelum melakukan tutup buku.</p>
         </div>
     </div>
 
@@ -60,7 +60,7 @@
 
         <div class="flex justify-end gap-3">
             <x-btn type="secondary" onclick="hidePreview()">Batal</x-btn>
-            <x-btn type="primary" onclick="executeClosing()">
+            <x-btn type="primary" onclick="executeClosing()" id="executeBtn">
                 <span class="material-symbols-outlined text-xl">lock</span>
                 Eksekusi Tutup Buku
             </x-btn>
@@ -72,66 +72,158 @@
         <h4 class="text-white font-bold mb-2">Catatan Penting:</h4>
         <ul class="text-sm text-text-muted space-y-1 list-disc list-inside">
             <li>Tutup buku akan membuat jurnal penutup secara otomatis</li>
-            <li>Saldo akun Pendapatan akan dipindahkan ke Laba Ditahan</li>
-            <li>Saldo akun Beban akan dipindahkan ke Laba Ditahan</li>
+            <li>Saldo akun Pendapatan akan dipindahkan ke Ikhtisar Laba-Rugi</li>
+            <li>Saldo akun Beban akan dipindahkan ke Ikhtisar Laba-Rugi</li>
+            <li>Selisih Laba/Rugi akan dipindahkan ke Laba Ditahan</li>
             <li>Proses ini tidak dapat dibatalkan, pastikan data sudah benar</li>
         </ul>
     </div>
 
     @push('scripts')
     <script>
-        function previewClosing() {
+        let previewData = null;
+
+        async function previewClosing() {
             const year = document.getElementById('year').value;
             const month = document.getElementById('month').value;
             
-            // Show preview with mock data (in real app, fetch from API)
-            document.getElementById('previewContent').innerHTML = `
+            try {
+                const response = await fetch('/journals/closing/preview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ year: parseInt(year), month: month ? parseInt(month) : null })
+                });
+
+                const result = await response.json();
+                
+                if (!result.success) {
+                    alert(result.message || 'Terjadi kesalahan');
+                    return;
+                }
+
+                previewData = result.data;
+                renderPreview(result.data);
+                document.getElementById('previewSection').classList.remove('hidden');
+
+            } catch (error) {
+                console.error(error);
+                alert('Terjadi kesalahan saat memuat preview');
+            }
+        }
+
+        function renderPreview(data) {
+            const formatRupiah = (num) => 'Rp ' + Math.abs(num).toLocaleString('id-ID');
+            
+            let html = `
                 <div class="text-text-muted text-sm mb-4">
-                    Periode: ${month ? getMonthName(month) + ' ' : ''}${year}
-                </div>
-                <div class="space-y-3">
-                    <div class="p-4 rounded-xl bg-surface-highlight/30">
-                        <div class="flex justify-between mb-2">
-                            <span class="text-white font-medium">Ikhtisar Laba Rugi</span>
-                            <span class="text-primary">Debit</span>
-                        </div>
-                        <p class="text-text-muted text-sm">Menutup akun Pendapatan</p>
-                    </div>
-                    <div class="p-4 rounded-xl bg-surface-highlight/30">
-                        <div class="flex justify-between mb-2">
-                            <span class="text-white font-medium">Ikhtisar Laba Rugi</span>
-                            <span class="text-red-400">Kredit</span>
-                        </div>
-                        <p class="text-text-muted text-sm">Menutup akun Beban</p>
-                    </div>
-                    <div class="p-4 rounded-xl bg-primary/10 border border-primary/30">
-                        <div class="flex justify-between mb-2">
-                            <span class="text-white font-medium">Laba Ditahan</span>
-                            <span class="text-primary">Transfer Laba/Rugi</span>
-                        </div>
-                        <p class="text-text-muted text-sm">Memindahkan saldo Ikhtisar Laba Rugi ke Laba Ditahan</p>
-                    </div>
+                    Periode: <span class="text-white font-medium">${data.period}</span>
                 </div>
             `;
-            
-            document.getElementById('previewSection').classList.remove('hidden');
+
+            // Revenue accounts
+            if (data.revenue_accounts.length > 0) {
+                html += `
+                    <div class="p-4 rounded-xl bg-green-500/10 border border-green-500/30 mb-3">
+                        <h4 class="text-green-400 font-bold mb-2">Menutup Akun Pendapatan</h4>
+                        <div class="space-y-1 text-sm">
+                            ${data.revenue_accounts.map(a => `
+                                <div class="flex justify-between">
+                                    <span class="text-text-muted">${a.code} - ${a.name}</span>
+                                    <span class="text-green-400">Debit: ${formatRupiah(a.balance)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="mt-2 pt-2 border-t border-green-500/30 flex justify-between font-bold">
+                            <span class="text-white">Total Pendapatan</span>
+                            <span class="text-green-400">${formatRupiah(data.total_revenue)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Expense accounts
+            if (data.expense_accounts.length > 0) {
+                html += `
+                    <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 mb-3">
+                        <h4 class="text-red-400 font-bold mb-2">Menutup Akun Beban</h4>
+                        <div class="space-y-1 text-sm">
+                            ${data.expense_accounts.map(a => `
+                                <div class="flex justify-between">
+                                    <span class="text-text-muted">${a.code} - ${a.name}</span>
+                                    <span class="text-red-400">Kredit: ${formatRupiah(a.balance)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="mt-2 pt-2 border-t border-red-500/30 flex justify-between font-bold">
+                            <span class="text-white">Total Beban</span>
+                            <span class="text-red-400">${formatRupiah(data.total_expense)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Net Income
+            const isProfit = data.net_income >= 0;
+            html += `
+                <div class="p-4 rounded-xl ${isProfit ? 'bg-primary/10 border-primary/30' : 'bg-orange-500/10 border-orange-500/30'} border">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white font-bold">${isProfit ? 'Laba Bersih' : 'Rugi Bersih'}</span>
+                        <span class="${isProfit ? 'text-primary' : 'text-orange-400'} font-bold text-xl">${formatRupiah(data.net_income)}</span>
+                    </div>
+                    <p class="text-text-muted text-sm mt-1">Akan dipindahkan ke Laba Ditahan</p>
+                </div>
+            `;
+
+            document.getElementById('previewContent').innerHTML = html;
         }
 
         function hidePreview() {
             document.getElementById('previewSection').classList.add('hidden');
-        }
-
-        function getMonthName(month) {
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
-                           'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            return months[parseInt(month) - 1];
+            previewData = null;
         }
 
         async function executeClosing() {
             if (!confirm('Yakin ingin melakukan tutup buku? Proses ini tidak dapat dibatalkan.')) return;
             
-            alert('Fitur tutup buku dalam pengembangan. Jurnal penutup akan dibuat secara otomatis.');
-            // In real implementation, call API to execute closing
+            const year = document.getElementById('year').value;
+            const month = document.getElementById('month').value;
+
+            const btn = document.getElementById('executeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined text-xl animate-spin">progress_activity</span> Memproses...';
+
+            try {
+                const response = await fetch('/journals/closing/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ year: parseInt(year), month: month ? parseInt(month) : null })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Tutup buku berhasil! Jurnal penutup telah dibuat.\n\nLaba/Rugi: Rp ' + Math.abs(result.data.net_income).toLocaleString('id-ID'));
+                    hidePreview();
+                    window.location.reload();
+                } else {
+                    alert(result.message || 'Terjadi kesalahan');
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert('Terjadi kesalahan saat eksekusi tutup buku');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined text-xl">lock</span> Eksekusi Tutup Buku';
+            }
         }
     </script>
     @endpush

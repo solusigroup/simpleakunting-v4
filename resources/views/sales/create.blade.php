@@ -210,6 +210,13 @@
             } catch (error) {
                 console.log('Inventory not available:', error);
             }
+            
+            // Initialize searchable selects for account dropdowns
+            if (typeof makeSearchable === 'function') {
+                makeSearchable(receivableSelect);
+                makeSearchable(cogsSelect);
+                makeSearchable(inventoryAccountSelect);
+            }
         }
 
         function getInventoryOptions() {
@@ -289,6 +296,12 @@
                 </td>
             `;
             tbody.appendChild(tr);
+            
+            // Initialize searchable select for the new account dropdown
+            const accountSelect = tr.querySelector('[name^="account_"]');
+            if (typeof makeSearchable === 'function' && accountSelect) {
+                makeSearchable(accountSelect);
+            }
         }
 
         function removeItem(id) {

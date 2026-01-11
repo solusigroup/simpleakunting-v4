@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" 
       x-data="{ 
         darkMode: localStorage.getItem('darkMode') !== 'false',
-        sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false',
+        sidebarOpen: localStorage.getItem('sidebarOpen') === 'true',
         sidebarMinimized: localStorage.getItem('sidebarMinimized') === 'true',
         isMobile: window.innerWidth < 1024
       }" 
@@ -130,6 +130,9 @@
         </main>
     </div>
 
+    <!-- Searchable Select Utility -->
+    <script src="{{ asset('js/searchable-select.js') }}"></script>
+    
     @stack('scripts')
 </body>
 </html>

@@ -50,7 +50,7 @@
     <div id="journalModal" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
         <div class="absolute inset-0 flex items-center justify-center p-4">
-            <div class="bg-background-dark rounded-2xl border border-border-dark w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            <div class="bg-background-dark rounded-2xl border border-border-dark w-full max-w-6xl max-h-[90vh] overflow-hidden">
                 <div class="px-6 py-4 border-b border-border-dark flex items-center justify-between">
                     <h3 class="text-lg font-bold text-white">Jurnal Manual</h3>
                     <button onclick="closeModal()" class="text-text-muted hover:text-white">
@@ -58,11 +58,16 @@
                     </button>
                 </div>
                 <form id="journalForm" class="p-6 space-y-4 overflow-y-auto max-h-[70vh]">
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-text-muted mb-2">Tanggal</label>
                             <input type="date" id="date" required
                                    class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-muted mb-2">Deskripsi</label>
+                            <input type="text" id="description" required placeholder="Deskripsi jurnal"
+                                   class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white placeholder-text-muted focus:border-primary focus:ring-primary">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-text-muted mb-2">Unit Usaha</label>
@@ -70,11 +75,13 @@
                                 <option value="">-- Tidak Ada --</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-text-muted mb-2">Deskripsi</label>
-                            <input type="text" id="description" required placeholder="Deskripsi jurnal"
-                                   class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white placeholder-text-muted focus:border-primary focus:ring-primary">
-                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Kontak (Opsional)</label>
+                        <select id="contactId" class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="">-- Tidak Ada --</option>
+                        </select>
+                        <p class="text-xs text-text-muted mt-1">Untuk hutang Bank/pinjaman, piutang karyawan, dll.</p>
                     </div>
 
                     <!-- Journal Lines -->
@@ -87,10 +94,10 @@
                             <table class="w-full text-sm">
                                 <thead class="bg-surface-dark">
                                     <tr>
-                                        <th class="p-3 text-left text-text-muted font-medium">Akun</th>
-                                        <th class="p-3 text-right text-text-muted font-medium w-32">Debit</th>
-                                        <th class="p-3 text-right text-text-muted font-medium w-32">Kredit</th>
-                                        <th class="p-3 w-10"></th>
+                                        <th class="p-3 text-left text-text-muted font-medium" style="min-width: 450px;">Akun</th>
+                                        <th class="p-3 text-right text-text-muted font-medium w-36">Debit</th>
+                                        <th class="p-3 text-right text-text-muted font-medium w-36">Kredit</th>
+                                        <th class="p-3 w-12"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="linesBody">
@@ -126,6 +133,7 @@
     <script>
         let accounts = [];
         let businessUnits = [];
+        let contacts = [];
         let lineCount = 0;
 
         async function loadAccounts() {
@@ -152,6 +160,19 @@
             const formSelect = document.getElementById('unitId');
             formSelect.innerHTML = '<option value="">-- Tidak Ada --</option>' +
                 businessUnits.map(u => `<option value="${u.id}">${u.code} - ${u.name}</option>`).join('');
+        }
+
+        async function loadContacts() {
+            const response = await fetch('/contacts', {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await response.json();
+            contacts = data.data || [];
+            
+            // Populate contact dropdown in form
+            const contactSelect = document.getElementById('contactId');
+            contactSelect.innerHTML = '<option value="">-- Tidak Ada --</option>' +
+                contacts.map(c => `<option value="${c.id}">${c.name} (${c.type})</option>`).join('');
         }
 
         async function loadJournals() {
@@ -198,6 +219,7 @@
                                 <p class="text-text-muted text-sm">
                                     ${journal.reference} • ${new Date(journal.date).toLocaleDateString('id-ID')}
                                     ${journal.business_unit ? `<span class="ml-2 px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-xs">${journal.business_unit.name}</span>` : ''}
+                                    ${journal.contact ? `<span class="ml-2 px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 text-xs">${journal.contact.name}</span>` : ''}
                                 </p>
                             </div>
                         </div>
@@ -248,9 +270,9 @@
             tr.id = `line-${lineCount}`;
             tr.className = 'border-t border-border-dark/50';
             tr.innerHTML = `
-                <td class="p-2">
+                <td class="p-2" style="min-width: 450px;">
                     <select name="account_${lineCount}" required
-                            class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm focus:border-primary focus:ring-primary">
+                            class="account-select w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm focus:border-primary focus:ring-primary">
                         <option value="">Pilih Akun</option>
                         ${accounts.map(a => `<option value="${a.id}">${a.code} - ${a.name}</option>`).join('')}
                     </select>
@@ -265,13 +287,19 @@
                            onchange="updateTotals()"
                            class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm text-right focus:border-primary focus:ring-primary">
                 </td>
-                <td class="p-2">
+                <td class="p-2 text-center">
                     <button type="button" onclick="removeLine(${lineCount})" class="text-text-muted hover:text-accent-red">
                         <span class="material-symbols-outlined">delete</span>
                     </button>
                 </td>
             `;
             tbody.appendChild(tr);
+            
+            // Initialize searchable select for the new row
+            const newSelect = tr.querySelector('.account-select');
+            if (typeof makeSearchable === 'function') {
+                makeSearchable(newSelect);
+            }
         }
 
         function removeLine(id) {
@@ -328,6 +356,7 @@
             });
             
             const unitId = document.getElementById('unitId').value;
+            const contactId = document.getElementById('contactId').value;
             const response = await fetch('/journals/manual', {
                 method: 'POST',
                 headers: {
@@ -339,6 +368,7 @@
                     date: document.getElementById('date').value,
                     description: document.getElementById('description').value,
                     unit_id: unitId || null,
+                    contact_id: contactId || null,
                     lines
                 })
             });
@@ -369,6 +399,7 @@
         // Initial load
         loadAccounts();
         loadBusinessUnits();
+        loadContacts();
         loadJournals();
     </script>
     @endpush

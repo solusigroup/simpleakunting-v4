@@ -134,6 +134,11 @@
             } catch (error) {
                 console.log('Business units not available:', error);
             }
+            
+            // Initialize searchable select for from account
+            if (typeof makeSearchable === 'function') {
+                makeSearchable(fromSelect);
+            }
         }
 
         function addItem() {
@@ -165,6 +170,12 @@
                 </td>
             `;
             tbody.appendChild(tr);
+            
+            // Initialize searchable select for to account
+            const toAccountSelect = tr.querySelector('[name^="to_account_"]');
+            if (typeof makeSearchable === 'function' && toAccountSelect) {
+                makeSearchable(toAccountSelect);
+            }
         }
 
         function removeItem(id) {

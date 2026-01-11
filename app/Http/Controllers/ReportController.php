@@ -50,6 +50,12 @@ class ReportController extends Controller
         foreach ($accounts as $account) {
             $balance = $this->getAccountBalance($account, null, $endDate, $unitId);
             
+            // Contra-asset accounts (Asset type with KREDIT normal balance) should reduce total assets
+            // Examples: Akumulasi Penyusutan
+            if ($account->type === 'Asset' && $account->normal_balance === 'KREDIT') {
+                $balance = -$balance;
+            }
+            
             $category = match($account->type) {
                 'Asset' => 'Aset',
                 'Liability' => 'Kewajiban',
@@ -649,6 +655,11 @@ class ReportController extends Controller
         foreach ($accounts as $account) {
             $balance = $this->getAccountBalance($account, null, $endDate, $unitId);
             
+            // Contra-asset accounts (Asset type with KREDIT normal balance) should reduce total assets
+            if ($account->type === 'Asset' && $account->normal_balance === 'KREDIT') {
+                $balance = -$balance;
+            }
+            
             $category = match($account->type) {
                 'Asset' => 'Aset',
                 'Liability' => 'Kewajiban',
@@ -831,6 +842,12 @@ class ReportController extends Controller
                 $startDate = $period['start_date'] ?? null;
                 $endDate = $period['end_date'];
                 $balance = $this->getAccountBalance($account, $startDate, $endDate, $unitId);
+                
+                // Contra-asset accounts (Asset type with KREDIT normal balance) should reduce total assets
+                if ($reportType === 'NERACA' && $account->type === 'Asset' && $account->normal_balance === 'KREDIT') {
+                    $balance = -$balance;
+                }
+                
                 $values[] = $balance;
             }
 
