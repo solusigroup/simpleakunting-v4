@@ -36,7 +36,7 @@ return new class extends Migration
             $table->timestamps();
             
             // Indexes
-            $table->index(['biological_asset_id', 'valuation_date']);
+            $table->index(['biological_asset_id', 'valuation_date'], 'bio_val_asset_date_idx');
         });
     }
 

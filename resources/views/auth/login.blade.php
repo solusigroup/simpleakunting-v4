@@ -39,13 +39,20 @@
                     Password
                 </span>
             </label>
-            <input id="password" 
-                   type="password" 
-                   name="password" 
-                   required 
-                   autocomplete="current-password"
-                   class="auth-input w-full px-4 py-3 rounded-xl text-white placeholder-text-muted focus:outline-none"
-                   placeholder="Masukkan password Anda">
+            <div class="relative">
+                <input id="password" 
+                       type="password" 
+                       name="password" 
+                       required 
+                       autocomplete="current-password"
+                       class="auth-input w-full px-4 py-3 pr-12 rounded-xl text-white placeholder-text-muted focus:outline-none"
+                       placeholder="Masukkan password Anda">
+                <button type="button" 
+                        onclick="togglePassword()" 
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-white transition cursor-pointer">
+                    <span id="eye-icon" class="material-symbols-outlined text-xl">visibility_off</span>
+                </button>
+            </div>
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
@@ -84,4 +91,18 @@
             </p>
         </div>
     </form>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.textContent = 'visibility';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.textContent = 'visibility_off';
+            }
+        }
+    </script>
 </x-guest-layout>
