@@ -16,6 +16,7 @@ class Journal extends Model
     protected $fillable = [
         'company_id',
         'business_unit_id',
+        'contact_id',
         'date',
         'reference',
         'description',
@@ -34,6 +35,14 @@ class Journal extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * Get the contact (for loans, receivables, etc).
+     */
+    public function contact(): BelongsTo
+    {
+        return $this->belongsTo(Contact::class);
     }
 
     /**

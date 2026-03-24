@@ -92,8 +92,11 @@
                     <td class="p-4 text-white text-right font-mono font-bold">Rp ${Number(purchase.total).toLocaleString('id-ID')}</td>
                     <td class="p-4">${getStatusBadge(purchase.status)}</td>
                     <td class="p-4 text-right">
-                        <button onclick="viewPurchase(${purchase.id})" class="text-text-muted hover:text-white p-1">
+                        <button onclick="viewPurchase(${purchase.id})" class="text-text-muted hover:text-white p-1" title="Lihat">
                             <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                        <button onclick="deletePurchase(${purchase.id})" class="text-text-muted hover:text-accent-red p-1" title="Hapus">
+                            <span class="material-symbols-outlined">delete</span>
                         </button>
                     </td>
                 </tr>
@@ -114,6 +117,32 @@
 
         function viewPurchase(id) {
             window.location.href = `/purchases/${id}`;
+        }
+
+        async function deletePurchase(id) {
+            if (!confirm('Yakin ingin menghapus tagihan ini? Stok persediaan akan dikembalikan.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/purchases/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    loadPurchases();
+                } else {
+                    alert(result.message || 'Gagal menghapus');
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan');
+            }
         }
 
         const today = new Date();

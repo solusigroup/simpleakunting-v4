@@ -6,6 +6,10 @@
                 <p class="text-text-muted text-sm mt-1">Kelola master data aset tetap dan penyusutan</p>
             </div>
             <div class="flex gap-2">
+                <x-btn type="secondary" onclick="openDepreciationModal()">
+                    <span class="material-symbols-outlined text-xl">calculate</span>
+                    Jalankan Depresiasi
+                </x-btn>
                 <x-btn type="secondary" onclick="window.location.href='/assets/export'">
                     <span class="material-symbols-outlined text-xl">download</span>
                     Export Excel
@@ -156,6 +160,17 @@
                             </select>
                         </div>
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Akun Beban Penyusutan</label>
+                        <select id="expense_coa_id"
+                                class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="">-- Pilih Akun Beban --</option>
+                            @foreach($expenseAccounts as $acc)
+                            <option value="{{ $acc->id }}">{{ $acc->code }} - {{ $acc->name }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-text-muted mt-1">Diperlukan untuk menjalankan depresiasi otomatis</p>
+                    </div>
                     <div id="activeToggle" class="hidden">
                         <label class="flex items-center gap-3 cursor-pointer">
                             <input type="checkbox" id="is_active" class="form-checkbox rounded bg-surface-dark border-border-dark text-primary focus:ring-primary">
@@ -201,6 +216,7 @@
             document.getElementById('useful_life_months').disabled = true;
             document.getElementById('depreciation_method').value = asset.depreciation_method;
             document.getElementById('depreciation_method').disabled = true;
+            document.getElementById('expense_coa_id').value = asset.expense_coa_id || '';
             document.getElementById('is_active').checked = asset.is_active;
             document.getElementById('activeToggle').classList.remove('hidden');
             document.getElementById('assetModal').classList.remove('hidden');
@@ -219,6 +235,7 @@
             const data = isEdit ? {
                 name: document.getElementById('name').value,
                 salvage_value: parseFloat(document.getElementById('salvage_value').value),
+                expense_coa_id: document.getElementById('expense_coa_id').value || null,
                 is_active: document.getElementById('is_active').checked,
             } : {
                 code: document.getElementById('code').value,
@@ -228,6 +245,7 @@
                 salvage_value: parseFloat(document.getElementById('salvage_value').value),
                 useful_life_months: parseInt(document.getElementById('useful_life_months').value),
                 depreciation_method: document.getElementById('depreciation_method').value,
+                expense_coa_id: document.getElementById('expense_coa_id').value || null,
             };
 
             const response = await fetch(isEdit ? `/assets/${id}` : '/assets', {
@@ -247,6 +265,103 @@
                 alert(result.message || 'Terjadi kesalahan');
             }
         });
+    </script>
+    @endpush
+
+    <!-- Depreciation Modal -->
+    <div id="depreciationModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeDepreciationModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-background-dark rounded-2xl border border-border-dark w-full max-w-md">
+                <div class="px-6 py-4 border-b border-border-dark flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-white">Jalankan Depresiasi</h3>
+                    <button onclick="closeDepreciationModal()" class="text-text-muted hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div class="p-4 rounded-xl bg-orange-500/10 border border-orange-500/30">
+                        <p class="text-orange-400 text-sm"><span class="material-symbols-outlined align-middle text-base mr-1">warning</span> Proses ini akan membuat jurnal penyusutan untuk semua aset aktif yang memiliki akun penyusutan lengkap.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-text-muted mb-2">Tahun</label>
+                            <select id="depYear" class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                                @for($y = now()->year; $y >= now()->year - 5; $y--)
+                                <option value="{{ $y }}" {{ $y == now()->year ? 'selected' : '' }}>{{ $y }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-muted mb-2">Bulan</label>
+                            <select id="depMonth" class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                                @foreach(['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] as $i => $name)
+                                <option value="{{ $i + 1 }}" {{ ($i + 1) == now()->month ? 'selected' : '' }}>{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4">
+                        <x-btn type="secondary" onclick="closeDepreciationModal()">Batal</x-btn>
+                        <x-btn type="primary" onclick="runDepreciation()" id="runDepBtn">
+                            <span class="material-symbols-outlined text-xl">calculate</span>
+                            Jalankan
+                        </x-btn>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        function openDepreciationModal() {
+            document.getElementById('depreciationModal').classList.remove('hidden');
+        }
+
+        function closeDepreciationModal() {
+            document.getElementById('depreciationModal').classList.add('hidden');
+        }
+
+        async function runDepreciation() {
+            const year = document.getElementById('depYear').value;
+            const month = document.getElementById('depMonth').value;
+            
+            if (!confirm(`Jalankan depresiasi untuk periode ${month}/${year}?`)) return;
+
+            const btn = document.getElementById('runDepBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined text-xl animate-spin">progress_activity</span> Memproses...';
+
+            try {
+                const response = await fetch('/assets/depreciate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ year: parseInt(year), month: parseInt(month) })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Berhasil! Jurnal penyusutan telah dibuat.\n\nTotal Penyusutan: Rp ${result.data.total_depreciation.toLocaleString('id-ID')}\nAset diproses: ${result.data.assets_processed}`);
+                    closeDepreciationModal();
+                    location.reload();
+                } else {
+                    alert(result.message || 'Terjadi kesalahan');
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert('Terjadi kesalahan saat menjalankan depresiasi');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined text-xl">calculate</span> Jalankan';
+            }
+        }
     </script>
     @endpush
 </x-app-layout>

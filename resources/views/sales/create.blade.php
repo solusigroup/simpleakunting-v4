@@ -45,6 +45,20 @@
                         <label class="block text-sm font-medium text-text-muted mb-2">Jatuh Tempo *</label>
                         <input type="date" id="due_date" required class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Akun HPP</label>
+                        <select id="cogs_account_id" class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="">Pilih Akun HPP...</option>
+                        </select>
+                        <p class="text-xs text-text-muted mt-1">Harga Pokok Penjualan (untuk barang dagangan)</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Akun Persediaan</label>
+                        <select id="inventory_account_id" class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="">Pilih Akun Persediaan...</option>
+                        </select>
+                        <p class="text-xs text-text-muted mt-1">Persediaan Barang Dagangan</p>
+                    </div>
                 </div>
                 <div class="mt-4">
                     <label class="block text-sm font-medium text-text-muted mb-2">Catatan</label>
@@ -90,9 +104,10 @@
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-border-dark">
+                            <th class="p-3 text-left text-xs font-bold text-text-muted uppercase w-48">Barang</th>
                             <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Akun Pendapatan</th>
                             <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Deskripsi</th>
-                            <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-24">Qty</th>
+                            <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-20">Qty</th>
                             <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-32">Harga</th>
                             <th class="p-3 text-right text-xs font-bold text-text-muted uppercase w-36">Jumlah</th>
                             <th class="p-3 w-12"></th>
@@ -123,6 +138,7 @@
         let accounts = [];
         let revenueAccounts = [];
         let businessUnits = [];
+        let inventoryItems = [];
         let itemCount = 0;
 
         async function loadData() {
@@ -161,9 +177,83 @@
             accounts.filter(a => a.type === 'Asset').forEach(a => {
                 receivableSelect.innerHTML += `<option value="${a.id}">${a.code} - ${a.name}</option>`;
             });
+
+            // Expense accounts for COGS (HPP)
+            const cogsSelect = document.getElementById('cogs_account_id');
+            accounts.filter(a => a.type === 'Expense').forEach(a => {
+                // Auto-select if name contains HPP or Harga Pokok
+                const isHPP = a.name.toLowerCase().includes('harga pokok') || 
+                              a.name.toLowerCase().includes('hpp') ||
+                              a.name.toLowerCase().includes('beban pokok');
+                cogsSelect.innerHTML += `<option value="${a.id}" ${isHPP ? 'selected' : ''}>${a.code} - ${a.name}</option>`;
+            });
+
+            // Asset accounts for Inventory
+            const inventoryAccountSelect = document.getElementById('inventory_account_id');
+            accounts.filter(a => a.type === 'Asset').forEach(a => {
+                // Auto-select if name contains Persediaan
+                const isPersediaan = a.name.toLowerCase().includes('persediaan') || 
+                                     a.name.toLowerCase().includes('inventory');
+                inventoryAccountSelect.innerHTML += `<option value="${a.id}" ${isPersediaan ? 'selected' : ''}>${a.code} - ${a.name}</option>`;
+            });
             
             // Revenue accounts for items
             revenueAccounts = accounts.filter(a => a.type === 'Revenue');
+
+            // Load inventory items (primarily finished goods for sales)
+            try {
+                const inventoryRes = await fetch('/inventory', { headers: { 'Accept': 'application/json' } });
+                const inventoryData = await inventoryRes.json();
+                if (inventoryData.success) {
+                    inventoryItems = inventoryData.data || [];
+                }
+            } catch (error) {
+                console.log('Inventory not available:', error);
+            }
+            
+            // Initialize searchable selects for account dropdowns
+            if (typeof makeSearchable === 'function') {
+                makeSearchable(receivableSelect);
+                makeSearchable(cogsSelect);
+                makeSearchable(inventoryAccountSelect);
+            }
+        }
+
+        function getInventoryOptions() {
+            let options = '<option value="">-- Manual / Jasa --</option>';
+            const categories = {
+                'finished_goods': 'Barang Jadi/Dagangan',
+                'raw_materials': 'Bahan Baku',
+                'supplies': 'Bahan Pembantu',
+                'work_in_process': 'Barang Dalam Proses'
+            };
+            
+            // Group by category - prioritize finished goods for sales
+            Object.entries(categories).forEach(([cat, label]) => {
+                const items = inventoryItems.filter(i => i.category === cat);
+                if (items.length > 0) {
+                    options += `<optgroup label="${label}">`;
+                    items.forEach(i => {
+                        const stockInfo = i.stock !== undefined ? ` (Stok: ${i.stock})` : '';
+                        options += `<option value="${i.id}" data-price="${i.price}" data-name="${i.name}" data-coa="${i.coa_id || ''}" data-stock="${i.stock || 0}">${i.code} - ${i.name}${stockInfo}</option>`;
+                    });
+                    options += '</optgroup>';
+                }
+            });
+            return options;
+        }
+
+        function onInventoryChange(selectEl, itemId) {
+            const selected = selectEl.options[selectEl.selectedIndex];
+            if (selected.value) {
+                const price = selected.dataset.price || 0;
+                const name = selected.dataset.name || '';
+                
+                document.querySelector(`[name="desc_${itemId}"]`).value = name;
+                document.querySelector(`[name="amount_${itemId}"]`).value = parseFloat(price).toFixed(0);
+                
+                calculateTotals();
+            }
         }
 
         function addItem() {
@@ -173,6 +263,11 @@
             tr.id = `item-${itemCount}`;
             tr.className = 'border-b border-border-dark/50';
             tr.innerHTML = `
+                <td class="p-2">
+                    <select name="inventory_${itemCount}" onchange="onInventoryChange(this, ${itemCount})" class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm focus:border-primary">
+                        ${getInventoryOptions()}
+                    </select>
+                </td>
                 <td class="p-2">
                     <select name="account_${itemCount}" required class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm focus:border-primary">
                         <option value="">Pilih...</option>
@@ -201,6 +296,12 @@
                 </td>
             `;
             tbody.appendChild(tr);
+            
+            // Initialize searchable select for the new account dropdown
+            const accountSelect = tr.querySelector('[name^="account_"]');
+            if (typeof makeSearchable === 'function' && accountSelect) {
+                makeSearchable(accountSelect);
+            }
         }
 
         function removeItem(id) {
@@ -234,8 +335,10 @@
             document.querySelectorAll('[name^="account_"]').forEach(sel => {
                 const id = sel.name.replace('account_', '');
                 if (sel.value) {
+                    const inventoryId = document.querySelector(`[name="inventory_${id}"]`)?.value;
                     items.push({
                         account_id: parseInt(sel.value),
+                        inventory_id: inventoryId ? parseInt(inventoryId) : null,
                         description: document.querySelector(`[name="desc_${id}"]`)?.value || '',
                         qty: parseFloat(document.querySelector(`[name="qty_${id}"]`)?.value) || 0,
                         amount: parseFloat(document.querySelector(`[name="amount_${id}"]`)?.value) || 0,
@@ -244,12 +347,17 @@
             });
 
             const unitId = document.getElementById('unit_id').value;
+            const cogsAccountId = document.getElementById('cogs_account_id').value;
+            const inventoryAccountId = document.getElementById('inventory_account_id').value;
+            
             const data = {
                 contact_id: parseInt(document.getElementById('contact_id').value),
                 date: document.getElementById('date').value,
                 due_date: document.getElementById('due_date').value,
                 unit_id: unitId ? parseInt(unitId) : null,
                 receivable_account_id: parseInt(document.getElementById('receivable_account_id').value),
+                cogs_account_id: cogsAccountId ? parseInt(cogsAccountId) : null,
+                inventory_account_id: inventoryAccountId ? parseInt(inventoryAccountId) : null,
                 notes: document.getElementById('notes').value,
                 items
             };

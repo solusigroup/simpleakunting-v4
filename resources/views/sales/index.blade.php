@@ -93,8 +93,11 @@
                     <td class="p-4 text-white text-right font-mono font-bold">Rp ${Number(sale.total).toLocaleString('id-ID')}</td>
                     <td class="p-4">${getStatusBadge(sale.status)}</td>
                     <td class="p-4 text-right">
-                        <button onclick="viewSale(${sale.id})" class="text-text-muted hover:text-white p-1">
+                        <button onclick="viewSale(${sale.id})" class="text-text-muted hover:text-white p-1" title="Lihat">
                             <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                        <button onclick="deleteSale(${sale.id})" class="text-text-muted hover:text-accent-red p-1" title="Hapus">
+                            <span class="material-symbols-outlined">delete</span>
                         </button>
                     </td>
                 </tr>
@@ -115,6 +118,32 @@
 
         function viewSale(id) {
             window.location.href = `/sales/${id}`;
+        }
+
+        async function deleteSale(id) {
+            if (!confirm('Yakin ingin menghapus invoice ini? Stok persediaan akan dikembalikan.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/sales/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    loadSales();
+                } else {
+                    alert(result.message || 'Gagal menghapus');
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan');
+            }
         }
 
         // Set default dates

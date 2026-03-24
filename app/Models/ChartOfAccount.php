@@ -25,6 +25,7 @@ class ChartOfAccount extends Model
         'is_system',
         'level',
         'account_category',
+        'opening_balance',
     ];
 
     protected $casts = [
@@ -63,6 +64,14 @@ class ChartOfAccount extends Model
     public function journalItems(): HasMany
     {
         return $this->hasMany(JournalItem::class, 'coa_id');
+    }
+
+    /**
+     * Check if this account has any transactions.
+     */
+    public function hasTransactions(): bool
+    {
+        return $this->journalItems()->exists();
     }
 
     /**

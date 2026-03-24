@@ -77,10 +77,17 @@ class DashboardController extends Controller
             );
         });
 
+        // Today's stats for slide-out menu (outside cache to avoid closure issues)
+        $today = now()->format('Y-m-d');
+        $todayRevenue = $this->getTotalRevenue($company->id, $today, $today);
+        $todayExpense = $this->getTotalExpense($company->id, $today, $today);
+
         return view('dashboard', array_merge($dashboardData, [
             'company' => $company,
             'startDate' => $startDate,
-            'endDate' => $endDate
+            'endDate' => $endDate,
+            'todayRevenue' => $todayRevenue,
+            'todayExpense' => $todayExpense
         ]));
     }
 

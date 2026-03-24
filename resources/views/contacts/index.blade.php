@@ -100,6 +100,24 @@
         </div>
     </div>
 
+    <!-- Detail/History Modal -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeDetailModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-background-dark rounded-2xl border border-border-dark w-full max-w-3xl max-h-[80vh] flex flex-col">
+                <div class="px-6 py-4 border-b border-border-dark flex items-center justify-between shrink-0">
+                    <h3 class="text-lg font-bold text-white" id="detailTitle">Detail Kontak</h3>
+                    <button onclick="closeDetailModal()" class="text-text-muted hover:text-white">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-6 overflow-y-auto flex-1" id="detailContent">
+                    <!-- Will be loaded via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
     <script>
         let contacts = [];
@@ -135,7 +153,7 @@
             }
 
             grid.innerHTML = filtered.map(contact => `
-                <div class="p-6 rounded-2xl border border-border-dark bg-surface-dark/30 hover:border-primary/50 transition group">
+                <div class="p-6 rounded-2xl border border-border-dark bg-surface-dark/30 hover:border-primary/50 transition group cursor-pointer" onclick="showContactDetail(${contact.id})">
                     <div class="flex items-start justify-between mb-4">
                         <div class="w-12 h-12 rounded-full ${getTypeColor(contact.type)} flex items-center justify-center">
                             <span class="font-bold text-lg">${contact.name.charAt(0).toUpperCase()}</span>
@@ -146,7 +164,7 @@
                     <p class="text-text-muted text-sm mb-3">${contact.email || contact.phone || '-'}</p>
                     <div class="flex items-center justify-between pt-3 border-t border-border-dark/50">
                         <span class="text-xs text-text-muted">${contact.invoices_count || 0} transaksi</span>
-                        <button onclick="editContact(${contact.id})" class="text-text-muted hover:text-primary opacity-0 group-hover:opacity-100 transition">
+                        <button onclick="event.stopPropagation(); editContact(${contact.id})" class="text-text-muted hover:text-primary opacity-0 group-hover:opacity-100 transition">
                             <span class="material-symbols-outlined">edit</span>
                         </button>
                     </div>
@@ -209,6 +227,156 @@
 
         function closeModal() {
             document.getElementById('contactModal').classList.add('hidden');
+        }
+
+        async function showContactDetail(id) {
+            document.getElementById('detailContent').innerHTML = `
+                <div class="flex items-center justify-center py-8">
+                    <span class="material-symbols-outlined animate-spin text-3xl text-primary">progress_activity</span>
+                </div>
+            `;
+            document.getElementById('detailModal').classList.remove('hidden');
+
+            try {
+                const response = await fetch(`/contacts/${id}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderContactDetail(data.data);
+                } else {
+                    document.getElementById('detailContent').innerHTML = `
+                        <div class="text-center text-accent-red py-8">Gagal memuat data</div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('detailContent').innerHTML = `
+                    <div class="text-center text-accent-red py-8">Terjadi kesalahan</div>
+                `;
+            }
+        }
+
+        function renderContactDetail(contact) {
+            document.getElementById('detailTitle').textContent = contact.name;
+            
+            const totalAmount = contact.invoices_sum_total ? parseFloat(contact.invoices_sum_total).toLocaleString('id-ID') : '0';
+            
+            let html = `
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="p-4 rounded-xl bg-surface-dark border border-border-dark">
+                        <div class="text-text-muted text-sm mb-1">Tipe</div>
+                        <div class="text-white font-bold">${getTypeLabel(contact.type)}</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-surface-dark border border-border-dark">
+                        <div class="text-text-muted text-sm mb-1">Total Transaksi</div>
+                        <div class="text-white font-bold">Rp ${totalAmount}</div>
+                    </div>
+                    ${contact.phone ? `
+                    <div class="p-4 rounded-xl bg-surface-dark border border-border-dark">
+                        <div class="text-text-muted text-sm mb-1">Telepon</div>
+                        <div class="text-white">${contact.phone}</div>
+                    </div>
+                    ` : ''}
+                    ${contact.email ? `
+                    <div class="p-4 rounded-xl bg-surface-dark border border-border-dark">
+                        <div class="text-text-muted text-sm mb-1">Email</div>
+                        <div class="text-white">${contact.email}</div>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <h4 class="text-white font-bold mb-4">Riwayat Transaksi (${contact.invoices?.length || 0})</h4>
+            `;
+
+            if (contact.invoices && contact.invoices.length > 0) {
+                html += `
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-border-dark">
+                                    <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Tanggal</th>
+                                    <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">No. Invoice</th>
+                                    <th class="p-3 text-left text-xs font-bold text-text-muted uppercase">Tipe</th>
+                                    <th class="p-3 text-right text-xs font-bold text-text-muted uppercase">Total</th>
+                                    <th class="p-3 text-center text-xs font-bold text-text-muted uppercase">Status</th>
+                                    <th class="p-3 w-16"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${contact.invoices.map(inv => `
+                                    <tr class="border-b border-border-dark/50 hover:bg-surface-dark/50">
+                                        <td class="p-3 text-white">${new Date(inv.date).toLocaleDateString('id-ID')}</td>
+                                        <td class="p-3 text-white font-mono">${inv.invoice_number}</td>
+                                        <td class="p-3">
+                                            <span class="px-2 py-1 rounded text-xs font-medium ${inv.type === 'Sales' ? 'bg-primary/20 text-primary' : 'bg-orange-500/20 text-orange-400'}">
+                                                ${inv.type === 'Sales' ? 'Penjualan' : 'Pembelian'}
+                                            </span>
+                                        </td>
+                                        <td class="p-3 text-right text-white font-mono">Rp ${parseFloat(inv.total).toLocaleString('id-ID')}</td>
+                                        <td class="p-3 text-center">
+                                            <span class="px-2 py-1 rounded text-xs font-medium ${inv.status === 'Paid' ? 'bg-green-500/20 text-green-400' : inv.status === 'Posted' ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'}">
+                                                ${inv.status}
+                                            </span>
+                                        </td>
+                                        <td class="p-3">
+                                            <button onclick="deleteInvoice('${inv.type === 'Sales' ? 'sales' : 'purchases'}', ${inv.id})" 
+                                                    class="text-text-muted hover:text-accent-red transition" 
+                                                    title="Hapus">
+                                                <span class="material-symbols-outlined text-xl">delete</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="py-8 text-center text-text-muted">
+                        <span class="material-symbols-outlined text-4xl mb-2">receipt_long</span>
+                        <p>Belum ada transaksi</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('detailContent').innerHTML = html;
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        async function deleteInvoice(type, id) {
+            if (!confirm('Yakin ingin menghapus transaksi ini? Stok persediaan akan dikembalikan.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/${type}/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    // Refresh the detail modal
+                    const contactId = contacts.find(c => c.invoices?.some(i => i.id === id))?.id;
+                    if (contactId) {
+                        showContactDetail(contactId);
+                    }
+                    loadContacts();
+                } else {
+                    alert(result.message || 'Gagal menghapus');
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan');
+            }
         }
 
         document.getElementById('contactForm').addEventListener('submit', async function(e) {

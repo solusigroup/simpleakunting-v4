@@ -45,10 +45,10 @@
                 <tr class="border-b border-border-dark bg-surface-dark">
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Kode</th>
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Nama Akun</th>
+                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider w-24">Jenis</th>
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Tipe</th>
-                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Kategori</th>
-                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Laporan</th>
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Saldo Normal</th>
+                    <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-right w-40">Saldo Awal</th>
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Status</th>
                     <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-right">Aksi</th>
                 </tr>
@@ -201,20 +201,39 @@
             );
 
             tbody.innerHTML = filtered.map(acc => `
-                <tr class="border-b border-border-dark/50 hover:bg-surface-highlight/30">
+                <tr class="border-b border-border-dark/50 hover:bg-surface-highlight/30" data-id="${acc.id}">
                     <td class="p-4 text-white font-mono">${acc.code}</td>
-                    <td class="p-4 text-white ${acc.is_parent ? 'font-bold' : ''}">
-                        ${'—'.repeat(acc.level - 1)} ${acc.name}
+                    <td class="p-4 ${acc.is_parent ? 'font-bold' : ''}">
+                        <span class="text-text-muted">${'—'.repeat(acc.level - 1)}</span>
+                        ${!acc.has_transactions ? `
+                            <input type="text" value="${acc.name}" 
+                                   data-id="${acc.id}" data-field="name"
+                                   onchange="updateField(${acc.id}, 'name', this.value)"
+                                   class="bg-transparent border-0 text-white p-0 focus:ring-0 focus:border-b focus:border-primary w-full hover:bg-surface-dark/50 rounded px-1 -mx-1"/>
+                        ` : `
+                            <span class="text-white">${acc.name}</span>
+                        `}
                         ${acc.is_system ? '<span class="ml-2 px-2 py-0.5 text-[10px] bg-yellow-500/20 text-yellow-400 rounded border border-yellow-500/30 font-semibold">SYSTEM</span>' : ''}
+                        ${acc.has_transactions ? '<span class="ml-2 px-2 py-0.5 text-[10px] bg-blue-500/20 text-blue-400 rounded border border-blue-500/30 font-semibold">AKTIF</span>' : ''}
+                    </td>
+                    <td class="p-4">
+                        ${acc.is_parent 
+                            ? '<span class="px-2 py-1 rounded text-xs font-medium bg-gray-500/20 text-gray-400 border border-gray-500/30">HEADER</span>' 
+                            : '<span class="px-2 py-1 rounded text-xs font-medium bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">DETAIL</span>'
+                        }
                     </td>
                     <td class="p-4">
                         <span class="px-2 py-1 rounded text-xs font-medium ${getTypeColor(acc.type)}">${acc.type}</span>
                     </td>
-                    <td class="p-4">
-                        ${acc.account_category ? `<span class="px-2 py-1 rounded text-xs font-medium bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">${getCategoryLabel(acc.account_category)}</span>` : '<span class="text-text-muted/50 text-xs">—</span>'}
-                    </td>
-                    <td class="p-4 text-text-muted">${acc.report_type}</td>
                     <td class="p-4 text-text-muted">${acc.normal_balance}</td>
+                    <td class="p-4 text-right">
+                        ${!acc.is_parent ? `
+                            <input type="number" value="${acc.opening_balance || 0}" 
+                                   data-id="${acc.id}" data-field="opening_balance"
+                                   onchange="updateField(${acc.id}, 'opening_balance', this.value)"
+                                   class="w-28 px-2 py-1 rounded bg-background-dark border border-border-dark text-white text-sm text-right focus:border-primary focus:ring-1 focus:ring-primary"/>
+                        ` : '<span class="text-text-muted/50 text-xs">—</span>'}
+                    </td>
                     <td class="p-4">
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" 
@@ -231,7 +250,7 @@
                         ${!acc.is_system ? `
                             <button onclick="editAccount(${acc.id})" 
                                     class="text-text-muted hover:text-white p-1 transition-colors"
-                                    title="Edit akun">
+                                    title="Edit akun lengkap">
                                 <span class="material-symbols-outlined text-xl">edit</span>
                             </button>
                         ` : `
@@ -315,6 +334,46 @@
 
         function closeModal() {
             document.getElementById('accountModal').classList.add('hidden');
+        }
+
+        // Inline update for name and opening_balance
+        async function updateField(id, field, value) {
+            try {
+                const data = {};
+                data[field] = field === 'opening_balance' ? parseFloat(value) || 0 : value;
+                
+                const response = await fetch(`/accounts/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    // Update local data
+                    const account = accounts.find(a => a.id === id);
+                    if (account) {
+                        account[field] = value;
+                    }
+                    // Show quick feedback
+                    const input = document.querySelector(`[data-id="${id}"][data-field="${field}"]`);
+                    if (input) {
+                        input.classList.add('border-green-500');
+                        setTimeout(() => input.classList.remove('border-green-500'), 1000);
+                    }
+                } else {
+                    alert(result.message || 'Terjadi kesalahan');
+                    loadAccounts();
+                }
+            } catch (error) {
+                console.error('Error updating field:', error);
+                alert('Terjadi kesalahan saat menyimpan');
+                loadAccounts();
+            }
         }
 
         async function toggleStatus(id, isActive) {

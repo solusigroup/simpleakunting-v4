@@ -43,8 +43,11 @@
         <x-sidebar-item href="{{ route('purchases.index') }}" icon="shopping_cart" :active="request()->routeIs('purchases.*')">
             Pembelian
         </x-sidebar-item>
-        <x-sidebar-item href="{{ route('journals.index') }}" icon="receipt_long" :active="request()->routeIs('journals.*')">
+        <x-sidebar-item href="{{ route('journals.index') }}" icon="receipt_long" :active="request()->routeIs('journals.index')">
             Jurnal Umum
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('journals.closing') }}" icon="lock" :active="request()->routeIs('journals.closing')">
+            Tutup Buku
         </x-sidebar-item>
         <x-sidebar-item href="{{ route('cash.receive') }}" icon="payments" :active="request()->routeIs('cash.receive')">
             Penerimaan Kas

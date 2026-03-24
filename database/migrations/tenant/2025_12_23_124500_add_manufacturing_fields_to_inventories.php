@@ -13,23 +13,37 @@ return new class extends Migration
     {
         Schema::table('inventories', function (Blueprint $table) {
             // Add inventory category for manufacturing
-            $table->enum('category', [
-                'finished_goods',    // Barang Jadi/Barang Dagangan
-                'raw_materials',     // Bahan Baku
-                'work_in_process',   // Barang Dalam Proses (WIP)
-                'supplies',          // Bahan Pembantu/Supplies
-            ])->default('finished_goods')->after('name');
+            if (!Schema::hasColumn('inventories', 'category')) {
+                $table->enum('category', [
+                    'finished_goods',    // Barang Jadi/Barang Dagangan
+                    'raw_materials',     // Bahan Baku
+                    'work_in_process',   // Barang Dalam Proses (WIP)
+                    'supplies',          // Bahan Pembantu/Supplies
+                ])->default('finished_goods')->after('name');
+            }
             
             // Add assembly flag
-            $table->boolean('is_assembly')->default(false)->after('category')
-                ->comment('True if this item can be assembled from components');
+            if (!Schema::hasColumn('inventories', 'is_assembly')) {
+                $table->boolean('is_assembly')->default(false)->after('category')
+                    ->comment('True if this item can be assembled from components');
+            }
             
             // Add description field
-            $table->text('description')->nullable()->after('is_assembly');
-            
-            // Add index for category
-            $table->index('category');
+            if (!Schema::hasColumn('inventories', 'description')) {
+                $table->text('description')->nullable()->after('is_assembly');
+            }
         });
+        
+        // Add index for category (separate call to avoid issues)
+        if (Schema::hasColumn('inventories', 'category')) {
+            try {
+                Schema::table('inventories', function (Blueprint $table) {
+                    $table->index('category');
+                });
+            } catch (\Exception $e) {
+                // Index already exists, ignore
+            }
+        }
     }
 
     /**

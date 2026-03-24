@@ -46,9 +46,15 @@ class AccountController extends Controller
         $accounts = $query->get();
 
         if ($request->wantsJson()) {
+            // Add has_transactions flag for each account
+            $data = $accounts->map(function ($acc) {
+                $acc->has_transactions = $acc->hasTransactions();
+                return $acc;
+            });
+            
             return response()->json([
                 'success' => true,
-                'data' => $accounts,
+                'data' => $data,
             ]);
         }
 
@@ -160,6 +166,7 @@ class AccountController extends Controller
             'is_parent' => ['sometimes', 'boolean'],
             'is_active' => ['sometimes', 'boolean'],
             'account_category' => ['nullable', 'string', 'in:cash_bank,accounts_receivable,other_receivable,inventory,prepaid_expense,other_current_asset,fixed_asset,accumulated_depreciation,intangible_asset,other_asset,accounts_payable,other_payable,accrued_expense,other_current_liability,long_term_liability,equity_capital,equity_retained,equity_other,revenue_sales,revenue_service,revenue_other,cogs,expense_operational,expense_administrative,expense_selling,expense_other,other_income,other_expense,general'],
+            'opening_balance' => ['sometimes', 'numeric'],
         ]);
 
         // Check if code is being changed and if it already exists

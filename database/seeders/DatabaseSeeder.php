@@ -16,10 +16,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create a test user first (without company)
-        $user = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Create admin user from environment variables (for production)
+        // Falls back to test values for development
+        // Uses create() directly instead of factory() to avoid Faker dependency in production
+        $user = User::create([
+            'name' => env('ADMIN_NAME', 'Test User'),
+            'email' => env('ADMIN_EMAIL', 'test@example.com'),
+            'password' => bcrypt(env('ADMIN_PASSWORD', 'password')),
             'role' => 'Administrator',
         ]);
 
