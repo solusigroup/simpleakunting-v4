@@ -28,6 +28,7 @@ use App\Http\Controllers\BiologicalReportController;
 use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ManufacturingReportController;
+use App\Http\Controllers\InternetCustomerController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -236,16 +237,8 @@ Route::middleware([
         // Journal (Manual Entry)
         Route::get('/journals', [JournalController::class, 'index'])->name('journals.index');
         Route::post('/journals/manual', [JournalController::class, 'storeManual'])->name('journals.manual');
-        Route::get('/journals/{id}', [JournalController::class, 'show'])->name('journals.show');
         
-        // Budgets (Anggaran)
-        Route::get('/budgets', [BudgetController::class, 'index'])->name('budgets.index');
-        Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store');
-        Route::put('/budgets/{budget}', [BudgetController::class, 'update'])->name('budgets.update');
-        Route::delete('/budgets/{budget}', [BudgetController::class, 'destroy'])->name('budgets.destroy');
-        Route::get('/budgets/comparison', [BudgetController::class, 'comparison'])->name('budgets.comparison');
-        
-        // Closing & Adjustment
+        // Closing & Adjustment (MUST be before /journals/{id} to avoid route conflict)
         Route::get('/journals/closing', function () {
             return view('journals.closing');
         })->name('journals.closing');
@@ -260,6 +253,16 @@ Route::middleware([
                 ->get();
             return view('journals.adjustment', compact('accounts', 'businessUnits'));
         })->name('journals.adjustment');
+        
+        // Journals parameterized route (MUST be after specific routes like /closing, /adjustment)
+        Route::get('/journals/{id}', [JournalController::class, 'show'])->name('journals.show')->where('id', '[0-9]+');
+        
+        // Budgets (Anggaran)
+        Route::get('/budgets', [BudgetController::class, 'index'])->name('budgets.index');
+        Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store');
+        Route::put('/budgets/{budget}', [BudgetController::class, 'update'])->name('budgets.update');
+        Route::delete('/budgets/{budget}', [BudgetController::class, 'destroy'])->name('budgets.destroy');
+        Route::get('/budgets/comparison', [BudgetController::class, 'comparison'])->name('budgets.comparison');
         
         // ==========================================
         // REPORTS
@@ -294,6 +297,23 @@ Route::middleware([
             Route::get('/biological-fair-value', [BiologicalReportController::class, 'fairValueChanges'])->name('biological-fair-value');
             Route::get('/biological-production', [BiologicalReportController::class, 'production'])->name('biological-production');
             Route::get('/biological-disclosure', [BiologicalReportController::class, 'disclosure'])->name('biological-disclosure');
+        });
+
+        // ==========================================
+        // INTERNET CUSTOMERS & BILLING
+        // ==========================================
+        Route::prefix('internet')->name('internet.')->group(function () {
+            Route::get('/', [InternetCustomerController::class, 'index'])->name('index');
+            Route::post('/', [InternetCustomerController::class, 'store'])->name('store');
+            Route::get('/settings', [InternetCustomerController::class, 'settings'])->name('settings');
+            Route::post('/settings', [InternetCustomerController::class, 'updateSettings'])->name('settings.update');
+            Route::get('/billing', [InternetCustomerController::class, 'billingIndex'])->name('billing');
+            Route::post('/billing/generate', [InternetCustomerController::class, 'generateBilling'])->name('billing.generate');
+            Route::post('/billing/{id}/pay', [InternetCustomerController::class, 'recordPayment'])->name('billing.pay')->where('id', '[0-9]+');
+            Route::get('/ledger', [InternetCustomerController::class, 'subsidiaryLedger'])->name('ledger');
+            Route::get('/{id}', [InternetCustomerController::class, 'customerDetail'])->name('show')->where('id', '[0-9]+');
+            Route::put('/{id}', [InternetCustomerController::class, 'update'])->name('update')->where('id', '[0-9]+');
+            Route::delete('/{id}', [InternetCustomerController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+');
         });
     });
 

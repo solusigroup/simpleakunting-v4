@@ -16,11 +16,12 @@
 
 <!-- Navigation -->
 <nav class="flex-1 p-4 space-y-1 overflow-y-auto" x-data="{ 
-    transaksi: true, 
-    masterData: true,
-    manufaktur: true,
-    laporan: true,
-    pengaturan: true 
+    transaksi: false, 
+    internet: false,
+    masterData: false,
+    manufaktur: false,
+    laporan: false,
+    pengaturan: false 
 }">
     <!-- Dashboard -->
     <x-sidebar-item href="{{ route('dashboard') }}" icon="dashboard" :active="request()->routeIs('dashboard')">
@@ -57,6 +58,27 @@
         </x-sidebar-item>
         <x-sidebar-item href="{{ route('budgets.index') }}" icon="account_balance_wallet" :active="request()->routeIs('budgets.*')">
             Anggaran
+        </x-sidebar-item>
+    </div>
+
+    <!-- Internet Group -->
+    <div class="pt-4">
+        <button @click="internet = !internet" 
+                class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
+            <span class="sidebar-group-label">Internet</span>
+            <span class="material-symbols-outlined text-sm transition-transform sidebar-group-label" 
+                  :class="internet ? 'rotate-0' : '-rotate-90'">expand_more</span>
+        </button>
+    </div>
+    <div x-show="internet" x-collapse>
+        <x-sidebar-item href="{{ route('internet.index') }}" icon="wifi" :active="request()->routeIs('internet.index') || request()->routeIs('internet.show')">
+            Pelanggan
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('internet.billing') }}" icon="receipt_long" :active="request()->routeIs('internet.billing*')">
+            Tagihan
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('internet.ledger') }}" icon="account_balance" :active="request()->routeIs('internet.ledger')">
+            Buku Bantu Piutang
         </x-sidebar-item>
     </div>
 

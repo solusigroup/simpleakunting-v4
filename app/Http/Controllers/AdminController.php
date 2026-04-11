@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
+    /**
+     * Display a listing of all tenants.
+     */
     public function index()
     {
         $tenants = Tenant::with('domains')->get();
@@ -16,11 +20,17 @@ class AdminController extends Controller
         return view('admin.index', compact('tenants', 'centralDomain'));
     }
 
+    /**
+     * Show the form for creating a new tenant.
+     */
     public function create()
     {
         return view('admin.create');
     }
 
+    /**
+     * Store a newly created tenant.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -52,9 +62,57 @@ class AdminController extends Controller
             return back()->with('error', 'Tenant created but database provisioning failed: ' . $e->getMessage());
         }
 
-        return redirect('/admin')->with('success', "Tenant '{$request->name}' berhasil dibuat!");
+        return redirect()->route('admin.index')->with('success', "Tenant '{$request->name}' berhasil dibuat!");
     }
 
+    /**
+     * Display the specified tenant.
+     */
+    public function show(Tenant $tenant)
+    {
+        $tenant->load('domains');
+        $centralDomain = env('CENTRAL_DOMAIN', 'simpleakunting4-0.test');
+
+        // Get database info
+        $dbName = config('tenancy.database.prefix') . $tenant->id . config('tenancy.database.suffix');
+
+        return view('admin.show', compact('tenant', 'centralDomain', 'dbName'));
+    }
+
+    /**
+     * Show the form for editing the specified tenant.
+     */
+    public function edit(Tenant $tenant)
+    {
+        $tenant->load('domains');
+        $centralDomain = env('CENTRAL_DOMAIN', 'simpleakunting4-0.test');
+
+        return view('admin.edit', compact('tenant', 'centralDomain'));
+    }
+
+    /**
+     * Update the specified tenant.
+     */
+    public function update(Request $request, Tenant $tenant)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'plan' => 'required|in:free,starter,pro',
+        ]);
+
+        $tenant->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'plan' => $request->plan,
+        ]);
+
+        return redirect()->route('admin.show', $tenant)->with('success', "Tenant '{$request->name}' berhasil diperbarui.");
+    }
+
+    /**
+     * Remove the specified tenant.
+     */
     public function destroy(Tenant $tenant)
     {
         $tenantName = $tenant->name;
@@ -81,6 +139,6 @@ class AdminController extends Controller
             }
         }
 
-        return redirect('/admin')->with('success', "Tenant '{$tenantName}' berhasil dihapus.");
+        return redirect()->route('admin.index')->with('success', "Tenant '{$tenantName}' berhasil dihapus.");
     }
 }

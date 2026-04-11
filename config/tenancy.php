@@ -52,7 +52,7 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => 'dbv4_tenant_',
+        'prefix' => 'dbv4_tenant-',
         'suffix' => '',
 
         /**

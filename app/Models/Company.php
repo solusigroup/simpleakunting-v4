@@ -29,6 +29,8 @@ class Company extends Model
         'staff_title',
         'enable_psak69',
         'business_sector',
+        'internet_receivable_module_coa_id',
+        'internet_revenue_module_coa_id',
     ];
 
     protected $casts = [
@@ -152,6 +154,22 @@ class Company extends Model
     public function biologicalAssets(): HasMany
     {
         return $this->hasMany(BiologicalAsset::class);
+    }
+
+    /**
+     * Get the internet receivable account.
+     */
+    public function internetReceivableAccount(): BelongsTo
+    {
+        return $this->belongsTo(ChartOfAccount::class, 'internet_receivable_module_coa_id');
+    }
+
+    /**
+     * Get the internet revenue account.
+     */
+    public function internetRevenueAccount(): BelongsTo
+    {
+        return $this->belongsTo(ChartOfAccount::class, 'internet_revenue_module_coa_id');
     }
 }
 
