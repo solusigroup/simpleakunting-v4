@@ -16,11 +16,11 @@ return [
      *
      * Only relevant if you're using the domain or subdomain identification middleware.
      */
-    'central_domains' => [
+    'central_domains' => array_filter([
+        env('CENTRAL_DOMAIN'),
         '127.0.0.1',
         'localhost',
-        env('CENTRAL_DOMAIN', 'simpleakunting.shop'),
-    ],
+    ]),
 
     /**
      * Tenancy bootstrappers are executed when tenancy is initialized.
