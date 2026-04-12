@@ -29,6 +29,8 @@ use App\Http\Controllers\AssemblyController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ManufacturingReportController;
 use App\Http\Controllers\InternetCustomerController;
+use App\Http\Controllers\InvestorController;
+use App\Http\Controllers\InvestorSharingController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
