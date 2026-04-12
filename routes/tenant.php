@@ -242,6 +242,8 @@ Route::middleware([
         // Journal (Manual Entry)
         Route::get('/journals', [JournalController::class, 'index'])->name('journals.index');
         Route::post('/journals/manual', [JournalController::class, 'storeManual'])->name('journals.manual');
+        Route::patch('/journals/{id}/toggle-post', [JournalController::class, 'togglePost'])->name('journals.toggle-post');
+        Route::delete('/journals/{id}', [JournalController::class, 'destroy'])->name('journals.destroy');
         
         // Closing & Adjustment (MUST be before /journals/{id} to avoid route conflict)
         Route::get('/journals/closing', function () {

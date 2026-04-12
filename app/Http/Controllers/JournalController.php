@@ -186,13 +186,72 @@ class JournalController extends Controller
     {
         $user = $request->user();
         
-        $journal = Journal::where('company_id', $user->company_id)
+        $journal = Journal::where('company_id', $user->company->id)
             ->with(['items.account', 'businessUnit', 'contact'])
             ->findOrFail($id);
 
         return response()->json([
             'success' => true,
             'data' => $journal,
+        ]);
+    }
+
+    /**
+     * PATCH /journals/{id}/toggle-post
+     * Toggle status posting (Valid?posted).
+     */
+    public function togglePost(Request $request, int $id): JsonResponse
+    {
+        $user = $request->user();
+        if (!$user->canApprove()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya Manajer atau Administrator yang dapat memposting jurnal.',
+            ], 403);
+        }
+
+        $journal = Journal::where('company_id', $user->company->id)->findOrFail($id);
+        
+        $journal->is_posted = !$journal->is_posted;
+        $journal->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => $journal->is_posted ? 'Jurnal berhasil diposting.' : 'Jurnal dibatalkan postingnya.',
+            'data' => [
+                'is_posted' => $journal->is_posted
+            ]
+        ]);
+    }
+
+    /**
+     * DELETE /journals/{id}
+     * Hapus jurnal jika belum diposting.
+     */
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        $user = $request->user();
+        if (!$user->canApprove()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki otoritas untuk menghapus jurnal.',
+            ], 403);
+        }
+
+        $journal = Journal::where('company_id', $user->company->id)->findOrFail($id);
+
+        if ($journal->is_posted) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Jurnal yang sudah diposting tidak dapat dihapus. Silakan batalkan posting terlebih dahulu jika ingin menghapus.',
+            ], 422);
+        }
+
+        $journal->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jurnal berhasil dihapus.',
         ]);
     }
 }

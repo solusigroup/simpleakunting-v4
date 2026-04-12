@@ -71,68 +71,80 @@ class InvestorSharingController extends Controller
             return back()->with('error', 'Silakan atur Akun Debet dan Akun Kredit untuk Bagi Hasil di Pengaturan Perusahaan terlebih dahulu.');
         }
 
-        return DB::transaction(function () use ($request, $company) {
-            $totalAmount = 0;
-            foreach ($request->investors as $invData) {
-                $totalAmount += $invData['amount'];
-            }
+        try {
+            return DB::transaction(function () use ($request, $company) {
+                $totalAmount = 0;
+                foreach ($request->investors as $invData) {
+                    $totalAmount += $invData['amount'];
+                }
 
-            if ($totalAmount <= 0) {
-                return back()->with('error', 'Total bagi hasil harus lebih dari 0.');
-            }
+                if ($totalAmount <= 0) {
+                    return back()->with('error', 'Total bagi hasil harus lebih dari 0.');
+                }
 
-            // Create Journal
-            $journal = Journal::create([
-                'company_id' => $company->id,
-                'business_unit_id' => $request->unit_id,
-                'date' => now(),
-                'reference' => 'BS-' . now()->format('YmdHis'),
-                'description' => 'Bagi Hasil Investor Periode ' . $request->start_date . ' s/d ' . $request->end_date,
-                'source' => 'manual',
-                'is_posted' => true,
-            ]);
-
-            // Debit Entry (Expense/Equity)
-            JournalItem::create([
-                'journal_id' => $journal->id,
-                'coa_id' => $company->investor_sharing_debit_coa_id,
-                'debit' => $totalAmount,
-                'credit' => 0,
-                'memo' => 'Alokasi Bagi Hasil Investor',
-            ]);
-
-            // Credit Entry (Liability/Payable)
-            JournalItem::create([
-                'journal_id' => $journal->id,
-                'coa_id' => $company->investor_sharing_credit_coa_id,
-                'debit' => 0,
-                'credit' => $totalAmount,
-                'memo' => 'Hutang Bagi Hasil Investor',
-            ]);
-
-            // Log individual records
-            foreach ($request->investors as $invData) {
-                $investor = Investor::find($invData['id']);
-                InvestorSharing::create([
-                    'investor_id' => $investor->id,
-                    'journal_id' => $journal->id,
-                    'amount' => $invData['amount'],
-                    'period_start' => $request->start_date,
-                    'period_end' => $request->end_date,
-                    'basis_amount' => $invData['basis_amount'] ?? 0,
-                    'note' => 'Bagi Hasil ' . $investor->share_percentage . '% dari ' . $investor->basis,
+                // Create Journal
+                $journal = Journal::create([
+                    'company_id' => $company->id,
+                    'business_unit_id' => $request->unit_id,
+                    'date' => now(),
+                    'reference' => 'BS-' . now()->format('YmdHis'),
+                    'description' => 'Bagi Hasil Investor Periode ' . $request->start_date . ' s/d ' . $request->end_date,
+                    'source' => 'manual',
+                    'is_posted' => true,
                 ]);
-            }
 
-            return redirect()->route('reports.investor-sharing')->with('success', 'Bagi hasil berhasil di-posting ke Jurnal Umum.');
-        });
+                // Debit Entry (Expense/Equity)
+                JournalItem::create([
+                    'journal_id' => $journal->id,
+                    'coa_id' => $company->investor_sharing_debit_coa_id,
+                    'debit' => $totalAmount,
+                    'credit' => 0,
+                    'memo' => 'Alokasi Bagi Hasil Investor',
+                ]);
+
+                // Credit Entry (Liability/Payable)
+                JournalItem::create([
+                    'journal_id' => $journal->id,
+                    'coa_id' => $company->investor_sharing_credit_coa_id,
+                    'debit' => 0,
+                    'credit' => $totalAmount,
+                    'memo' => 'Hutang Bagi Hasil Investor',
+                ]);
+
+                // Log individual records
+                foreach ($request->investors as $invData) {
+                    $investor = Investor::find($invData['id']);
+                    InvestorSharing::create([
+                        'investor_id' => $investor->id,
+                        'journal_id' => $journal->id,
+                        'amount' => $invData['amount'],
+                        'period_start' => $request->start_date,
+                        'period_end' => $request->end_date,
+                        'basis_amount' => $invData['basis_amount'] ?? 0,
+                        'note' => 'Bagi Hasil ' . $investor->share_percentage . '% dari ' . $investor->basis,
+                    ]);
+                }
+
+                return redirect()->route('reports.investor-sharing')->with('success', 'Bagi hasil berhasil di-posting ke Jurnal Umum.');
+            });
+        } catch (\Exception $e) {
+            \Log::error('Investor Sharing Posting Error: ' . $e->getMessage(), [
+                'company_id' => $company->id,
+                'request' => $request->all()
+            ]);
+            return back()->with('error', 'Terjadi kesalahan saat memposting jurnal: ' . $e->getMessage());
+        }
     }
 
     private function calculateGrossProfit($company, $startDate, $endDate, $unitId)
     {
         $revenue = $this->getSumBalance($company, 'Revenue', $startDate, $endDate, $unitId);
-        // HPP usually starts with 5xxx in your seeder
-        $cogs = $this->getSumBalanceByCode($company, '5', $startDate, $endDate, $unitId);
+        
+        // HPP Prefix logic based on entity type
+        // BUMDesa: 5.1 is HPP, 5.2/5.3 are other expenses
+        // UMKM: 5xxx is HPP, 6xxx are other expenses
+        $cogsPrefix = $company->entity_type === 'BUMDesa' ? '5.1' : '5';
+        $cogs = $this->getSumBalanceByCode($company, $cogsPrefix, $startDate, $endDate, $unitId);
 
         return $revenue - $cogs;
     }

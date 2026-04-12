@@ -157,30 +157,36 @@
                             @php
                                 $coaSet = $company->investor_sharing_debit_coa_id && $company->investor_sharing_credit_coa_id;
                             @endphp
-                            @if(!$coaSet)
-                                <div class="mt-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-3 text-red-400 text-xs">
-                                    <span class="material-symbols-outlined text-sm">warning</span>
-                                    <span>
-                                        <strong>Akun Belum Diatur:</strong> Anda harus memilih Akun Debet & Kredit di 
-                                        <a href="{{ route('company.settings') }}" class="underline font-bold hover:text-white">Pengaturan Perusahaan</a> 
-                                        sebelem dapat melakukan posting jurnal.
-                                    </span>
-                                </div>
-                            @endif
-                        </div>
-                        
-                        <div class="flex flex-col items-end gap-2">
-                            <button type="submit" 
-                                    @if(!$coaSet) disabled title="Atur COA di Pengaturan Perusahaan" @endif
-                                    class="px-10 py-4 bg-primary text-background-dark font-bold rounded-2xl hover:bg-[#2ec56a] transition shadow-lg shadow-primary/20 flex items-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed"
-                                    onclick="return confirm('Apakah Anda yakin ingin memposting hasil perhitungan ini ke Jurnal Umum?')">
-                                <span class="material-symbols-outlined">description</span>
-                                Posting Jurnal Otomatis
-                            </button>
-                            @if(!$coaSet)
-                                <p class="text-[10px] text-red-500 animate-pulse font-bold">Tombol Non-aktif: Pengaturan Akun Diperlukan</p>
-                            @endif
-                        </div>
+                                @if(!$coaSet)
+                                    <div class="mt-3 p-4 rounded-xl bg-red-500/10 border-2 border-red-500/50 flex flex-col gap-3 text-red-400">
+                                        <div class="flex items-center gap-3">
+                                            <span class="material-symbols-outlined text-2xl animate-pulse">warning</span>
+                                            <span class="font-bold text-lg">Konfigurasi Akun Diperlukan</span>
+                                        </div>
+                                        <p class="text-sm">
+                                            Anda belum mengatur <strong>Akun Debet & Kredit</strong> untuk pembagian laba. 
+                                            Silakan atur di Pengaturan Perusahaan agar tombol posting dapat digunakan.
+                                        </p>
+                                        <a href="{{ route('company.settings') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition w-fit">
+                                            <span class="material-symbols-outlined text-sm">settings</span>
+                                            Ke Pengaturan Perusahaan
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            <div class="flex flex-col items-end gap-2">
+                                <button type="submit" 
+                                        @if(!$coaSet) disabled @endif
+                                        class="px-10 py-4 bg-primary text-background-dark font-bold rounded-2xl hover:bg-[#2ec56a] transition shadow-lg shadow-primary/20 flex items-center gap-3 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed"
+                                        onclick="return confirm('Apakah Anda yakin ingin memposting hasil perhitungan ini ke Jurnal Umum?')">
+                                    <span class="material-symbols-outlined">description</span>
+                                    Posting Jurnal Otomatis
+                                </button>
+                                @if(!$coaSet)
+                                    <p class="text-[10px] text-red-500 animate-bounce font-bold uppercase tracking-widest">Tombol Terkunci</p>
+                                @endif
+                            </div>
                     </div>
                 </div>
                 @endif

@@ -129,6 +129,71 @@
         </div>
     </div>
 
+    <!-- View Modal -->
+    <div id="viewModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeViewModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-background-dark rounded-3xl border border-border-dark w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+                <div class="px-8 py-6 border-b border-border-dark flex items-center justify-between bg-surface-dark/50">
+                    <div>
+                        <h3 class="text-xl font-bold text-white" id="viewDescription">Detail Jurnal</h3>
+                        <p class="text-text-muted text-sm mt-1" id="viewReferenceDate"></p>
+                    </div>
+                    <button onclick="closeViewModal()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 text-text-muted hover:text-white transition">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-8 overflow-y-auto flex-1 space-y-6">
+                    <!-- Journal Metadata -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 p-6 rounded-2xl bg-surface-dark/30 border border-border-dark/50">
+                        <div>
+                            <p class="text-xs text-text-muted uppercase tracking-wider font-bold mb-1">Sumber</p>
+                            <p id="viewSource" class="text-white font-medium"></p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-text-muted uppercase tracking-wider font-bold mb-1">Unit Usaha</p>
+                            <p id="viewUnit" class="text-white font-medium"></p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-text-muted uppercase tracking-wider font-bold mb-1">Kontak</p>
+                            <p id="viewContact" class="text-white font-medium"></p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-text-muted uppercase tracking-wider font-bold mb-1">Status</p>
+                            <div id="viewStatus"></div>
+                        </div>
+                    </div>
+
+                    <!-- Journal Items Table -->
+                    <div class="rounded-2xl border border-border-dark overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead class="bg-surface-dark">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-text-muted font-bold uppercase tracking-wider">Akun</th>
+                                    <th class="px-6 py-4 text-right text-text-muted font-bold uppercase tracking-wider w-40">Debit</th>
+                                    <th class="px-6 py-4 text-right text-text-muted font-bold uppercase tracking-wider w-40">Kredit</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viewItemsBody">
+                                <!-- Detailed lines will be injected here -->
+                            </tbody>
+                            <tfoot class="bg-surface-dark/50 border-t border-border-dark">
+                                <tr>
+                                    <td class="px-6 py-4 text-right font-bold text-white">TOTAL</td>
+                                    <td class="px-6 py-4 text-right font-extrabold text-primary" id="viewTotalDebit">0</td>
+                                    <td class="px-6 py-4 text-right font-extrabold text-primary" id="viewTotalCredit">0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="px-8 py-6 border-t border-border-dark bg-surface-dark/30 flex justify-end">
+                    <button onclick="closeViewModal()" class="px-6 py-2.5 rounded-xl bg-white/5 border border-border-dark text-white font-bold hover:bg-white/10 transition">Tutup Detail</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
     <script>
         let accounts = [];
@@ -208,22 +273,48 @@
             }
 
             container.innerHTML = journals.map(journal => `
-                <div class="rounded-2xl border border-border-dark bg-surface-dark/30 overflow-hidden">
-                    <div class="px-6 py-4 flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-xl ${getSourceColor(journal.source)} flex items-center justify-center">
-                                <span class="material-symbols-outlined text-xl">${getSourceIcon(journal.source)}</span>
+                <div class="group rounded-2xl border border-border-dark bg-surface-dark/30 overflow-hidden hover:border-primary/50 transition duration-300">
+                    <div class="px-6 py-5 flex items-center justify-between">
+                        <div class="flex items-center gap-5">
+                            <div class="w-12 h-12 rounded-2xl ${getSourceColor(journal.source)} flex items-center justify-center shadow-lg">
+                                <span class="material-symbols-outlined text-2xl">${getSourceIcon(journal.source)}</span>
                             </div>
                             <div>
-                                <p class="text-white font-medium">${journal.description}</p>
-                                <p class="text-text-muted text-sm">
-                                    ${journal.reference} • ${new Date(journal.date).toLocaleDateString('id-ID')}
-                                    ${journal.business_unit ? `<span class="ml-2 px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-xs">${journal.business_unit.name}</span>` : ''}
-                                    ${journal.contact ? `<span class="ml-2 px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 text-xs">${journal.contact.name}</span>` : ''}
+                                <div class="flex items-center gap-3 mb-1">
+                                    <p class="text-white font-bold text-lg">${journal.description}</p>
+                                    ${journal.is_posted 
+                                        ? '<span class="px-2.5 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/30">Posted</span>' 
+                                        : '<span class="px-2.5 py-0.5 rounded-full bg-white/10 text-text-muted text-[10px] font-black uppercase tracking-widest border border-white/10">Draft</span>'
+                                    }
+                                </div>
+                                <p class="text-text-muted text-sm flex items-center gap-2">
+                                    <span class="font-mono text-xs opacity-70">${journal.reference}</span> 
+                                    <span class="opacity-30">|</span> 
+                                    <span>${new Date(journal.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                    ${journal.business_unit ? `<span class="ml-2 px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/20">${journal.business_unit.name}</span>` : ''}
+                                    ${journal.contact ? `<span class="ml-2 px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 text-[10px] font-bold border border-cyan-500/20">${journal.contact.name}</span>` : ''}
                                 </p>
                             </div>
                         </div>
-                        <span class="px-2 py-1 rounded text-xs font-medium ${getSourceBadge(journal.source)}">${getSourceLabel(journal.source)}</span>
+                        
+                        <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <button onclick="viewJournal(${journal.id})" class="p-2.5 rounded-xl bg-surface-dark border border-border-dark text-white hover:bg-white/10 transition group/btn" title="Lihat Detail">
+                                <span class="material-symbols-outlined text-sm">visibility</span>
+                            </button>
+                            
+                            <button onclick="toggleJournalPost(${journal.id})" 
+                                    class="p-2.5 rounded-xl border transition flex items-center gap-2 font-bold text-xs ${journal.is_posted ? 'bg-orange-500/10 border-orange-500/30 text-orange-400 hover:bg-orange-500/20' : 'bg-primary/10 border-primary/30 text-primary hover:bg-primary/20'}" 
+                                    title="${journal.is_posted ? 'Batalkan Posting' : 'Posting Jurnal'}">
+                                <span class="material-symbols-outlined text-sm">${journal.is_posted ? 'lock_open' : 'check_circle'}</span>
+                                ${journal.is_posted ? 'Unpost' : 'Post'}
+                            </button>
+
+                            ${!journal.is_posted ? `
+                                <button onclick="deleteJournal(${journal.id})" class="p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 hover:bg-red-500/20 transition" title="Hapus Jurnal">
+                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                </button>
+                            ` : ''}
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -395,6 +486,92 @@
         document.getElementById('unitFilter').addEventListener('change', loadJournals);
         document.getElementById('dateStart').addEventListener('change', loadJournals);
         document.getElementById('dateEnd').addEventListener('change', loadJournals);
+
+        async function viewJournal(id) {
+            const response = await fetch(`/journals/${id}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                const journal = result.data;
+                document.getElementById('viewDescription').textContent = journal.description;
+                document.getElementById('viewReferenceDate').textContent = `${journal.reference} • ${new Date(journal.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+                document.getElementById('viewSource').textContent = getSourceLabel(journal.source);
+                document.getElementById('viewUnit').textContent = journal.business_unit ? journal.business_unit.name : '-';
+                document.getElementById('viewContact').textContent = journal.contact ? journal.contact.name : '-';
+                
+                const statusDiv = document.getElementById('viewStatus');
+                statusDiv.innerHTML = journal.is_posted 
+                    ? '<span class="px-3 py-1 rounded-full bg-primary/20 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/30">Posted</span>' 
+                    : '<span class="px-3 py-1 rounded-full bg-white/10 text-text-muted text-[10px] font-black uppercase tracking-widest border border-white/10">Draft</span>';
+
+                const itemsBody = document.getElementById('viewItemsBody');
+                itemsBody.innerHTML = journal.items.map(item => `
+                    <tr class="border-t border-border-dark/50">
+                        <td class="px-6 py-4">
+                            <p class="text-white font-medium">${item.account.code} - ${item.account.name}</p>
+                            ${item.memo ? `<p class="text-text-muted text-xs mt-0.5 italic">${item.memo}</p>` : ''}
+                        </td>
+                        <td class="px-6 py-4 text-right ${item.debit > 0 ? 'text-white' : 'text-text-muted opacity-30'}">
+                            ${parseFloat(item.debit).toLocaleString('id-ID')}
+                        </td>
+                        <td class="px-6 py-4 text-right ${item.credit > 0 ? 'text-white' : 'text-text-muted opacity-30'}">
+                            ${parseFloat(item.credit).toLocaleString('id-ID')}
+                        </td>
+                    </tr>
+                `).join('');
+
+                const totalDebit = journal.items.reduce((sum, item) => sum + parseFloat(item.debit), 0);
+                const totalCredit = journal.items.reduce((sum, item) => sum + parseFloat(item.credit), 0);
+                document.getElementById('viewTotalDebit').textContent = totalDebit.toLocaleString('id-ID');
+                document.getElementById('viewTotalCredit').textContent = totalCredit.toLocaleString('id-ID');
+
+                document.getElementById('viewModal').classList.remove('hidden');
+            }
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewModal').classList.add('hidden');
+        }
+
+        async function toggleJournalPost(id) {
+            if (!confirm('Ubah status validasi/posting jurnal ini?')) return;
+            
+            const response = await fetch(`/journals/${id}/toggle-post`, {
+                method: 'PATCH',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                loadJournals();
+            } else {
+                alert(result.message);
+            }
+        }
+
+        async function deleteJournal(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus jurnal ini? Tindakan ini tidak dapat dibatalkan.')) return;
+            
+            const response = await fetch(`/journals/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                loadJournals();
+            } else {
+                alert(result.message);
+            }
+        }
 
         // Initial load
         loadAccounts();
