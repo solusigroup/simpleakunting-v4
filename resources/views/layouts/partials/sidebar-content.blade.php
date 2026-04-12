@@ -109,6 +109,9 @@
         <x-sidebar-item href="{{ route('assets.index') }}" icon="precision_manufacturing" :active="request()->routeIs('assets.*')">
             Aset Tetap
         </x-sidebar-item>
+        <x-sidebar-item href="{{ route('investors.index') }}" icon="group" :active="request()->routeIs('investors.*')">
+            Investor
+        </x-sidebar-item>
         @if(auth()->user()->company?->usesPsak69())
         <x-sidebar-item href="{{ route('biological-assets.index') }}" icon="eco" :active="request()->routeIs('biological-assets.*')">
             Aset Biologis (PSAK 69)
@@ -176,6 +179,9 @@
         </x-sidebar-item>
         <x-sidebar-item href="{{ route('reports.financial-analysis') }}" icon="analytics" :active="request()->routeIs('reports.financial-analysis')">
             Analisa Keuangan
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('reports.investor-sharing') }}" icon="groups" :active="request()->routeIs('reports.investor-sharing')">
+            Bagi Hasil Investor
         </x-sidebar-item>
         
         @if(auth()->user()->company?->usesPsak69())

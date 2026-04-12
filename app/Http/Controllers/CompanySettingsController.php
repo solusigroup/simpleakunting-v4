@@ -30,6 +30,8 @@ class CompanySettingsController extends Controller
             'logo' => 'nullable|image|max:2048',
             'enable_psak69' => 'nullable|boolean',
             'business_sector' => 'nullable|in:general,livestock,plantation,aquaculture,forestry,mixed_agriculture',
+            'investor_sharing_debit_coa_id' => 'nullable|exists:chart_of_accounts,id',
+            'investor_sharing_credit_coa_id' => 'nullable|exists:chart_of_accounts,id',
         ]);
 
         if ($request->hasFile('logo')) {

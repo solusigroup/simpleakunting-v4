@@ -132,6 +132,9 @@ Route::middleware([
         Route::put('/contacts/{id}', [ContactController::class, 'update'])->name('contacts.update');
         Route::get('/contacts/{id}', [ContactController::class, 'show'])->name('contacts.show');
         
+        // Investors
+        Route::resource('investors', InvestorController::class);
+        
         // Business Units (BUMDesa only)
         Route::get('/units', [BusinessUnitController::class, 'index'])->name('units.index');
         Route::post('/units', [BusinessUnitController::class, 'store'])->name('units.store');
@@ -297,6 +300,10 @@ Route::middleware([
             Route::get('/biological-fair-value', [BiologicalReportController::class, 'fairValueChanges'])->name('biological-fair-value');
             Route::get('/biological-production', [BiologicalReportController::class, 'production'])->name('biological-production');
             Route::get('/biological-disclosure', [BiologicalReportController::class, 'disclosure'])->name('biological-disclosure');
+
+            // Investor Sharing
+            Route::get('/investor-sharing', [InvestorSharingController::class, 'index'])->name('investor-sharing');
+            Route::post('/investor-sharing/post', [InvestorSharingController::class, 'post'])->name('investor-sharing.post');
         });
 
         // ==========================================

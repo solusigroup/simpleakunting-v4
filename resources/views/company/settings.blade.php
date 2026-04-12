@@ -203,6 +203,50 @@
                 </div>
             </div>
 
+            <!-- Investor Sharing Section -->
+            <div class="pt-6 border-t border-border-dark">
+                <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-purple-400">group</span>
+                    Konfigurasi Bagi Hasil Investor
+                </h3>
+                
+                <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/30 mb-4">
+                    <p class="text-sm text-text-muted">
+                        Pilih akun yang akan digunakan saat memposting jurnal bagi hasil otomatis.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Akun Debet (Beban/Ekuitas)</label>
+                        <select name="investor_sharing_debit_coa_id"
+                                class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="">-- Pilih Akun --</option>
+                            @foreach($company->chartOfAccounts()->where('is_parent', false)->orderBy('code')->get() as $coa)
+                                <option value="{{ $coa->id }}" {{ old('investor_sharing_debit_coa_id', $company->investor_sharing_debit_coa_id) == $coa->id ? 'selected' : '' }}>
+                                    {{ $coa->code }} - {{ $coa->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-xs text-text-muted">Biasanya akun Penarikkan Modal atau Beban Kerjasama.</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Akun Kredit (Hutang)</label>
+                        <select name="investor_sharing_credit_coa_id"
+                                class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="">-- Pilih Akun --</option>
+                            @foreach($company->chartOfAccounts()->where('is_parent', false)->orderBy('code')->get() as $coa)
+                                <option value="{{ $coa->id }}" {{ old('investor_sharing_credit_coa_id', $company->investor_sharing_credit_coa_id) == $coa->id ? 'selected' : '' }}>
+                                    {{ $coa->code }} - {{ $coa->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-xs text-text-muted">Biasanya akun Hutang Bagi Hasil Investor.</p>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Submit Button -->
             <div class="flex justify-end gap-3 pt-6 border-t border-border-dark">
                 <a href="{{ route('dashboard') }}" 
