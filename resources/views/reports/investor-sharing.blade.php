@@ -27,6 +27,16 @@
     </x-slot>
 
     <div class="space-y-8">
+        @if($errors->any())
+            <div class="p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400">
+                <ul class="list-disc list-inside">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         @if(session('success'))
             <div class="p-4 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400">
                 {{ session('success') }}
@@ -75,6 +85,7 @@
                 @csrf
                 <input type="hidden" name="start_date" value="{{ $startDate }}">
                 <input type="hidden" name="end_date" value="{{ $endDate }}">
+                <input type="hidden" name="unit_id" value="{{ request('unit_id') }}">
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
@@ -141,23 +152,35 @@
                         <div class="max-w-md">
                             <h4 class="text-white font-bold mb-2">Konfirmasi Posting Jurnal</h4>
                             <p class="text-sm text-text-muted">
-                                Mengklik tombol di samping akan membuat **Jurnal Umum** otomatis berdasarkan pengaturan akun di Profil Perusahaan.
+                                Mengklik tombol di bawah akan membuat **Jurnal Umum** otomatis berdasarkan pengaturan akun di Profil Perusahaan. Pastikan nominal sudah benar sebelum posting.
                             </p>
-                            @if(!$company->investor_sharing_debit_coa_id || !$company->investor_sharing_credit_coa_id)
-                                <div class="mt-3 flex items-center gap-2 text-red-400 text-xs">
+                            @php
+                                $coaSet = $company->investor_sharing_debit_coa_id && $company->investor_sharing_credit_coa_id;
+                            @endphp
+                            @if(!$coaSet)
+                                <div class="mt-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-3 text-red-400 text-xs">
                                     <span class="material-symbols-outlined text-sm">warning</span>
-                                    <span>Akun Debet/Kredit belum diatur! <a href="{{ route('company.settings') }}" class="underline hover:text-white">Atur di sini</a></span>
+                                    <span>
+                                        <strong>Akun Belum Diatur:</strong> Anda harus memilih Akun Debet & Kredit di 
+                                        <a href="{{ route('company.settings') }}" class="underline font-bold hover:text-white">Pengaturan Perusahaan</a> 
+                                        sebelem dapat melakukan posting jurnal.
+                                    </span>
                                 </div>
                             @endif
                         </div>
                         
-                        <button type="submit" 
-                                @if(!$company->investor_sharing_debit_coa_id || !$company->investor_sharing_credit_coa_id) disabled @endif
-                                class="px-10 py-4 bg-primary text-background-dark font-bold rounded-2xl hover:bg-[#2ec56a] transition shadow-lg shadow-primary/20 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                                onclick="return confirm('Apakah Anda yakin ingin memposting hasil perhitungan ini ke Jurnal Umum?')">
-                            <span class="material-symbols-outlined">description</span>
-                            Konfirmasi & Posting Jurnal
-                        </button>
+                        <div class="flex flex-col items-end gap-2">
+                            <button type="submit" 
+                                    @if(!$coaSet) disabled title="Atur COA di Pengaturan Perusahaan" @endif
+                                    class="px-10 py-4 bg-primary text-background-dark font-bold rounded-2xl hover:bg-[#2ec56a] transition shadow-lg shadow-primary/20 flex items-center gap-3 disabled:opacity-30 disabled:cursor-not-allowed"
+                                    onclick="return confirm('Apakah Anda yakin ingin memposting hasil perhitungan ini ke Jurnal Umum?')">
+                                <span class="material-symbols-outlined">description</span>
+                                Posting Jurnal Otomatis
+                            </button>
+                            @if(!$coaSet)
+                                <p class="text-[10px] text-red-500 animate-pulse font-bold">Tombol Non-aktif: Pengaturan Akun Diperlukan</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
                 @endif

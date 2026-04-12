@@ -84,6 +84,7 @@ class InvestorSharingController extends Controller
             // Create Journal
             $journal = Journal::create([
                 'company_id' => $company->id,
+                'business_unit_id' => $request->unit_id,
                 'date' => now(),
                 'reference' => 'BS-' . now()->format('YmdHis'),
                 'description' => 'Bagi Hasil Investor Periode ' . $request->start_date . ' s/d ' . $request->end_date,
