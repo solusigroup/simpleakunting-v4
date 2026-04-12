@@ -10,6 +10,7 @@ use App\Models\JournalItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class PurchaseController extends Controller
 {
@@ -78,10 +79,16 @@ class PurchaseController extends Controller
             'date' => ['required', 'date'],
             'due_date' => ['nullable', 'date', 'after_or_equal:date'],
             'unit_id' => ['nullable', 'exists:business_units,id'],
-            'payable_account_id' => ['required', 'exists:chart_of_accounts,id'], // Akun Utang/Kas
+            'payable_account_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+            ],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
-            'items.*.account_id' => ['required', 'exists:chart_of_accounts,id'],
+            'items.*.account_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+            ],
             'items.*.inventory_id' => ['nullable', 'exists:inventories,id'],
             'items.*.description' => ['required', 'string'],
             'items.*.quantity' => ['required', 'numeric', 'min:0.01'],
@@ -94,11 +101,12 @@ class PurchaseController extends Controller
                 return ($item['quantity'] ?? 1) * $item['amount'];
             });
 
-            // Generate invoice number
+            // Generate invoice number with DB lock
             $lastInvoice = Invoice::where('company_id', $company->id)
                 ->where('type', 'Purchase')
                 ->whereYear('date', now()->year)
                 ->orderBy('id', 'desc')
+                ->lockForUpdate()
                 ->first();
             
             $sequence = 1;
@@ -121,7 +129,7 @@ class PurchaseController extends Controller
                 'tax' => 0,
                 'discount' => 0,
                 'total' => $subtotal,
-                'status' => 'Posted',
+                'status' => 'Draft',
                 'notes' => $request->notes,
             ]);
 
@@ -163,7 +171,7 @@ class PurchaseController extends Controller
                 'reference' => $invoiceNumber,
                 'description' => 'Pembelian: ' . $invoiceNumber,
                 'source' => 'purchase',
-                'is_posted' => true,
+                'is_posted' => false,
             ]);
 
             // Debit: Biaya/Aset (per item)
@@ -233,7 +241,7 @@ class PurchaseController extends Controller
     {
         $user = $request->user();
         
-        if (!$user->canEdit()) {
+        if (!$user->canDelete()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki izin untuk menghapus transaksi.',
@@ -244,6 +252,13 @@ class PurchaseController extends Controller
             ->where('type', 'Purchase')
             ->with(['items', 'journal'])
             ->findOrFail($id);
+
+        if ($invoice->status === 'Posted' || ($invoice->journal && $invoice->journal->is_posted)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Transaksi yang sudah diposting tidak dapat dihapus. Silakan batalkan posting terlebih dahulu.',
+            ], 422);
+        }
 
         DB::transaction(function () use ($invoice) {
             // Reverse Inventory Stock (decrease for deleted purchases)

@@ -31,6 +31,8 @@ use App\Http\Controllers\ManufacturingReportController;
 use App\Http\Controllers\InternetCustomerController;
 use App\Http\Controllers\InvestorController;
 use App\Http\Controllers\InvestorSharingController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\DataResetController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -90,15 +92,21 @@ Route::middleware([
             return redirect()->route('help');
         })->name('help.deployment');
         
-        // Company Settings (Administrator only)
+        // Company Management (Admin & Manager)
+        Route::middleware(['role:Administrator,Manajer'])->group(function () {
+            // User Management
+            Route::resource('users', UserController::class);
+
+            // Role Management Dashboard
+            Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+        });
+        
+        // System Settings (Administrator only)
         Route::middleware(['role:Administrator'])->group(function () {
             Route::get('/company/settings', [CompanySettingsController::class, 'edit'])->name('company.settings');
             Route::put('/company/settings', [CompanySettingsController::class, 'update'])->name('company.update');
             
-            // User Management (Administrator only)
-            Route::resource('users', UserController::class);
-            
-            // Audit Trail (Administrator only)
+            // Audit Trail
             Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
             Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
         });
@@ -215,14 +223,18 @@ Route::middleware([
         Route::get('/sales/create', function () {
             return view('sales.create');
         })->name('sales.create');
-        Route::post('/sales', [SalesController::class, 'store'])->name('sales.store');
+        Route::middleware('throttle:60,1')->group(function () {
+            Route::post('/sales', [SalesController::class, 'store'])->name('sales.store');
+        });
         Route::get('/sales/{id}', [SalesController::class, 'show'])->name('sales.show');
         
         Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
         Route::get('/purchases/create', function () {
             return view('purchases.create');
         })->name('purchases.create');
-        Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+        Route::middleware('throttle:60,1')->group(function () {
+            Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+        });
         Route::get('/purchases/{id}', [PurchaseController::class, 'show'])->name('purchases.show');
         
         // ==========================================
@@ -232,16 +244,22 @@ Route::middleware([
         Route::get('/cash/receive', function () {
             return view('cash.receive');
         })->name('cash.receive');
-        Route::post('/cash/receive', [CashController::class, 'receive'])->name('cash.receive.store');
+        Route::middleware('throttle:60,1')->group(function () {
+            Route::post('/cash/receive', [CashController::class, 'receive'])->name('cash.receive.store');
+        });
         
         Route::get('/cash/spend', function () {
             return view('cash.spend');  
         })->name('cash.spend');
-        Route::post('/cash/spend', [CashController::class, 'spend'])->name('cash.spend.store');
+        Route::middleware('throttle:60,1')->group(function () {
+            Route::post('/cash/spend', [CashController::class, 'spend'])->name('cash.spend.store');
+        });
         
         // Journal (Manual Entry)
         Route::get('/journals', [JournalController::class, 'index'])->name('journals.index');
-        Route::post('/journals/manual', [JournalController::class, 'storeManual'])->name('journals.manual');
+        Route::middleware('throttle:60,1')->group(function () {
+            Route::post('/journals/manual', [JournalController::class, 'storeManual'])->name('journals.manual');
+        });
         Route::patch('/journals/{id}/toggle-post', [JournalController::class, 'togglePost'])->name('journals.toggle-post');
         Route::delete('/journals/{id}', [JournalController::class, 'destroy'])->name('journals.destroy');
         
@@ -307,7 +325,9 @@ Route::middleware([
 
             // Investor Sharing
             Route::get('/investor-sharing', [InvestorSharingController::class, 'index'])->name('investor-sharing');
-            Route::post('/investor-sharing/post', [InvestorSharingController::class, 'post'])->name('investor-sharing.post');
+            Route::middleware('throttle:60,1')->group(function () {
+                Route::post('/investor-sharing/post', [InvestorSharingController::class, 'post'])->name('investor-sharing.post');
+            });
         });
 
         // ==========================================
@@ -325,6 +345,13 @@ Route::middleware([
             Route::get('/{id}', [InternetCustomerController::class, 'customerDetail'])->name('show')->where('id', '[0-9]+');
             Route::put('/{id}', [InternetCustomerController::class, 'update'])->name('update')->where('id', '[0-9]+');
             Route::delete('/{id}', [InternetCustomerController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+');
+        });
+
+        // ==========================================
+        // DATA MANAGEMENT
+        // ==========================================
+        Route::middleware(['role:Administrator'])->group(function () {
+            Route::post('/reset-transactions', [DataResetController::class, 'resetTransactions'])->name('data.reset');
         });
     });
 

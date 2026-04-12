@@ -16,14 +16,25 @@ class CheckUserRole
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (!$request->user()) {
+        $user = $request->user();
+        if (!$user) {
             return redirect()->route('login');
         }
 
-        if (!in_array($request->user()->role, $roles)) {
-            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        foreach ($roles as $role) {
+            // If it contains a dot, treat it as a permission check
+            if (str_contains($role, '.')) {
+                if ($user->hasPermission($role)) {
+                    return $next($request);
+                }
+            } else {
+                // Otherwise treat as a raw role name check
+                if ($user->role === $role) {
+                    return $next($request);
+                }
+            }
         }
 
-        return $next($request);
+        abort(403, 'Anda tidak memiliki akses ke halaman ini.');
     }
 }

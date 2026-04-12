@@ -9,6 +9,7 @@ use App\Models\Journal;
 use App\Models\JournalItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class InvestorSharingController extends Controller
 {
@@ -56,11 +57,16 @@ class InvestorSharingController extends Controller
      */
     public function post(Request $request)
     {
+        $company = auth()->user()->company;
+
         $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'investors' => 'required|array',
-            'investors.*.id' => 'required|exists:investors,id',
+            'investors.*.id' => [
+                'required', 
+                Rule::exists('investors', 'id')->where('company_id', $company->id)
+            ],
             'investors.*.amount' => 'required|numeric|min:0',
         ]);
 
@@ -90,7 +96,7 @@ class InvestorSharingController extends Controller
                     'reference' => 'BS-' . now()->format('YmdHis'),
                     'description' => 'Bagi Hasil Investor Periode ' . $request->start_date . ' s/d ' . $request->end_date,
                     'source' => 'manual',
-                    'is_posted' => true,
+                    'is_posted' => false,
                 ]);
 
                 // Debit Entry (Expense/Equity)

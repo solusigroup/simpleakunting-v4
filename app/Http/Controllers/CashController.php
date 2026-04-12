@@ -8,6 +8,7 @@ use App\Traits\ValidatesCashBalance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class CashController extends Controller
 {
@@ -34,12 +35,18 @@ class CashController extends Controller
         $company = $user->company;
 
         $request->validate([
-            'from_account_id' => ['required', 'exists:chart_of_accounts,id'], // Kas/Bank
+            'from_account_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+            ],
             'date' => ['required', 'date'],
             'description' => ['nullable', 'string'],
             'unit_id' => ['nullable', 'exists:business_units,id'],
             'items' => ['required', 'array', 'min:1'],
-            'items.*.to_account_id' => ['required', 'exists:chart_of_accounts,id'],
+            'items.*.to_account_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+            ],
             'items.*.amount' => ['required', 'numeric', 'min:0.01'],
             'items.*.memo' => ['nullable', 'string'],
         ]);
@@ -87,7 +94,7 @@ class CashController extends Controller
                 'reference' => $reference,
                 'description' => $request->description ?? 'Pengeluaran Kas',
                 'source' => 'cash_bank',
-                'is_posted' => true,
+                'is_posted' => false,
             ]);
 
             // Debit: Akun Biaya (per item)
@@ -142,12 +149,18 @@ class CashController extends Controller
         $company = $user->company;
 
         $request->validate([
-            'to_account_id' => ['required', 'exists:chart_of_accounts,id'], // Kas/Bank
+            'to_account_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+            ],
             'date' => ['required', 'date'],
             'description' => ['nullable', 'string'],
             'unit_id' => ['nullable', 'exists:business_units,id'],
             'items' => ['required', 'array', 'min:1'],
-            'items.*.from_account_id' => ['required', 'exists:chart_of_accounts,id'],
+            'items.*.from_account_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+            ],
             'items.*.amount' => ['required', 'numeric', 'min:0.01'],
             'items.*.memo' => ['nullable', 'string'],
         ]);
@@ -166,7 +179,7 @@ class CashController extends Controller
                 'reference' => $reference,
                 'description' => $request->description ?? 'Penerimaan Kas',
                 'source' => 'cash_bank',
-                'is_posted' => true,
+                'is_posted' => false,
             ]);
 
             // Debit: Akun Kas/Bank

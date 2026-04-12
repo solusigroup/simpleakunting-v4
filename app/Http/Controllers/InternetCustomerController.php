@@ -11,6 +11,7 @@ use App\Models\JournalItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class InternetCustomerController extends Controller
 {
@@ -44,8 +45,14 @@ class InternetCustomerController extends Controller
         }
 
         $request->validate([
-            'internet_receivable_module_coa_id' => ['required', 'exists:chart_of_accounts,id'],
-            'internet_revenue_module_coa_id' => ['required', 'exists:chart_of_accounts,id'],
+            'internet_receivable_module_coa_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $user->company->id)
+            ],
+            'internet_revenue_module_coa_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $user->company->id)
+            ],
         ]);
 
         $user->company->update([
@@ -372,7 +379,7 @@ class InternetCustomerController extends Controller
                     'reference' => $billingNumber,
                     'description' => "Tagihan Internet {$this->monthName($month)} {$year} - {$customer->name}",
                     'source' => 'internet_billing',
-                    'is_posted' => true,
+                    'is_posted' => false,
                 ]);
 
                 // Debit: Piutang Pelanggan Internet
@@ -454,7 +461,10 @@ class InternetCustomerController extends Controller
             'amount' => ['required', 'numeric', 'min:1'],
             'payment_date' => ['required', 'date'],
             'payment_method' => ['required', 'in:cash,transfer,other'],
-            'cash_bank_account_id' => ['required', 'exists:chart_of_accounts,id'],
+            'cash_bank_account_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+            ],
             'notes' => ['nullable', 'string'],
         ]);
 
@@ -489,7 +499,7 @@ class InternetCustomerController extends Controller
                 'reference' => $paymentNumber,
                 'description' => "Pembayaran Internet {$billing->period_label} - {$customer->name}",
                 'source' => 'internet_payment',
-                'is_posted' => true,
+                'is_posted' => false,
             ]);
 
             // Debit: Kas/Bank

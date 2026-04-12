@@ -203,8 +203,8 @@
         @endif
     </div>
 
-    <!-- Pengaturan Group (Admin access) -->
-    @if(auth()->user()->isAdmin() || !auth()->user()->role || auth()->user()->role == 'User')
+    <!-- Pengaturan Group (Admin & Manager) -->
+    @if(auth()->user()->isAdmin() || auth()->user()->isManajer())
     <div class="pt-4">
         <button @click="pengaturan = !pengaturan" 
                 class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
@@ -219,6 +219,9 @@
         </x-sidebar-item>
         <x-sidebar-item href="{{ route('users.index') }}" icon="group" :active="request()->routeIs('users.*')">
             Kelola Pengguna
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('roles.index') }}" icon="verified_user" :active="request()->routeIs('roles.*')">
+            Managemen Role
         </x-sidebar-item>
         <x-sidebar-item href="{{ route('audit-logs.index') }}" icon="history" :active="request()->routeIs('audit-logs.*')">
             Audit Trail

@@ -8,6 +8,7 @@ use App\Traits\ValidatesCashBalance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class JournalController extends Controller
 {
@@ -82,7 +83,10 @@ class JournalController extends Controller
             'unit_id' => ['nullable', 'exists:business_units,id'],
             'contact_id' => ['nullable', 'exists:contacts,id'],
             'lines' => ['required', 'array', 'min:2'],
-            'lines.*.account_id' => ['required', 'exists:chart_of_accounts,id'],
+            'lines.*.account_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+            ],
             'lines.*.debit' => ['required', 'numeric', 'min:0'],
             'lines.*.credit' => ['required', 'numeric', 'min:0'],
             'lines.*.memo' => ['nullable', 'string'],
@@ -154,7 +158,7 @@ class JournalController extends Controller
                 'reference' => $reference,
                 'description' => $request->description,
                 'source' => 'manual',
-                'is_posted' => true,
+                'is_posted' => false,
             ]);
 
             // Create Journal Items

@@ -133,17 +133,21 @@ class ClosingController extends Controller
         $year = $request->year;
         $month = $request->month;
 
-        // Calculate period dates
-        if ($month) {
-            $startDate = sprintf('%04d-%02d-01', $year, $month);
-            $endDate = sprintf('%04d-%02d-%02d', $year, $month, cal_days_in_month(CAL_GREGORIAN, $month, $year));
-            $periodLabel = date('F Y', strtotime($startDate));
-            $reference = 'CLO-' . $year . str_pad($month, 2, '0', STR_PAD_LEFT);
-        } else {
-            $startDate = sprintf('%04d-01-01', $year);
-            $endDate = sprintf('%04d-12-31', $year);
-            $periodLabel = "Tahun $year";
-            $reference = 'CLO-' . $year;
+        $reference = $month 
+            ? 'CLO-' . $year . str_pad($month, 2, '0', STR_PAD_LEFT)
+            : 'CLO-' . $year;
+
+        // Check if closing already exists for this period
+        $exists = Journal::where('company_id', $company->id)
+            ->where('reference', $reference)
+            ->where('source', 'closing')
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => "Tutup buku untuk periode {$periodLabel} sudah pernah dilakukan.",
+            ], 422);
         }
 
         try {

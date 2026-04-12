@@ -12,6 +12,7 @@ use App\Models\JournalItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class BiologicalAssetController extends Controller
 {
@@ -127,8 +128,14 @@ class BiologicalAssetController extends Controller
                 'valuation_method' => ['required', 'in:fair_value,cost_model'],
                 'location' => ['nullable', 'string', 'max:255'],
                 'notes' => ['nullable', 'string'],
-                'coa_id' => ['required', 'exists:chart_of_accounts,id'],
-                'fair_value_gain_loss_coa_id' => ['nullable', 'exists:chart_of_accounts,id'],
+                'coa_id' => [
+                    'required', 
+                    Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+                ],
+                'fair_value_gain_loss_coa_id' => [
+                    'nullable', 
+                    Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+                ],
             ]);
 
             // Check for duplicate code
@@ -514,7 +521,10 @@ class BiologicalAssetController extends Controller
                 'unit' => ['required', 'string', 'max:50'],
                 'fair_value_at_harvest' => ['required', 'numeric', 'min:0'],
                 'cost_to_sell' => ['required', 'numeric', 'min:0'],
-                'coa_id' => ['required', 'exists:chart_of_accounts,id'],
+                'coa_id' => [
+                    'required', 
+                    Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+                ],
                 'notes' => ['nullable', 'string'],
                 'create_journal' => ['sometimes', 'boolean'],
             ]);
@@ -588,7 +598,7 @@ class BiologicalAssetController extends Controller
             'date' => $date,
             'type' => 'General',
             'description' => "Penyesuaian Nilai Wajar - {$asset->name}",
-            'is_posted' => true,
+            'is_posted' => false,
         ]);
 
         if ($fairValueChange > 0) {
@@ -636,7 +646,7 @@ class BiologicalAssetController extends Controller
             'date' => $date,
             'type' => 'General',
             'description' => "Panen - {$produce->product_name}",
-            'is_posted' => true,
+            'is_posted' => false,
         ]);
 
         // Dr. Agricultural Produce (Inventory)

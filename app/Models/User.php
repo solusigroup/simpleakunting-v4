@@ -118,7 +118,7 @@ class User extends Authenticatable
      */
     public function canManageUsers(): bool
     {
-        return $this->isAdmin();
+        return $this->isAdmin() || $this->isManajer();
     }
 
     /**
@@ -130,10 +130,18 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user has specific module permission.
+     */
+    public function hasPermission(string $permission): bool
+    {
+        return \App\Helpers\PermissionHelper::hasPermission($this->role, $permission);
+    }
+
+    /**
      * Check if user can view reports.
      */
     public function canViewReports(): bool
     {
-        return true; // All roles can view reports
+        return $this->hasPermission('reports.view');
     }
 }

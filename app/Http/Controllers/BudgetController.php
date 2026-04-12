@@ -7,6 +7,7 @@ use App\Models\ChartOfAccount;
 use App\Models\BusinessUnit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class BudgetController extends Controller
 {
@@ -62,8 +63,13 @@ class BudgetController extends Controller
      */
     public function store(Request $request)
     {
+        $companyId = auth()->user()->company_id;
+
         $validator = Validator::make($request->all(), [
-            'coa_id' => 'required|exists:chart_of_accounts,id',
+            'coa_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $companyId)
+            ],
             'period_type' => 'required|in:MONTHLY,QUARTERLY,YEARLY',
             'period_year' => 'required|integer|min:2020|max:2030',
             'period_month' => 'nullable|integer|min:1|max:12',
