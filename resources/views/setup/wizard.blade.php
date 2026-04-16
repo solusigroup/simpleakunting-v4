@@ -33,6 +33,11 @@
 
                     <form id="companyForm" class="space-y-4">
                         <div>
+                            <label class="block text-sm font-medium text-text-muted mb-2">Nama Perusahaan</label>
+                            <input type="text" id="companyName" placeholder="Contoh: PT. Solusi Abadi"
+                                   class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white placeholder-text-muted focus:border-primary focus:ring-primary">
+                        </div>
+                        <div>
                             <label class="block text-sm font-medium text-text-muted mb-2">Logo Perusahaan</label>
                             <div class="flex items-center gap-4">
                                 <div class="w-20 h-20 rounded-xl bg-background-dark border border-border-dark flex items-center justify-center" id="logoPreview">
@@ -272,6 +277,7 @@
             
             // Save company info
             const companyData = {
+                name: document.getElementById('companyName').value,
                 phone: document.getElementById('phone').value,
                 email: document.getElementById('companyEmail').value,
                 npwp: document.getElementById('npwp').value,

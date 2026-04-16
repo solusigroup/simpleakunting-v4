@@ -3,7 +3,7 @@
         <span class="material-symbols-outlined text-background-dark">account_balance</span>
     </div>
     <div class="sidebar-text flex-1">
-        <h1 class="text-lg font-bold text-white">Simple Akunting</h1>
+        <h1 class="text-lg font-bold text-white">{{ auth()->user()->company->name ?? 'Simple Akunting' }}</h1>
         <p class="text-xs text-text-muted">{{ auth()->user()->company->entity_type ?? 'UMKM' }}</p>
     </div>
     <!-- Close button -->

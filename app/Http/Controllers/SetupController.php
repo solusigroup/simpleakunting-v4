@@ -111,6 +111,7 @@ class SetupController extends Controller
         }
 
         $request->validate([
+            'name' => ['nullable', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
             'npwp' => ['nullable', 'string', 'max:30'],
@@ -121,6 +122,7 @@ class SetupController extends Controller
         ]);
 
         $company->update($request->only([
+            'name',
             'phone', 
             'email', 
             'npwp', 
