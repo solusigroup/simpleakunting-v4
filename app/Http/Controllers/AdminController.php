@@ -18,7 +18,8 @@ class AdminController extends Controller
     public function index()
     {
         $tenants = Tenant::with('domains')->get();
-        $centralDomain = env('CENTRAL_DOMAIN', 'simpleakunting4-0.test');
+        $centralDomains = config('tenancy.central_domains', []);
+        $centralDomain = $centralDomains[0] ?? env('CENTRAL_DOMAIN', 'simpleakunting-v4.test');
 
         return view('admin.index', compact('tenants', 'centralDomain'));
     }
@@ -28,7 +29,10 @@ class AdminController extends Controller
      */
     public function create()
     {
-        return view('admin.create');
+        $centralDomains = config('tenancy.central_domains', []);
+        $centralDomain = $centralDomains[0] ?? env('CENTRAL_DOMAIN', 'simpleakunting-v4.test');
+
+        return view('admin.create', compact('centralDomain'));
     }
 
     /**
