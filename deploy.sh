@@ -66,12 +66,16 @@ else
 fi
 
 # 3. Install/update NPM dependencies and build assets
-step "Installing NPM dependencies..."
-export NODE_OPTIONS="--max-old-space-size=512"
-npm install --legacy-peer-deps --no-audit --no-fund
+if command -v npm >/dev/null 2>&1; then
+    step "Installing NPM dependencies..."
+    export NODE_OPTIONS="--max-old-space-size=512"
+    npm install --legacy-peer-deps --no-audit --no-fund
 
-step "Building assets..."
-npm run build
+    step "Building assets..."
+    npm run build
+else
+    warn "npm command not found. Skipping asset build. Please build assets locally and push to Git."
+fi
 
 # 4. Run database migrations
 step "Running database migrations..."
