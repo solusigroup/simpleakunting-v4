@@ -157,5 +157,4 @@ class SetupController extends Controller
         return $company;
     }
 }
-}
 
