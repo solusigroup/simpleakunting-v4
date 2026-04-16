@@ -36,11 +36,16 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Subdomain</label>
-                    @php $subdomain = $tenant->domains->first()?->domain ?? '-'; @endphp
-                    <input type="text" class="form-control" value="{{ $subdomain }}.{{ $centralDomain }}" disabled
-                           style="opacity:0.6;">
-                    <div class="form-hint">Subdomain tidak bisa diubah setelah dibuat.</div>
+                    <label for="subdomain">Subdomain</label>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        @php $subdomainPrefix = $tenant->domains->first()?->domain ?? ''; @endphp
+                        <input type="text" id="subdomain" name="subdomain" class="form-control" 
+                               value="{{ old('subdomain', $subdomainPrefix) }}" required 
+                               style="flex: 1;">
+                        <span style="font-weight: 600; color: #64748b;">.{{ $centralDomain }}</span>
+                    </div>
+                    @error('subdomain') <div class="form-error">{{ $message }}</div> @enderror
+                    <div class="form-hint">Ubah bagian depan saja. Contoh: <strong>bisnis1</strong></div>
                 </div>
 
                 <div class="form-group">

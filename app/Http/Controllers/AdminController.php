@@ -88,7 +88,8 @@ class AdminController extends Controller
     public function edit(Tenant $tenant)
     {
         $tenant->load('domains');
-        $centralDomain = env('CENTRAL_DOMAIN', 'simpleakunting4-0.test');
+        $centralDomains = config('tenancy.central_domains', []);
+        $centralDomain = $centralDomains[0] ?? env('CENTRAL_DOMAIN', 'simpleakunting-v4.test');
 
         return view('admin.edit', compact('tenant', 'centralDomain'));
     }
@@ -101,6 +102,7 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
+            'subdomain' => 'required|string|max:63|alpha_dash',
             'plan' => 'required|in:free,starter,pro',
             'tenant_user_name' => 'nullable|string|max:255',
             'tenant_user_email' => 'nullable|email|max:255',
@@ -112,6 +114,17 @@ class AdminController extends Controller
             'email' => $request->email,
             'plan' => $request->plan,
         ]);
+
+        // Update subdomain if changed
+        $newSubdomain = strtolower($request->subdomain);
+        $currentDomain = $tenant->domains->first();
+        if ($currentDomain && $currentDomain->domain !== $newSubdomain) {
+            // Check if new domain is already taken
+            if (\Stancl\Tenancy\Database\Models\Domain::where('domain', $newSubdomain)->where('tenant_id', '!=', $tenant->id)->exists()) {
+                return back()->withErrors(['subdomain' => 'Subdomain ini sudah digunakan oleh tenant lain.'])->withInput();
+            }
+            $currentDomain->update(['domain' => $newSubdomain]);
+        }
 
         // Handle tenant user creation/reset if password is provided
         if ($request->filled('tenant_user_password')) {
