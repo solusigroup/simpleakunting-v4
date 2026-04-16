@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tenant;
+use App\Models\User;
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -99,6 +102,9 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'plan' => 'required|in:free,starter,pro',
+            'tenant_user_name' => 'nullable|string|max:255',
+            'tenant_user_email' => 'nullable|email|max:255',
+            'tenant_user_password' => 'nullable|string|min:8',
         ]);
 
         $tenant->update([
@@ -106,6 +112,34 @@ class AdminController extends Controller
             'email' => $request->email,
             'plan' => $request->plan,
         ]);
+
+        // Handle tenant user creation/reset if password is provided
+        if ($request->filled('tenant_user_password')) {
+            $userName = $request->tenant_user_name ?: 'Administrator';
+            $userEmail = $request->tenant_user_email ?: $tenant->email;
+            $password = Hash::make($request->tenant_user_password);
+
+            $tenant->run(function () use ($userName, $userEmail, $password) {
+                $company = Company::first();
+                
+                $user = User::updateOrCreate(
+                    ['email' => $userEmail],
+                    [
+                        'name' => $userName,
+                        'password' => $password,
+                        'role' => 'Administrator',
+                        'company_id' => $company?->id,
+                    ]
+                );
+
+                // If company exists but has no user, or if we want to ensure this admin owns it
+                if ($company && !$company->user_id) {
+                    $company->update(['user_id' => $user->id]);
+                }
+            });
+
+            return redirect()->route('admin.show', $tenant)->with('success', "Tenant updated and user '{$userEmail}' has been set as Administrator.");
+        }
 
         return redirect()->route('admin.show', $tenant)->with('success', "Tenant '{$request->name}' berhasil diperbarui.");
     }

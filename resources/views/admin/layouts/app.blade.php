@@ -343,6 +343,7 @@
                 <span class="user-info">
                     👤 <strong>{{ Auth::guard('admin')->user()->name }}</strong>
                 </span>
+                <a href="{{ route('admin.profile.edit') }}" class="btn btn-secondary btn-sm" title="Pengaturan Profil">⚙️</a>
                 <form action="{{ route('admin.logout') }}" method="POST" style="display:inline;">
                     @csrf
                     <button type="submit" class="btn btn-logout">Logout</button>

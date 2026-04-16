@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AdminProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,10 +43,14 @@ foreach (config('tenancy.central_domains', []) as $domain) {
                 Route::get('/', [AdminController::class, 'index'])->name('admin.index');
                 Route::get('/create', [AdminController::class, 'create'])->name('admin.create');
                 Route::post('/', [AdminController::class, 'store'])->name('admin.store');
-                Route::get('/{tenant}', [AdminController::class, 'show'])->name('admin.show');
-                Route::get('/{tenant}/edit', [AdminController::class, 'edit'])->name('admin.edit');
-                Route::put('/{tenant}', [AdminController::class, 'update'])->name('admin.update');
-                Route::delete('/{tenant}', [AdminController::class, 'destroy'])->name('admin.destroy');
+                // Profile & Settings
+                Route::get('/profile', [AdminProfileController::class, 'edit'])->name('admin.profile.edit');
+                Route::put('/profile', [AdminProfileController::class, 'update'])->name('admin.profile.update');
+
+                Route::get('/{tenant}', [AdminController::class, 'show'])->name('admin.show')->where('tenant', '[a-z0-9-]+');
+                Route::get('/{tenant}/edit', [AdminController::class, 'edit'])->name('admin.edit')->where('tenant', '[a-z0-9-]+');
+                Route::put('/{tenant}', [AdminController::class, 'update'])->name('admin.update')->where('tenant', '[a-z0-9-]+');
+                Route::delete('/{tenant}', [AdminController::class, 'destroy'])->name('admin.destroy')->where('tenant', '[a-z0-9-]+');
             });
 
     }); // end Route::domain($domain)
