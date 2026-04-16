@@ -17,7 +17,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-$centralDomains = config('tenancy.central_domains', []);
+$centralDomains = array_filter(array_unique(array_merge(
+    config('tenancy.central_domains', []),
+    ['v4.simpleakunting.biz.id']
+)));
 
 foreach ($centralDomains as $index => $domain) {
     Route::domain($domain)->group(function () use ($index) {

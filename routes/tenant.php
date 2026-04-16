@@ -47,20 +47,18 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 */
 
+Route::get('/', function () {
+    if (in_array(request()->getHost(), config('tenancy.central_domains', []))) {
+        return redirect('/admin');
+    }
+    return redirect('/login');
+});
+
 Route::middleware([
     'web',
     InitializeTenancyBySubdomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
-
-    // Root route — redirect to login (only for tenants)
-    Route::get('/', function () {
-        if (in_array(request()->getHost(), config('tenancy.central_domains', []))) {
-            return redirect('/admin');
-        }
-        return redirect('/login');
-    });
-
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware(['auth', 'verified'])
         ->name('dashboard');
