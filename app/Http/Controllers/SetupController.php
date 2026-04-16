@@ -22,14 +22,7 @@ class SetupController extends Controller
         ]);
 
         $user = $request->user();
-        $company = $user->company;
-
-        if (!$company) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User tidak memiliki company.',
-            ], 400);
-        }
+        $company = $this->getOrCreateCompany($user);
 
         // Check permission
         if (!$user->isAdmin()) {
@@ -101,14 +94,7 @@ class SetupController extends Controller
     public function updateCompany(Request $request): JsonResponse
     {
         $user = $request->user();
-        $company = $user->company;
-
-        if (!$company) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Company not found',
-            ], 400);
-        }
+        $company = $this->getOrCreateCompany($user);
 
         $request->validate([
             'name' => ['nullable', 'string', 'max:255'],
@@ -138,5 +124,38 @@ class SetupController extends Controller
             'data' => $company->fresh(),
         ]);
     }
+
+    /**
+     * Helper to get current company or create one if missing.
+     */
+    protected function getOrCreateCompany($user)
+    {
+        // 1. Check direct association
+        if ($user->company) {
+            return $user->company;
+        }
+
+        // 2. Try to find any company in this tenant database
+        $company = \App\Models\Company::first();
+
+        if (!$company) {
+            // 3. Create fresh company from tenant data
+            $company = \App\Models\Company::create([
+                'user_id' => $user->id,
+                'name' => tenant('name') ?? 'Nama Perusahaan',
+                'email' => tenant('email') ?? $user->email,
+                'entity_type' => 'UMKM',
+                'fiscal_start' => date('Y-01-01'),
+            ]);
+        }
+
+        // 4. Link user to company if not linked
+        if ($user->company_id !== $company->id) {
+            $user->update(['company_id' => $company->id]);
+        }
+
+        return $company;
+    }
+}
 }
 
