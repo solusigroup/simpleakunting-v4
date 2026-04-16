@@ -15,7 +15,7 @@ class AdminController extends Controller
     /**
      * Display a listing of all tenants.
      */
-    public function index()
+    public function index($centralDomain)
     {
         $tenants = Tenant::with('domains')->get();
         $centralDomain = env('CENTRAL_DOMAIN', 'simpleakunting4-0.test');
@@ -26,7 +26,7 @@ class AdminController extends Controller
     /**
      * Show the form for creating a new tenant.
      */
-    public function create()
+    public function create($centralDomain)
     {
         return view('admin.create');
     }
@@ -34,7 +34,7 @@ class AdminController extends Controller
     /**
      * Store a newly created tenant.
      */
-    public function store(Request $request)
+    public function store(Request $request, $centralDomain)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -71,7 +71,7 @@ class AdminController extends Controller
     /**
      * Display the specified tenant.
      */
-    public function show(Tenant $tenant)
+    public function show($centralDomain, Tenant $tenant)
     {
         $tenant->load('domains');
         $centralDomain = env('CENTRAL_DOMAIN', 'simpleakunting4-0.test');
@@ -85,7 +85,7 @@ class AdminController extends Controller
     /**
      * Show the form for editing the specified tenant.
      */
-    public function edit(Tenant $tenant)
+    public function edit($centralDomain, Tenant $tenant)
     {
         $tenant->load('domains');
         $centralDomain = env('CENTRAL_DOMAIN', 'simpleakunting4-0.test');
@@ -96,7 +96,7 @@ class AdminController extends Controller
     /**
      * Update the specified tenant.
      */
-    public function update(Request $request, Tenant $tenant)
+    public function update(Request $request, $centralDomain, Tenant $tenant)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -147,7 +147,7 @@ class AdminController extends Controller
     /**
      * Remove the specified tenant.
      */
-    public function destroy(Tenant $tenant)
+    public function destroy($centralDomain, Tenant $tenant)
     {
         $tenantName = $tenant->name;
 

@@ -14,7 +14,7 @@ class AdminProfileController extends Controller
     /**
      * Show the form for editing the admin profile.
      */
-    public function edit()
+    public function edit($centralDomain)
     {
         return view('admin.profile', [
             'user' => Auth::guard('admin')->user(),
@@ -24,7 +24,7 @@ class AdminProfileController extends Controller
     /**
      * Update the admin profile.
      */
-    public function update(Request $request)
+    public function update(Request $request, $centralDomain)
     {
         $user = Auth::guard('admin')->user();
 
