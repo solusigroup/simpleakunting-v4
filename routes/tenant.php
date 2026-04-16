@@ -53,7 +53,11 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
 
+    // Root route — redirect to login (only for tenants)
     Route::get('/', function () {
+        if (in_array(request()->getHost(), config('tenancy.central_domains', []))) {
+            return redirect('/admin');
+        }
         return redirect('/login');
     });
 
