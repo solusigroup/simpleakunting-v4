@@ -50,11 +50,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the role.
+     * Get the role record from database.
      */
-    public function role(): BelongsTo
+    public function roleRecord(): BelongsTo
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    /**
+     * Get the company associated with the user.
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
     }
 
     /**
@@ -62,7 +70,7 @@ class User extends Authenticatable
      */
     public function isSuper(): bool
     {
-        return ($this->role()->exists() && $this->role->name === 'Super User') || $this->role === 'Super User';
+        return ($this->roleRecord()->exists() && $this->roleRecord->name === 'Super User') || $this->role === 'Super User';
     }
 
     /**
@@ -71,7 +79,7 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         if ($this->isSuper()) return true;
-        return ($this->role()->exists() && $this->role->name === 'Administrator') || $this->role === 'Administrator';
+        return ($this->roleRecord()->exists() && $this->roleRecord->name === 'Administrator') || $this->role === 'Administrator';
     }
 
     /**
@@ -80,7 +88,7 @@ class User extends Authenticatable
     public function isManajer(): bool
     {
         if ($this->isAdmin()) return true;
-        return ($this->role()->exists() && $this->role->name === 'Manajer') || $this->role === 'Manajer';
+        return ($this->roleRecord()->exists() && $this->roleRecord->name === 'Manajer') || $this->role === 'Manajer';
     }
 
     /**
@@ -89,7 +97,7 @@ class User extends Authenticatable
     public function isOperator(): bool
     {
         if ($this->isManajer()) return true;
-        return ($this->role()->exists() && $this->role->name === 'Operator') || $this->role === 'Operator';
+        return ($this->roleRecord()->exists() && $this->roleRecord->name === 'Operator') || $this->role === 'Operator';
     }
 
     /**
@@ -98,7 +106,7 @@ class User extends Authenticatable
     public function isPeninjau(): bool
     {
         if ($this->isOperator()) return true;
-        return ($this->role()->exists() && $this->role->name === 'Peninjau') || $this->role === 'Peninjau';
+        return ($this->roleRecord()->exists() && $this->roleRecord->name === 'Peninjau') || $this->role === 'Peninjau';
     }
 
     /**
@@ -152,23 +160,23 @@ class User extends Authenticatable
         }
 
         // Check if role is dynamic (database)
-        if ($this->role()->exists()) {
+        if ($this->roleRecord()->exists()) {
             // Priority: direct permission check via relationship
-            $hasPerm = $this->role->permissions()->where('slug', $permission)->exists();
+            $hasPerm = $this->roleRecord->permissions()->where('slug', $permission)->exists();
             if ($hasPerm) return true;
 
             // Handle wildcards like 'sales.*'
             if (str_contains($permission, '.')) {
                 $module = explode('.', $permission)[0];
                 $wildcard = $module . '.*';
-                if ($this->role->permissions()->where('slug', $wildcard)->exists()) {
+                if ($this->roleRecord->permissions()->where('slug', $wildcard)->exists()) {
                     return true;
                 }
             }
         }
 
         // Fallback to hardcoded permissions if role is still a string or relationship doesn't have it
-        $roleName = $this->role()->exists() ? $this->role->name : $this->role;
+        $roleName = $this->roleRecord()->exists() ? $this->roleRecord->name : $this->role;
         return \App\Helpers\PermissionHelper::hasPermission($roleName, $permission);
     }
 

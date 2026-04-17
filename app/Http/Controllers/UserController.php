@@ -13,7 +13,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('role')->where('company_id', auth()->user()->company_id)->get();
+        $users = User::with('roleRecord')->where('company_id', auth()->user()->company_id)->get();
         return view('users.index', compact('users'));
     }
 

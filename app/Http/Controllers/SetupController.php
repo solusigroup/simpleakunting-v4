@@ -33,18 +33,15 @@ class SetupController extends Controller
         }
 
         DB::transaction(function () use ($request, $company) {
-            // Delete existing COA
-            ChartOfAccount::where('company_id', $company->id)->delete();
-
             // Update company entity type based on standard
             $entityType = $request->standard === 'SAK_EP' ? 'UMKM' : 'BUMDesa';
             $company->update(['entity_type' => $entityType]);
 
             // Seed new COA
             if ($request->standard === 'SAK_EP') {
-                (new CoaUmkmSeeder())->run($company);
+                (new CoaUmkmSeeder())->run($company->fresh());
             } else {
-                (new CoaBumdesaSeeder())->run($company);
+                (new CoaBumdesaSeeder())->run($company->fresh());
             }
         });
 
@@ -74,14 +71,25 @@ class SetupController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'role' => $user->role,
+                    'role' => $user->roleRecord?->name ?? $user->role,
                 ],
                 'company' => $company ? [
                     'id' => $company->id,
                     'name' => $company->name,
+                    'email' => $company->email,
+                    'phone' => $company->phone,
+                    'npwp' => $company->npwp,
+                    'address' => $company->address,
                     'entity_type' => $company->entity_type,
                     'accounting_standard' => $company->entity_type === 'UMKM' ? 'SAK_EP' : 'KEPMENDESA',
                     'fiscal_start' => $company->fiscal_start?->format('Y-m-d'),
+                    'business_sector' => $company->business_sector,
+                    'director_name' => $company->director_name,
+                    'director_title' => $company->director_title,
+                    'secretary_name' => $company->secretary_name,
+                    'secretary_title' => $company->secretary_title,
+                    'staff_name' => $company->staff_name,
+                    'staff_title' => $company->staff_title,
                 ] : null,
             ],
         ]);
@@ -97,12 +105,18 @@ class SetupController extends Controller
         $company = $this->getOrCreateCompany($user);
 
         $request->validate([
-            'name' => ['nullable', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
             'npwp' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string'],
-            'fiscal_start' => ['nullable', 'date'],
+            'fiscal_start' => ['required', 'date'],
+            'director_name' => ['nullable', 'string', 'max:255'],
+            'director_title' => ['nullable', 'string', 'max:255'],
+            'secretary_name' => ['nullable', 'string', 'max:255'],
+            'secretary_title' => ['nullable', 'string', 'max:255'],
+            'staff_name' => ['nullable', 'string', 'max:255'],
+            'staff_title' => ['nullable', 'string', 'max:255'],
             'business_sector' => ['nullable', 'in:general,livestock,plantation,aquaculture,forestry,mixed_agriculture'],
             'enable_psak69' => ['nullable', 'boolean'],
         ]);
@@ -114,6 +128,12 @@ class SetupController extends Controller
             'npwp', 
             'address', 
             'fiscal_start',
+            'director_name',
+            'director_title',
+            'secretary_name',
+            'secretary_title',
+            'staff_name',
+            'staff_title',
             'business_sector',
             'enable_psak69',
         ]));

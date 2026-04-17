@@ -242,6 +242,45 @@
     <script>
         let currentStep = 1;
 
+        // Fetch company profile on load
+        async function fetchProfile() {
+            try {
+                const response = await fetch('/user/profile');
+                const result = await response.json();
+                
+                if (result.success && result.data.company) {
+                    const c = result.data.company;
+                    if (c.name) document.getElementById('companyName').value = c.name;
+                    if (c.phone) document.getElementById('phone').value = c.phone;
+                    if (c.email) document.getElementById('companyEmail').value = c.email;
+                    if (c.npwp) document.getElementById('npwp').value = c.npwp;
+                    if (c.address) document.getElementById('address').value = c.address;
+                    if (c.fiscal_start) document.getElementById('fiscalStart').value = c.fiscal_start;
+                    if (c.director_name) document.getElementById('directorName').value = c.director_name;
+                    if (c.director_title) document.getElementById('directorTitle').value = c.director_title;
+                    if (c.secretary_name) document.getElementById('secretaryName').value = c.secretary_name;
+                    if (c.secretary_title) document.getElementById('secretaryTitle').value = c.secretary_title;
+                    if (c.staff_name) document.getElementById('staffName').value = c.staff_name;
+                    if (c.staff_title) document.getElementById('staffTitle').value = c.staff_title;
+                    
+                    if (c.accounting_standard) {
+                        const radio = document.querySelector(`input[name="standard"][value="${c.accounting_standard}"]`);
+                        if (radio) radio.checked = true;
+                    }
+
+                    if (c.business_sector) {
+                        document.getElementById('businessSector').value = c.business_sector;
+                        togglePsak69Info();
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch profile:', error);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', fetchProfile);
+
         function goToStep(step) {
             document.querySelectorAll('[id^="step"]').forEach(el => {
                 if (el.id.match(/^step\d$/)) el.classList.add('hidden');
@@ -293,7 +332,7 @@
 
             try {
                 // Update company
-                await fetch('/api/company/update', {
+                const updateResponse = await fetch('/api/company/update', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -302,6 +341,11 @@
                     },
                     body: JSON.stringify(companyData)
                 });
+
+                if (!updateResponse.ok) {
+                    const updateError = await updateResponse.json();
+                    throw new Error(updateError.message || 'Gagal memperbarui data perusahaan');
+                }
 
                 // Initialize COA
                 const coaResponse = await fetch('/setup/init-coa', {
@@ -315,14 +359,14 @@
                 });
 
                 const result = await coaResponse.json();
-                if (result.success) {
+                if (coaResponse.ok && result.success) {
                     goToStep(3);
                 } else {
-                    alert(result.message || 'Terjadi kesalahan');
+                    throw new Error(result.message || 'Gagal menginisialisasi Chart of Accounts');
                 }
             } catch (error) {
                 console.error(error);
-                alert('Terjadi kesalahan saat menyimpan');
+                alert('Kesalahan: ' + error.message);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = 'Simpan & Lanjutkan <span class="material-symbols-outlined align-middle ml-1">arrow_forward</span>';
@@ -340,8 +384,10 @@
             }
         }
 
-        // Set default fiscal start
-        document.getElementById('fiscalStart').value = new Date().getFullYear() + '-01-01';
+        // Set default fiscal start if empty (handled by fetchProfile if data exists)
+        if (!document.getElementById('fiscalStart').value) {
+            document.getElementById('fiscalStart').value = new Date().getFullYear() + '-01-01';
+        }
 
         // Logo preview
         document.getElementById('logo').addEventListener('change', function(e) {
