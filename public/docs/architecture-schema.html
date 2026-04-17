@@ -101,10 +101,11 @@
         }
 
         .mermaid {
-            background-color: white;
-            padding: 2rem;
+            background-color: transparent;
+            padding: 1rem;
             border-radius: 1rem;
             margin-top: 2rem;
+            color: white;
         }
 
         p {
@@ -235,14 +236,12 @@
     <script>
         mermaid.initialize({ 
             startOnLoad: true,
-            theme: 'base',
+            theme: 'dark',
             themeVariables: {
                 primaryColor: '#10b981',
-                primaryTextColor: '#fff',
-                primaryBorderColor: '#064e3b',
-                lineColor: '#334155',
-                secondaryColor: '#1e293b',
-                tertiaryColor: '#0f172a'
+                edgeLabelBackground: '#1e293b',
+                nodeBorder: '#10b981',
+                mainBkg: '#0f172a'
             }
         });
     </script>
