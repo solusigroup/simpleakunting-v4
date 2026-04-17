@@ -130,4 +130,4 @@ echo "  - Branch: $(git branch --show-current)"
 echo "  - Date: $(date '+%Y-%m-%d %H:%M:%S')"
 echo ""
 
-success "Application is ready!"
+success "Aplikasi sudah siap!!"

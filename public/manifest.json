@@ -1,0 +1,30 @@
+{
+    "name": "Simple Akunting",
+    "short_name": "SimpleAkunting",
+    "description": "Sistem Informasi Akuntansi Simple dan Modern",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a1628",
+    "theme_color": "#e86c25",
+    "icons": [
+        {
+            "src": "/images/pwa-icon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/pwa-icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/pwa-icon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "orientation": "portrait"
+}
