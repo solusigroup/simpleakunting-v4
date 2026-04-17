@@ -94,13 +94,13 @@ Route::middleware([
             return redirect()->route('help');
         })->name('help.deployment');
         
-        // Company Management (Admin & Manager)
-        Route::middleware(['role:Administrator,Manajer'])->group(function () {
+        // Company Management (Super User & Administrator)
+        Route::middleware(['role:Super User,Administrator'])->group(function () {
             // User Management
             Route::resource('users', UserController::class);
 
-            // Role Management Dashboard
-            Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+            // Role Management
+            Route::resource('roles', RoleController::class);
         });
         
         // System Settings (Administrator only)

@@ -87,27 +87,9 @@ class PermissionHelper
     public static function getPermissionMatrix(): array
     {
         $permissions = self::getPermissions();
-        $allPermissions = [];
+        $allPermissions = self::getAllAvailablePermissions();
         
-        foreach ($permissions as $role => $perms) {
-            foreach ($perms as $p) {
-                if ($p !== '*') {
-                    $allPermissions[] = $p;
-                }
-            }
-        }
-        
-        // Add common actions that might be covered by wildcards
-        $modules = ['sales', 'purchase', 'cash', 'journal', 'inventory', 'assets', 'internet', 'biological', 'manufacturing', 'budget', 'investor', 'reports'];
-        $actions = ['view', 'create', 'edit', 'delete', 'post'];
-        
-        foreach ($modules as $m) {
-            foreach ($actions as $a) {
-                $allPermissions[] = "$m.$a";
-            }
-        }
-
-        $uniquePermissions = array_unique($allPermissions);
+        $uniquePermissions = array_column($allPermissions, 'slug');
         sort($uniquePermissions);
 
         $matrix = [];
@@ -120,5 +102,53 @@ class PermissionHelper
         }
 
         return $matrix;
+    }
+
+    /**
+     * Get all available permissions grouped by module.
+     */
+    public static function getAllAvailablePermissions(): array
+    {
+        $modules = [
+            'sales' => 'Penjualan',
+            'purchase' => 'Pembelian',
+            'cash' => 'Kas & Bank',
+            'journal' => 'Jurnal & Penutupan',
+            'inventory' => 'Persediaan',
+            'assets' => 'Aset Tetap',
+            'internet' => 'Internet & Billing',
+            'biological' => 'Aset Biologis',
+            'manufacturing' => 'Manufaktur',
+            'budget' => 'Anggaran',
+            'investor' => 'Investor',
+            'reports' => 'Laporan',
+        ];
+
+        $actions = [
+            'view' => 'Lihat',
+            'create' => 'Tambah',
+            'edit' => 'Ubah',
+            'delete' => 'Hapus',
+            'post' => 'Posting/Approve',
+        ];
+
+        $all = [];
+        foreach ($modules as $mSlug => $mName) {
+            foreach ($actions as $aSlug => $aName) {
+                $all[] = [
+                    'slug' => "$mSlug.$aSlug",
+                    'name' => "$aName $mName",
+                    'module' => $mName,
+                ];
+            }
+            // Add wildcard
+            $all[] = [
+                'slug' => "$mSlug.*",
+                'name' => "Semua Akses $mName",
+                'module' => $mName,
+            ];
+        }
+
+        return $all;
     }
 }

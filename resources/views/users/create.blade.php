@@ -30,16 +30,20 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-text-muted mb-2">Role</label>
-                <select name="role" class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
-                    <option value="Administrator">Administrator - Akses penuh sistem</option>
-                    <option value="Manajer">Manajer - Approve & supervisi</option>
-                    <option value="Operator" selected>Operator - Input data</option>
-                    <option value="Peninjau">Peninjau - Hanya lihat laporan</option>
+                <label class="block text-sm font-medium text-text-muted mb-2">Role / Hak Akses</label>
+                <select name="role_id" class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary appearance-none cursor-pointer">
+                    @foreach($roles as $role)
+                        <option value="{{ $role->id }}" @selected(old('role_id') == $role->id || ($role->name == 'Operator' && !old('role_id')))>
+                            {{ $role->name }} - {{ $role->description ?: 'Tingkat akses kustom' }}
+                        </option>
+                    @endforeach
                 </select>
                 <p class="mt-2 text-xs text-text-muted">
-                    Operator dapat input data, Manajer dapat approve, Administrator full access, Peninjau hanya bisa lihat
+                    Setiap role memiliki hak akses berbeda yang dapat diatur di menu <a href="{{ route('roles.index') }}" class="text-primary hover:underline">Manajemen Role</a>
                 </p>
+                @error('role_id')
+                <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                @enderror
             </div>
 
             <div>

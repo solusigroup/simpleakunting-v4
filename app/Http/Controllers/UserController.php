@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -13,7 +13,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::where('company_id', auth()->user()->company_id)->get();
+        $users = User::with('role')->where('company_id', auth()->user()->company_id)->get();
         return view('users.index', compact('users'));
     }
 
@@ -22,7 +22,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('users.create');
+        $roles = Role::all();
+        return view('users.create', compact('roles'));
     }
 
     /**
@@ -34,14 +35,17 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8|confirmed',
-            'role' => 'nullable|string|in:Administrator,Manajer,Operator,Peninjau',
+            'role_id' => 'required|exists:roles,id',
         ]);
+
+        $role = Role::findOrFail($validated['role_id']);
 
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role' => $validated['role'] ?? 'User',
+            'role_id' => $role->id,
+            'role' => $role->name, // Keep for backward compatibility
             'company_id' => auth()->user()->company_id,
         ]);
 
@@ -62,7 +66,8 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::where('company_id', auth()->user()->company_id)->findOrFail($id);
-        return view('users.edit', compact('user'));
+        $roles = Role::all();
+        return view('users.edit', compact('user', 'roles'));
     }
 
     /**
@@ -76,13 +81,16 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$id,
             'password' => 'nullable|min:8|confirmed',
-            'role' => 'nullable|string|max:50',
+            'role_id' => 'required|exists:roles,id',
         ]);
+
+        $role = Role::findOrFail($validated['role_id']);
 
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'role' => $validated['role'] ?? $user->role,
+            'role_id' => $role->id,
+            'role' => $role->name, // Keep for backward compatibility
         ]);
 
         if (!empty($validated['password'])) {
