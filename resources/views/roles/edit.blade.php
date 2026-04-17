@@ -27,12 +27,12 @@
                         </h3>
                         <div class="space-y-4">
                             <div>
-                                <x-label for="name" value="Nama Role" />
+                                <x-input-label for="name" value="Nama Role" />
                                 <x-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $role->name)" required :disabled="$role->is_system" />
                                 <x-input-error for="name" class="mt-2" />
                             </div>
                             <div>
-                                <x-label for="description" value="Deskripsi" />
+                                <x-input-label for="description" value="Deskripsi" />
                                 <textarea id="description" name="description" class="mt-1 block w-full rounded-xl bg-surface-highlight border-white/5 border text-white focus:border-primary focus:ring-primary transition-all text-sm" rows="4">{{ old('description', $role->description) }}</textarea>
                                 <x-input-error for="description" class="mt-2" />
                             </div>
