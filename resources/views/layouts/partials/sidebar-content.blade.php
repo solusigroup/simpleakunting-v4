@@ -230,11 +230,25 @@
     @endif
 </nav>
 
-<!-- Help - Pinned at bottom -->
-<div class="px-4 pb-2">
-    <x-sidebar-item href="{{ route('help') }}" icon="menu_book" :active="request()->routeIs('help')">
-        Panduan Aplikasi
-    </x-sidebar-item>
+<!-- Help & Documentation -->
+<div class="px-4 pb-2" x-data="{ help: false }">
+    <button @click="help = !help" 
+            class="w-full px-4 py-3 flex items-center justify-between rounded-xl hover:bg-surface-highlight text-text-muted hover:text-white transition">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined">menu_book</span>
+            <span class="text-sm font-medium sidebar-text">Panduan Aplikasi</span>
+        </div>
+        <span class="material-symbols-outlined text-sm transition-transform sidebar-text" 
+              :class="help ? 'rotate-0' : '-rotate-90'">expand_more</span>
+    </button>
+    <div x-show="help" x-collapse class="mt-1 space-y-1">
+        <x-sidebar-item href="{{ route('help') }}" icon="auto_stories" :active="request()->routeIs('help')">
+            Cara Penggunaan
+        </x-sidebar-item>
+        <x-sidebar-item href="/docs/architecture-schema.html" target="_blank" icon="account_tree" :active="false">
+            Skema Arsitektur
+        </x-sidebar-item>
+    </div>
 </div>
 
 <!-- Theme Toggle & User Menu -->
