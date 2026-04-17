@@ -61,7 +61,7 @@ php artisan tenant:register bisnis1 bisnis1.v4.simpleakunting.biz.id
 
 ### Step C: Run Tenant Migrations
 ```bash
-php artisan tenants:migrate --tenant=bisnis1
+php artisan tenants:migrate --tenants=bisnis1
 ```
 
 ## 5. Maintenance & Updates
