@@ -16,7 +16,7 @@ class CreateTenant extends Command
         $name = $this->argument('name');
         $subdomain = $this->option('domain') ?: strtolower(str_replace(' ', '-', $name));
         $email = $this->option('email') ?: '';
-        $centralDomain = env('CENTRAL_DOMAIN', 'simpleakunting4-0.test');
+        $centralDomain = env('CENTRAL_DOMAIN', config('tenancy.central_domains')[0] ?? 'localhost');
 
         $this->info("Creating tenant: {$name}");
         $this->info("Subdomain: {$subdomain}.{$centralDomain}");

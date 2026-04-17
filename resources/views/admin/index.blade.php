@@ -50,7 +50,8 @@
                     @foreach($tenants as $tenant)
                         @php
                             $subdomain = $tenant->domains->first()?->domain ?? '-';
-                            $fullUrl = "http://{$subdomain}.{$centralDomain}";
+                            $protocol = request()->getScheme();
+                            $fullUrl = "{$protocol}://{$subdomain}.{$centralDomain}";
                         @endphp
                         <tr>
                             <td>

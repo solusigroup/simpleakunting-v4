@@ -19,7 +19,7 @@ class AdminController extends Controller
     {
         $tenants = Tenant::with('domains')->get();
         $centralDomains = config('tenancy.central_domains', []);
-        $centralDomain = $centralDomains[0] ?? env('CENTRAL_DOMAIN', 'simpleakunting-v4.test');
+        $centralDomain = $centralDomains[0] ?? (env('CENTRAL_DOMAIN') ?: request()->getHost());
 
         return view('admin.index', compact('tenants', 'centralDomain'));
     }
@@ -30,7 +30,7 @@ class AdminController extends Controller
     public function create()
     {
         $centralDomains = config('tenancy.central_domains', []);
-        $centralDomain = $centralDomains[0] ?? env('CENTRAL_DOMAIN', 'simpleakunting-v4.test');
+        $centralDomain = $centralDomains[0] ?? (env('CENTRAL_DOMAIN') ?: request()->getHost());
 
         return view('admin.create', compact('centralDomain'));
     }
@@ -78,7 +78,7 @@ class AdminController extends Controller
     public function show(Tenant $tenant)
     {
         $tenant->load('domains');
-        $centralDomain = env('CENTRAL_DOMAIN', 'simpleakunting4-0.test');
+        $centralDomain = env('CENTRAL_DOMAIN') ?: request()->getHost();
 
         // Get database info
         $dbName = config('tenancy.database.prefix') . $tenant->id . config('tenancy.database.suffix');
@@ -93,7 +93,7 @@ class AdminController extends Controller
     {
         $tenant->load('domains');
         $centralDomains = config('tenancy.central_domains', []);
-        $centralDomain = $centralDomains[0] ?? env('CENTRAL_DOMAIN', 'simpleakunting-v4.test');
+        $centralDomain = $centralDomains[0] ?? (env('CENTRAL_DOMAIN') ?: request()->getHost());
 
         return view('admin.edit', compact('tenant', 'centralDomain'));
     }

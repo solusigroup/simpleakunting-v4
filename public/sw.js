@@ -1,4 +1,4 @@
-const CACHE_NAME = 'simple-akunting-v1';
+const CACHE_NAME = 'simple-akunting';
 const ASSETS_TO_CACHE = [
     '/',
     '/images/pwa-icon.png',

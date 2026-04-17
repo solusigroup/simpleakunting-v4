@@ -40,7 +40,7 @@
                            value="{{ old('subdomain') }}" required
                            placeholder="contoh-sukses" oninput="updatePreview()">
                     <div class="form-hint">
-                        URL: <span id="preview" style="color:#60a5fa;">___</span>.{{ $centralDomain }}
+                        URL: <span style="color:#60a5fa;">{{ request()->getScheme() }}://</span><span id="preview" style="color:#60a5fa;">___</span>.{{ $centralDomain }}
                     </div>
                     @error('subdomain') <div class="form-error">{{ $message }}</div> @enderror
                 </div>

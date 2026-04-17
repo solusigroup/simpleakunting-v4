@@ -1,7 +1,7 @@
 {
     "name": "Simple Akunting",
     "short_name": "SimpleAkunting",
-    "description": "Sistem Informasi Akuntansi Simple dan Modern",
+    "description": "Sistem Informasi Akuntansi Simple dan Modern developed by Kurniawan",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#0a1628",

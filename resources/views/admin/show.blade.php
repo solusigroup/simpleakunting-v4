@@ -14,7 +14,8 @@
         <div class="action-bar">
             @php
                 $subdomain = $tenant->domains->first()?->domain ?? null;
-                $fullUrl = $subdomain ? "http://{$subdomain}.{$centralDomain}" : '#';
+                $protocol = request()->getScheme();
+                $fullUrl = $subdomain ? "{$protocol}://{$subdomain}.{$centralDomain}" : '#';
             @endphp
             @if($subdomain)
                 <a href="{{ $fullUrl }}" target="_blank" class="btn btn-secondary btn-sm">🌐 Buka Subdomain</a>
@@ -83,7 +84,10 @@
                     </thead>
                     <tbody>
                         @foreach($tenant->domains as $domain)
-                            @php $domainUrl = "http://{$domain->domain}.{$centralDomain}"; @endphp
+                            @php 
+                                $protocol = request()->getScheme();
+                                $domainUrl = "{$protocol}://{$domain->domain}.{$centralDomain}"; 
+                            @endphp
                             <tr>
                                 <td style="font-family:monospace; color:#60a5fa;">{{ $domain->domain }}</td>
                                 <td>
