@@ -27,7 +27,7 @@
                         <div class="space-y-4">
                             <div>
                                 <x-input-label for="name" value="Nama Role" />
-                                <x-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required placeholder="Contoh: Staff Gudang" />
+                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required placeholder="Contoh: Staff Gudang" />
                                 <x-input-error for="name" class="mt-2" />
                             </div>
                             <div>

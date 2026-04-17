@@ -28,7 +28,7 @@
                         <div class="space-y-4">
                             <div>
                                 <x-input-label for="name" value="Nama Role" />
-                                <x-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $role->name)" required :disabled="$role->is_system" />
+                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $role->name)" required :disabled="$role->is_system" />
                                 <x-input-error for="name" class="mt-2" />
                             </div>
                             <div>
