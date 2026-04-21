@@ -9,8 +9,9 @@
 
     <!-- PWA -->
     <meta name="theme-color" content="#e86c25">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/images/pwa-icon.png">
+    <link rel="manifest" href="{{ global_asset('manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ global_asset('images/logo_sa.png') }}">
+    <link rel="icon" type="image/png" href="{{ global_asset('images/logo_sa.png') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Simple Akunting">
@@ -489,7 +490,7 @@
     <!-- Navigation -->
     <nav class="nav-bar">
         <a href="/" class="nav-logo">
-            <img src="{{ asset('images/logo_baru.jpg') }}" alt="Logo">
+            <img src="{{ global_asset('images/logo_sa.png') }}" alt="Logo">
             <span class="nav-logo-text">Simple<span>Akunting</span></span>
         </a>
         <div class="nav-links">

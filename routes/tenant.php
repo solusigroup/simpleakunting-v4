@@ -63,6 +63,11 @@ Route::middleware([
         ->middleware(['auth', 'verified'])
         ->name('dashboard');
 
+    // Override internal asset route to use Subdomain identification
+    Route::get('/tenancy/assets/{path?}', [\Stancl\Tenancy\Controllers\TenantAssetsController::class, 'asset'])
+        ->where('path', '(.*)')
+        ->name('stancl.tenancy.asset');
+
     Route::middleware('auth')->group(function () {
         // Profile
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

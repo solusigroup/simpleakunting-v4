@@ -33,7 +33,7 @@
                         <div class="flex items-center gap-6">
                             <div class="w-24 h-24 bg-surface-highlight rounded-xl flex items-center justify-center overflow-hidden border border-border-dark">
                                 @if($company->logo)
-                                    <img src="{{ asset('storage/' . $company->logo) }}" alt="Logo" class="w-full h-full object-contain">
+                                    <img src="{{ tenant_asset($company->logo) }}" alt="Logo" class="w-full h-full object-contain">
                                 @else
                                     <span class="material-symbols-outlined text-4xl text-text-muted">business</span>
                                 @endif

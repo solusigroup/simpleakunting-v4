@@ -1,6 +1,6 @@
 <div class="p-6 border-b border-border-dark flex items-center gap-3">
-    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
-        <span class="material-symbols-outlined text-background-dark">account_balance</span>
+    <div class="w-11 h-11 flex items-center justify-center flex-shrink-0 bg-surface-dark rounded-xl overflow-hidden border border-border-dark/50">
+        <img src="{{ global_asset('images/logo_sa.png') }}" alt="Logo" class="w-full h-full object-contain">
     </div>
     <div class="sidebar-text flex-1">
         <h1 class="text-lg font-bold text-white">{{ auth()->user()->company->name ?? 'Simple Akunting' }}</h1>
