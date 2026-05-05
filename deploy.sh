@@ -77,16 +77,16 @@ else
     warn "npm command not found. Skipping asset build. Please build assets locally and push to Git."
 fi
 
-# 4. Run database migrations
-step "Running database migrations..."
-php artisan migrate --force
-
-# 5. Clear and optimize cache
+# 4. Clear and optimize cache before migrations
 step "Clearing old cache..."
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
 php artisan view:clear
+
+# 5. Run database migrations
+step "Running database migrations..."
+php artisan migrate --force
 
 # 6. Optimize for production
 if [ "$ENVIRONMENT" == "production" ]; then

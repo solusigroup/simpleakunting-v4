@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
             background: #0a0f1e;
@@ -29,13 +37,21 @@
             width: 200%;
             height: 200%;
             background: radial-gradient(ellipse at 30% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
-                        radial-gradient(ellipse at 70% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 60%);
+                radial-gradient(ellipse at 70% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 60%);
             animation: drift 20s ease-in-out infinite;
             z-index: 0;
         }
+
         @keyframes drift {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(20px, -20px); }
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(20px, -20px);
+            }
         }
 
         .login-container {
@@ -50,6 +66,7 @@
             text-align: center;
             margin-bottom: 2rem;
         }
+
         .login-header .logo {
             font-size: 2rem;
             font-weight: 800;
@@ -59,6 +76,7 @@
             background-clip: text;
             margin-bottom: 0.5rem;
         }
+
         .login-header .badge {
             display: inline-block;
             padding: 0.3rem 0.85rem;
@@ -70,6 +88,7 @@
             font-weight: 600;
             margin-bottom: 0.75rem;
         }
+
         .login-header p {
             color: #64748b;
             font-size: 0.9rem;
@@ -83,7 +102,10 @@
             backdrop-filter: blur(12px);
         }
 
-        .form-group { margin-bottom: 1.25rem; }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
         .form-group label {
             display: block;
             font-size: 0.8rem;
@@ -93,6 +115,7 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+
         .form-group input {
             width: 100%;
             padding: 0.75rem 1rem;
@@ -105,16 +128,21 @@
             outline: none;
             transition: all 0.2s;
         }
+
         .form-group input:focus {
             border-color: #6366f1;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
-        .form-group input::placeholder { color: #475569; }
+
+        .form-group input::placeholder {
+            color: #475569;
+        }
 
         /* Password toggle */
         .password-wrapper {
             position: relative;
         }
+
         .password-toggle {
             position: absolute;
             right: 0.75rem;
@@ -131,9 +159,11 @@
             transition: color 0.2s;
             z-index: 10;
         }
+
         .password-toggle:hover {
             color: #818cf8;
         }
+
         .form-group input#password {
             padding-right: 2.75rem;
         }
@@ -144,11 +174,13 @@
             gap: 0.5rem;
             margin-bottom: 1.5rem;
         }
+
         .remember-row input[type="checkbox"] {
             accent-color: #6366f1;
             width: 16px;
             height: 16px;
         }
+
         .remember-row label {
             font-size: 0.85rem;
             color: #94a3b8;
@@ -189,13 +221,18 @@
             font-family: inherit;
             box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
         }
+
         .btn-login:hover {
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
         }
-        .btn-login:active { transform: translateY(0); }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-header">
@@ -217,17 +254,19 @@
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus
-                           placeholder="admin@simpleakunting.com">
+                        placeholder="kurniawan@petalmail.com">
                     @error('email') <div class="error-text">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="password-wrapper">
-                        <input type="password" id="password" name="password" required
-                               placeholder="••••••••">
-                        <button type="button" id="togglePassword" class="password-toggle" title="Tampilkan/Sembunyikan Kata Sandi">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+                        <input type="password" id="password" name="password" required placeholder="••••••••">
+                        <button type="button" id="togglePassword" class="password-toggle"
+                            title="Tampilkan/Sembunyikan Kata Sandi">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="eye-icon">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
                             </svg>
@@ -254,7 +293,7 @@
             // toggle the type attribute
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-            
+
             // toggle the eye icon (optional: switch to eye-off icon)
             if (type === 'text') {
                 eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
@@ -264,4 +303,5 @@
         });
     </script>
 </body>
+
 </html>
