@@ -24,12 +24,23 @@
     waste: false,
     pengaturan: false 
 }">
+    @php
+        $sidebarSettings = auth()->user()->company->sidebar_settings ?? [
+            'accounting', 'cash_bank', 'sales', 'purchase', 'inventory', 
+            'fixed_assets', 'manufacturing', 'internet', 'waste', 'investor'
+        ];
+        $isModuleEnabled = function($module) use ($sidebarSettings) {
+            return in_array($module, $sidebarSettings);
+        };
+    @endphp
+
     <!-- Dashboard -->
     <x-sidebar-item href="{{ route('dashboard') }}" icon="dashboard" :active="request()->routeIs('dashboard')">
         Dashboard
     </x-sidebar-item>
 
     <!-- Waste Bank Group -->
+    @if($isModuleEnabled('waste'))
     <div class="pt-4">
         <button @click="waste = !waste" 
                 class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
@@ -64,8 +75,10 @@
             Pengaturan Akun
         </x-sidebar-item>
     </div>
+    @endif
 
     <!-- Transaksi Group -->
+    @if($isModuleEnabled('sales') || $isModuleEnabled('purchase') || $isModuleEnabled('accounting') || $isModuleEnabled('cash_bank'))
     <div class="pt-4">
         <button @click="transaksi = !transaksi" 
                 class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
@@ -75,30 +88,46 @@
         </button>
     </div>
     <div x-show="transaksi" x-collapse>
+        @if($isModuleEnabled('sales'))
         <x-sidebar-item href="{{ route('sales.index') }}" icon="point_of_sale" :active="request()->routeIs('sales.*')">
             Penjualan
         </x-sidebar-item>
+        @endif
+
+        @if($isModuleEnabled('purchase'))
         <x-sidebar-item href="{{ route('purchases.index') }}" icon="shopping_cart" :active="request()->routeIs('purchases.*')">
             Pembelian
         </x-sidebar-item>
+        @endif
+
+        @if($isModuleEnabled('accounting'))
         <x-sidebar-item href="{{ route('journals.index') }}" icon="receipt_long" :active="request()->routeIs('journals.index')">
             Jurnal Umum
         </x-sidebar-item>
         <x-sidebar-item href="{{ route('journals.closing') }}" icon="lock" :active="request()->routeIs('journals.closing')">
             Tutup Buku
         </x-sidebar-item>
+        @endif
+
+        @if($isModuleEnabled('cash_bank'))
         <x-sidebar-item href="{{ route('cash.receive') }}" icon="payments" :active="request()->routeIs('cash.receive')">
             Penerimaan Kas
         </x-sidebar-item>
         <x-sidebar-item href="{{ route('cash.spend') }}" icon="wallet" :active="request()->routeIs('cash.spend')">
             Pengeluaran Kas
         </x-sidebar-item>
+        @endif
+
+        @if($isModuleEnabled('accounting'))
         <x-sidebar-item href="{{ route('budgets.index') }}" icon="account_balance_wallet" :active="request()->routeIs('budgets.*')">
             Anggaran
         </x-sidebar-item>
+        @endif
     </div>
+    @endif
 
     <!-- Internet Group -->
+    @if($isModuleEnabled('internet'))
     <div class="pt-4">
         <button @click="internet = !internet" 
                 class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
@@ -118,6 +147,7 @@
             Buku Bantu Piutang
         </x-sidebar-item>
     </div>
+    @endif
 
     <!-- Master Data Group -->
     <div class="pt-4">
@@ -129,9 +159,11 @@
         </button>
     </div>
     <div x-show="masterData" x-collapse>
+        @if($isModuleEnabled('accounting'))
         <x-sidebar-item href="{{ route('accounts.index') }}" icon="account_tree" :active="request()->routeIs('accounts.*')">
             Chart of Accounts
         </x-sidebar-item>
+        @endif
         <x-sidebar-item href="{{ route('contacts.index') }}" icon="contacts" :active="request()->routeIs('contacts.*')">
             Pelanggan & Supplier
         </x-sidebar-item>
@@ -140,15 +172,21 @@
             Unit Usaha
         </x-sidebar-item>
         @endif
+        @if($isModuleEnabled('inventory'))
         <x-sidebar-item href="{{ route('inventory.index') }}" icon="inventory_2" :active="request()->routeIs('inventory.*')">
             Persediaan
         </x-sidebar-item>
+        @endif
+        @if($isModuleEnabled('fixed_assets'))
         <x-sidebar-item href="{{ route('assets.index') }}" icon="precision_manufacturing" :active="request()->routeIs('assets.*')">
             Aset Tetap
         </x-sidebar-item>
+        @endif
+        @if($isModuleEnabled('investor'))
         <x-sidebar-item href="{{ route('investors.index') }}" icon="group" :active="request()->routeIs('investors.*')">
             Investor
         </x-sidebar-item>
+        @endif
         @if(auth()->user()->company?->usesPsak69())
         <x-sidebar-item href="{{ route('biological-assets.index') }}" icon="eco" :active="request()->routeIs('biological-assets.*')">
             Aset Biologis (PSAK 69)
@@ -157,6 +195,7 @@
     </div>
 
     <!-- Manufacturing Group -->
+    @if($isModuleEnabled('manufacturing'))
     <div class="pt-4">
         <button @click="manufaktur = !manufaktur" 
                 class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
@@ -176,6 +215,7 @@
             Laporan Manufaktur
         </x-sidebar-item>
     </div>
+    @endif
 
     <!-- Laporan Group -->
     <div class="pt-4">
@@ -208,18 +248,24 @@
         <x-sidebar-item href="{{ route('reports.journal-list') }}" icon="receipt_long" :active="request()->routeIs('reports.journal-list')">
             Daftar Jurnal
         </x-sidebar-item>
+        @if($isModuleEnabled('sales'))
         <x-sidebar-item href="{{ route('reports.sales') }}" icon="point_of_sale" :active="request()->routeIs('reports.sales')">
             Lap. Penjualan
         </x-sidebar-item>
+        @endif
+        @if($isModuleEnabled('purchase'))
         <x-sidebar-item href="{{ route('reports.purchases') }}" icon="local_shipping" :active="request()->routeIs('reports.purchases')">
             Lap. Pembelian
         </x-sidebar-item>
+        @endif
         <x-sidebar-item href="{{ route('reports.financial-analysis') }}" icon="analytics" :active="request()->routeIs('reports.financial-analysis')">
             Analisa Keuangan
         </x-sidebar-item>
+        @if($isModuleEnabled('investor'))
         <x-sidebar-item href="{{ route('reports.investor-sharing') }}" icon="groups" :active="request()->routeIs('reports.investor-sharing')">
             Bagi Hasil Investor
         </x-sidebar-item>
+        @endif
         
         @if(auth()->user()->company?->usesPsak69())
         <div class="pt-2 pb-1 px-4">

@@ -32,6 +32,7 @@ class CompanySettingsController extends Controller
             'business_sector' => 'nullable|in:general,livestock,plantation,aquaculture,forestry,mixed_agriculture',
             'investor_sharing_debit_coa_id' => 'nullable|exists:chart_of_accounts,id',
             'investor_sharing_credit_coa_id' => 'nullable|exists:chart_of_accounts,id',
+            'sidebar_settings' => 'nullable|array',
         ]);
 
         if ($request->hasFile('logo')) {
@@ -40,6 +41,9 @@ class CompanySettingsController extends Controller
 
         // Convert checkbox value
         $validated['enable_psak69'] = $request->boolean('enable_psak69');
+        
+        // Ensure sidebar_settings is at least an empty array if not provided
+        $validated['sidebar_settings'] = $request->input('sidebar_settings', []);
 
         auth()->user()->company->update($validated);
 

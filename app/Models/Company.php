@@ -38,11 +38,13 @@ class Company extends Model
         'waste_revenue_account_id',
         'waste_cash_account_id',
         'waste_cogs_account_id',
+        'sidebar_settings',
     ];
 
     protected $casts = [
         'fiscal_start' => 'date',
         'enable_psak69' => 'boolean',
+        'sidebar_settings' => 'array',
     ];
 
     /**

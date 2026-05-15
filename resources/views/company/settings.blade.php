@@ -203,47 +203,52 @@
                 </div>
             </div>
 
-            <!-- Investor Sharing Section -->
+            <!-- Sidebar Menu Visibility Section -->
             <div class="pt-6 border-t border-border-dark">
                 <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-purple-400">group</span>
-                    Konfigurasi Bagi Hasil Investor
+                    <span class="material-symbols-outlined text-orange-400">side_navigation</span>
+                    Visibilitas Menu Sidebar
                 </h3>
                 
-                <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/30 mb-4">
+                <div class="p-4 rounded-xl bg-orange-500/10 border border-orange-500/30 mb-6">
                     <p class="text-sm text-text-muted">
-                        Pilih akun yang akan digunakan saat memposting jurnal bagi hasil otomatis.
+                        Pilih menu yang ingin Anda tampilkan di sidebar. Menu yang tidak dicentang akan disembunyikan dari seluruh pengguna.
                     </p>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-text-muted mb-2">Akun Debet (Beban/Ekuitas)</label>
-                        <select name="investor_sharing_debit_coa_id"
-                                class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
-                            <option value="">-- Pilih Akun --</option>
-                            @foreach($company->chartOfAccounts()->where('is_parent', false)->orderBy('code')->get() as $coa)
-                                <option value="{{ $coa->id }}" {{ old('investor_sharing_debit_coa_id', $company->investor_sharing_debit_coa_id) == $coa->id ? 'selected' : '' }}>
-                                    {{ $coa->code }} - {{ $coa->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <p class="mt-1 text-xs text-text-muted">Biasanya akun Penarikkan Modal atau Beban Kerjasama.</p>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-text-muted mb-2">Akun Kredit (Hutang)</label>
-                        <select name="investor_sharing_credit_coa_id"
-                                class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
-                            <option value="">-- Pilih Akun --</option>
-                            @foreach($company->chartOfAccounts()->where('is_parent', false)->orderBy('code')->get() as $coa)
-                                <option value="{{ $coa->id }}" {{ old('investor_sharing_credit_coa_id', $company->investor_sharing_credit_coa_id) == $coa->id ? 'selected' : '' }}>
-                                    {{ $coa->code }} - {{ $coa->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <p class="mt-1 text-xs text-text-muted">Biasanya akun Hutang Bagi Hasil Investor.</p>
-                    </div>
+                @php
+                    $modules = [
+                        'accounting' => ['label' => 'Akuntansi', 'icon' => 'account_balance', 'desc' => 'Jurnal Umum, Buku Besar, Neraca Saldo'],
+                        'cash_bank' => ['label' => 'Kas & Bank', 'icon' => 'payments', 'desc' => 'Buku Kas, Buku Bank, Rekonsiliasi'],
+                        'sales' => ['label' => 'Penjualan', 'icon' => 'sell', 'desc' => 'Invoice, Piutang, Laporan Penjualan'],
+                        'purchase' => ['label' => 'Pembelian', 'icon' => 'shopping_cart', 'desc' => 'Faktur Pembelian, Utang, Stok Masuk'],
+                        'inventory' => ['label' => 'Persediaan', 'icon' => 'inventory_2', 'desc' => 'Stok Barang, Opname, Kartu Stok'],
+                        'fixed_assets' => ['label' => 'Aset Tetap', 'icon' => 'account_tree', 'desc' => 'Daftar Aset, Penyusutan Otomatis'],
+                        'manufacturing' => ['label' => 'Produksi & Perakitan', 'icon' => 'factory', 'desc' => 'BOM, Produksi, Biaya Manufaktur'],
+                        'internet' => ['label' => 'Internet & Tagihan', 'icon' => 'router', 'desc' => 'Pelanggan Internet, Tagihan Bulanan'],
+                        'waste' => ['label' => 'Bank Sampah', 'icon' => 'recycling', 'desc' => 'Setoran Sampah, Tabungan Nasabah'],
+                        'investor' => ['label' => 'Investor & Bagi Hasil', 'icon' => 'group', 'desc' => 'Modal Investor, Dividen, Bagi Hasil'],
+                    ];
+                    $currentSettings = $company->sidebar_settings ?? array_keys($modules);
+                @endphp
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach($modules as $key => $mod)
+                    <label class="flex items-start gap-3 p-4 rounded-xl bg-background-dark border border-border-dark hover:border-orange-500/50 transition cursor-pointer group">
+                        <div class="mt-1">
+                            <input type="checkbox" name="sidebar_settings[]" value="{{ $key }}" 
+                                   {{ in_array($key, $currentSettings) ? 'checked' : '' }}
+                                   class="form-checkbox rounded bg-surface-dark border-border-dark text-orange-500 focus:ring-orange-500 w-5 h-5">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="material-symbols-outlined text-sm text-orange-400">{{ $mod['icon'] }}</span>
+                                <span class="text-white font-bold text-sm group-hover:text-orange-400 transition">{{ $mod['label'] }}</span>
+                            </div>
+                            <p class="text-[10px] text-text-muted leading-relaxed">{{ $mod['desc'] }}</p>
+                        </div>
+                    </label>
+                    @endforeach
                 </div>
             </div>
             
