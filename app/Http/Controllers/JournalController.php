@@ -186,7 +186,7 @@ class JournalController extends Controller
      * GET /journals/{id}
      * Detail Jurnal.
      */
-    public function show(Request $request, int $id): JsonResponse
+    public function show(Request $request, int $id)
     {
         $user = $request->user();
         
@@ -194,10 +194,14 @@ class JournalController extends Controller
             ->with(['items.account', 'businessUnit', 'contact'])
             ->findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => $journal,
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $journal,
+            ]);
+        }
+
+        return view('journals.show', compact('journal'));
     }
 
     /**

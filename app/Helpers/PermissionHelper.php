@@ -18,7 +18,7 @@ class PermissionHelper
                 'sales.*', 'purchase.*', 'cash.*', 'journal.*', 
                 'inventory.*', 'assets.*', 'internet.*', 
                 'biological.*', 'manufacturing.*', 'budget.*', 
-                'investor.*', 'reports.*'
+                'investor.*', 'reports.*', 'waste.*'
             ],
             
             'Operator' => [
@@ -33,6 +33,7 @@ class PermissionHelper
                 'manufacturing.view', 'manufacturing.create',
                 'budget.view', 'budget.create',
                 'investor.view', 'investor.create',
+                'waste.view', 'waste.create',
                 'reports.view',
             ],
             
@@ -48,6 +49,7 @@ class PermissionHelper
                 'manufacturing.view',
                 'budget.view',
                 'investor.view',
+                'waste.view',
                 'reports.view',
             ],
         ];
@@ -121,6 +123,7 @@ class PermissionHelper
             'manufacturing' => 'Manufaktur',
             'budget' => 'Anggaran',
             'investor' => 'Investor',
+            'waste' => 'Bank Sampah',
             'reports' => 'Laporan',
         ];
 

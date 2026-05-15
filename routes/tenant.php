@@ -33,6 +33,14 @@ use App\Http\Controllers\InvestorController;
 use App\Http\Controllers\InvestorSharingController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\DataResetController;
+use App\Http\Controllers\WasteDashboardController;
+use App\Http\Controllers\WasteCategoryController;
+use App\Http\Controllers\WasteCollectorController;
+use App\Http\Controllers\WasteDepositController;
+use App\Http\Controllers\WasteSaleController;
+use App\Http\Controllers\WasteWithdrawalController;
+use App\Http\Controllers\WasteSettingsController;
+use App\Http\Controllers\WasteReportController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -352,6 +360,41 @@ Route::middleware([
             Route::get('/{id}', [InternetCustomerController::class, 'customerDetail'])->name('show')->where('id', '[0-9]+');
             Route::put('/{id}', [InternetCustomerController::class, 'update'])->name('update')->where('id', '[0-9]+');
             Route::delete('/{id}', [InternetCustomerController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+');
+        });
+
+        // ==========================================
+        // WASTE BANK (BANK SAMPAH)
+        // ==========================================
+        Route::prefix('waste')->name('waste.')->group(function () {
+            Route::get('/', [WasteDashboardController::class, 'index'])->name('index');
+            
+            // Categories
+            Route::resource('categories', WasteCategoryController::class);
+            
+            // Collectors (Nasabah)
+            Route::resource('collectors', WasteCollectorController::class);
+            
+            // Deposits (Setoran)
+            Route::resource('deposits', WasteDepositController::class);
+            
+            // Sales (Penjualan ke Agregator)
+            Route::resource('sales', WasteSaleController::class);
+            
+            // Withdrawals (Penarikan Tabungan)
+            Route::resource('/withdrawals', WasteWithdrawalController::class);
+            Route::get('/withdrawals/{withdrawal}/receipt', [WasteWithdrawalController::class, 'receipt'])->name('withdrawals.receipt');
+
+            // Settings
+            Route::get('/settings', [WasteSettingsController::class, 'edit'])->name('settings.edit');
+            Route::put('/settings', [WasteSettingsController::class, 'update'])->name('settings.update');
+
+            // Reports
+            Route::prefix('reports')->name('reports.')->group(function () {
+                Route::get('/', [WasteReportController::class, 'index'])->name('index');
+                Route::get('/stock', [WasteReportController::class, 'stock'])->name('stock');
+                Route::get('/collectors', [WasteReportController::class, 'collectors'])->name('collectors');
+                Route::get('/ledger', [WasteReportController::class, 'ledger'])->name('ledger');
+            });
         });
 
         // ==========================================

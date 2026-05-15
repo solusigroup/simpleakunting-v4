@@ -33,6 +33,11 @@ class Company extends Model
         'internet_revenue_module_coa_id',
         'investor_sharing_debit_coa_id',
         'investor_sharing_credit_coa_id',
+        'waste_inventory_account_id',
+        'waste_liability_account_id',
+        'waste_revenue_account_id',
+        'waste_cash_account_id',
+        'waste_cogs_account_id',
     ];
 
     protected $casts = [
@@ -196,6 +201,46 @@ class Company extends Model
     public function investors(): HasMany
     {
         return $this->hasMany(Investor::class);
+    }
+
+    /**
+     * Get the waste inventory account.
+     */
+    public function wasteInventoryAccount(): BelongsTo
+    {
+        return $this->belongsTo(ChartOfAccount::class, 'waste_inventory_account_id');
+    }
+
+    /**
+     * Get the waste liability account.
+     */
+    public function wasteLiabilityAccount(): BelongsTo
+    {
+        return $this->belongsTo(ChartOfAccount::class, 'waste_liability_account_id');
+    }
+
+    /**
+     * Get the waste revenue account.
+     */
+    public function wasteRevenueAccount(): BelongsTo
+    {
+        return $this->belongsTo(ChartOfAccount::class, 'waste_revenue_account_id');
+    }
+
+    /**
+     * Get the waste cash account.
+     */
+    public function wasteCashAccount(): BelongsTo
+    {
+        return $this->belongsTo(ChartOfAccount::class, 'waste_cash_account_id');
+    }
+
+    /**
+     * Get the waste COGS account.
+     */
+    public function wasteCogsAccount(): BelongsTo
+    {
+        return $this->belongsTo(ChartOfAccount::class, 'waste_cogs_account_id');
     }
 }
 

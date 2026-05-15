@@ -21,12 +21,49 @@
     masterData: false,
     manufaktur: false,
     laporan: false,
+    waste: false,
     pengaturan: false 
 }">
     <!-- Dashboard -->
     <x-sidebar-item href="{{ route('dashboard') }}" icon="dashboard" :active="request()->routeIs('dashboard')">
         Dashboard
     </x-sidebar-item>
+
+    <!-- Waste Bank Group -->
+    <div class="pt-4">
+        <button @click="waste = !waste" 
+                class="w-full px-4 py-2 flex items-center justify-between text-xs font-bold text-text-muted uppercase tracking-wider hover:text-white transition">
+            <span class="sidebar-group-label">Bank Sampah</span>
+            <span class="material-symbols-outlined text-sm transition-transform sidebar-group-label" 
+                  :class="waste ? 'rotate-0' : '-rotate-90'">expand_more</span>
+        </button>
+    </div>
+    <div x-show="waste" x-collapse>
+        <x-sidebar-item href="{{ route('waste.index') }}" icon="dashboard" :active="request()->routeIs('waste.index')">
+            Dashboard
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('waste.collectors.index') }}" icon="groups" :active="request()->routeIs('waste.collectors.*')">
+            Daftar Nasabah
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('waste.deposits.index') }}" icon="add_shopping_cart" :active="request()->routeIs('waste.deposits.*')">
+            Setoran Sampah
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('waste.sales.index') }}" icon="sell" :active="request()->routeIs('waste.sales.*')">
+            Penjualan Stok
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('waste.withdrawals.index') }}" icon="payments" :active="request()->routeIs('waste.withdrawals.*')">
+            Tarik Tabungan
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('waste.categories.index') }}" icon="inventory_2" :active="request()->routeIs('waste.categories.*')">
+            Kategori & Harga
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('waste.reports.index') }}" icon="analytics" :active="request()->routeIs('waste.reports.*')">
+            Laporan Bank Sampah
+        </x-sidebar-item>
+        <x-sidebar-item href="{{ route('waste.settings.edit') }}" icon="settings" :active="request()->routeIs('waste.settings.*')">
+            Pengaturan Akun
+        </x-sidebar-item>
+    </div>
 
     <!-- Transaksi Group -->
     <div class="pt-4">

@@ -29,7 +29,7 @@ class CheckUserRole
 
             // Role name check (literal)
             // If the user's role name matches exactly
-            $roleName = $user->role()->exists() ? $user->role->name : $user->role;
+            $roleName = $user->roleRecord()->exists() ? $user->roleRecord->name : $user->role;
             if ($roleName === $role) {
                 return $next($request);
             }
