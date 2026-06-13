@@ -86,6 +86,13 @@
                         <textarea name="address" rows="2"
                                   class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">{{ old('address', $company->address) }}</textarea>
                     </div>
+
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-text-muted mb-2">Kota / Kabupaten (Untuk Tanda Tangan Laporan PDF)</label>
+                        <input type="text" name="city" value="{{ old('city', $company->city) }}" placeholder="Contoh: Banyuwangi"
+                               class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                        <p class="mt-1 text-xs text-text-muted">Kota atau Kabupaten ini akan digunakan sebagai lokasi pembuatan laporan di tanda tangan PDF (misal: "Banyuwangi, 13 Juni 2026").</p>
+                    </div>
                 </div>
             </div>
 

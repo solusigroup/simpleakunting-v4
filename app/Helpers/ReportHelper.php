@@ -56,6 +56,15 @@ class ReportHelper
      */
     public static function extractCity($address)
     {
+        // 1. Try to get city from active tenant's company settings
+        if (auth()->check()) {
+            $company = auth()->user()->company;
+            if ($company && !empty($company->city)) {
+                return $company->city;
+            }
+        }
+
+        // 2. Extract from address if possible
         if (empty($address)) {
             return 'Jakarta';
         }

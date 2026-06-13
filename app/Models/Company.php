@@ -20,6 +20,7 @@ class Company extends Model
         'email',
         'npwp',
         'address',
+        'city',
         'fiscal_start',
         'director_name',
         'director_title',

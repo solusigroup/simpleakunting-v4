@@ -20,6 +20,7 @@ class CompanySettingsController extends Controller
             'email' => 'nullable|email|max:255',
             'npwp' => 'nullable|string|max:50',
             'address' => 'nullable|string',
+            'city' => 'nullable|string|max:255',
             'fiscal_start' => 'nullable|date',
             'director_name' => 'nullable|string|max:255',
             'director_title' => 'nullable|string|max:255',
