@@ -17,6 +17,7 @@ class InternetPayment extends Model
         'journal_id',
         'payment_number',
         'amount',
+        'discount',
         'payment_date',
         'payment_method',
         'cash_bank_account_id',
@@ -25,6 +26,7 @@ class InternetPayment extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'discount' => 'decimal:2',
         'payment_date' => 'date',
     ];
 

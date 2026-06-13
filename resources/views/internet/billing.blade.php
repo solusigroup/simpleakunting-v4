@@ -196,6 +196,10 @@
                         <input type="number" id="payAmount" required min="1" class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white font-mono focus:border-primary focus:ring-primary">
                     </div>
                     <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Potongan Penjualan / Diskon (Rp)</label>
+                        <input type="number" id="payDiscount" min="0" class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white font-mono focus:border-primary focus:ring-primary" placeholder="0">
+                    </div>
+                    <div>
                         <label class="block text-sm font-medium text-text-muted mb-2">Tanggal Bayar *</label>
                         <input type="date" id="payDate" required class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
                     </div>
@@ -243,9 +247,17 @@
             const modal = document.getElementById('paymentModal');
             if (!modal) return;
             document.getElementById('payBillingId').value = billingId;
-            document.getElementById('payBillingInfo').textContent = `${billingNumber} - ${customerName}`;
+            document.getElementById('payBillingInfo').innerHTML = `
+                <div>${billingNumber} - ${customerName}</div>
+                <div class="text-primary mt-1 text-sm">Sisa Tagihan: Rp ${remaining.toLocaleString('id-ID')}</div>
+            `;
             document.getElementById('payAmount').value = remaining;
             document.getElementById('payAmount').max = remaining;
+            const discountInput = document.getElementById('payDiscount');
+            if (discountInput) {
+                discountInput.value = 0;
+                discountInput.max = remaining;
+            }
             document.getElementById('payDate').value = new Date().toISOString().split('T')[0];
             modal.classList.remove('hidden');
         }
@@ -302,6 +314,7 @@
                             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
                             body: JSON.stringify({
                                 amount: document.getElementById('payAmount').value,
+                                discount: document.getElementById('payDiscount').value || 0,
                                 payment_date: document.getElementById('payDate').value,
                                 payment_method: document.getElementById('payMethod').value,
                                 cash_bank_account_id: document.getElementById('payCashAccount').value,

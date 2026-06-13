@@ -32,6 +32,7 @@ class Company extends Model
         'business_sector',
         'internet_receivable_module_coa_id',
         'internet_revenue_module_coa_id',
+        'internet_discount_coa_id',
         'investor_sharing_debit_coa_id',
         'investor_sharing_credit_coa_id',
         'waste_inventory_account_id',
@@ -180,6 +181,14 @@ class Company extends Model
     public function internetRevenueAccount(): BelongsTo
     {
         return $this->belongsTo(ChartOfAccount::class, 'internet_revenue_module_coa_id');
+    }
+
+    /**
+     * Get the internet discount account.
+     */
+    public function internetDiscountAccount(): BelongsTo
+    {
+        return $this->belongsTo(ChartOfAccount::class, 'internet_discount_coa_id');
     }
 
     /**

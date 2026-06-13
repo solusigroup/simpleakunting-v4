@@ -106,6 +106,9 @@
                                     <div class="text-text-muted">
                                         {{ $pay->payment_date->format('d/m/Y') }} — 
                                         <span class="text-primary font-mono">Rp {{ number_format($pay->amount, 0, ',', '.') }}</span>
+                                        @if($pay->discount > 0)
+                                            <span class="text-orange-400 font-mono text-[10px]">(Pot. Rp {{ number_format($pay->discount, 0, ',', '.') }})</span>
+                                        @endif
                                         ({{ $pay->cashBankAccount->name ?? '-' }})
                                     </div>
                                     @endforeach

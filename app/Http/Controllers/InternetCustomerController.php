@@ -53,11 +53,16 @@ class InternetCustomerController extends Controller
                 'required', 
                 Rule::exists('chart_of_accounts', 'id')->where('company_id', $user->company->id)
             ],
+            'internet_discount_coa_id' => [
+                'nullable', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $user->company->id)
+            ],
         ]);
 
         $user->company->update([
             'internet_receivable_module_coa_id' => $request->internet_receivable_module_coa_id,
             'internet_revenue_module_coa_id' => $request->internet_revenue_module_coa_id,
+            'internet_discount_coa_id' => $request->internet_discount_coa_id ?: null,
         ]);
 
         return response()->json([
@@ -462,6 +467,7 @@ class InternetCustomerController extends Controller
 
         $request->validate([
             'amount' => ['required', 'numeric', 'min:1'],
+            'discount' => ['nullable', 'numeric', 'min:0'],
             'payment_date' => ['required', 'date'],
             'payment_method' => ['required', 'in:cash,transfer,other'],
             'cash_bank_account_id' => [
@@ -472,12 +478,14 @@ class InternetCustomerController extends Controller
         ]);
 
         $payAmount = (float)$request->amount;
+        $discount = (float)($request->discount ?? 0);
+        $totalCleared = $payAmount + $discount;
         $remaining = $billing->remaining_amount;
 
-        if ($payAmount > $remaining) {
+        if ($totalCleared > $remaining) {
             return response()->json([
                 'success' => false,
-                'message' => "Jumlah bayar (Rp " . number_format($payAmount, 0, ',', '.') . ") melebihi sisa tagihan (Rp " . number_format($remaining, 0, ',', '.') . ").",
+                'message' => "Jumlah bayar + potongan (Rp " . number_format($totalCleared, 0, ',', '.') . ") melebihi sisa tagihan (Rp " . number_format($remaining, 0, ',', '.') . ").",
             ], 422);
         }
 
@@ -489,18 +497,26 @@ class InternetCustomerController extends Controller
             ], 422);
         }
 
-        $receivableAccount = $company->internetReceivableAccount;
+        if ($discount > 0 && !$company->internet_discount_coa_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun COA Potongan Penjualan belum diatur di menu Pengaturan Internet.',
+            ], 422);
+        }
 
-        $payment = DB::transaction(function () use ($request, $company, $billing, $payAmount, $receivableAccount) {
+        $receivableAccount = $company->internetReceivableAccount;
+        $discountAccount = $company->internetDiscountAccount;
+
+        $payment = DB::transaction(function () use ($request, $company, $billing, $payAmount, $discount, $totalCleared, $receivableAccount, $discountAccount) {
             $paymentNumber = InternetPayment::generatePaymentNumber($company->id);
             $customer = $billing->customer;
 
-            // Create Journal: Debit Kas/Bank, Credit Piutang
+            // Create Journal: Debit Kas/Bank, Debit Potongan Penjualan (if > 0), Credit Piutang
             $journal = Journal::create([
                 'company_id' => $company->id,
                 'date' => $request->payment_date,
                 'reference' => $paymentNumber,
-                'description' => "Pembayaran Internet {$billing->period_label} - {$customer->name}",
+                'description' => "Pembayaran Internet {$billing->period_label} - {$customer->name}" . ($discount > 0 ? " (Potongan)" : ""),
                 'source' => 'internet_payment',
                 'is_posted' => false,
             ]);
@@ -514,12 +530,23 @@ class InternetCustomerController extends Controller
                 'memo' => "Pembayaran dari {$customer->customer_id} - {$customer->name}",
             ]);
 
+            // Debit: Potongan Penjualan (only if > 0)
+            if ($discount > 0) {
+                JournalItem::create([
+                    'journal_id' => $journal->id,
+                    'coa_id' => $discountAccount->id,
+                    'debit' => $discount,
+                    'credit' => 0,
+                    'memo' => "Potongan penjualan untuk tagihan {$billing->billing_number}",
+                ]);
+            }
+
             // Credit: Piutang Pelanggan Internet
             JournalItem::create([
                 'journal_id' => $journal->id,
                 'coa_id' => $receivableAccount->id,
                 'debit' => 0,
-                'credit' => $payAmount,
+                'credit' => $totalCleared,
                 'memo' => "Pelunasan tagihan {$billing->billing_number}",
             ]);
 
@@ -530,6 +557,7 @@ class InternetCustomerController extends Controller
                 'journal_id' => $journal->id,
                 'payment_number' => $paymentNumber,
                 'amount' => $payAmount,
+                'discount' => $discount,
                 'payment_date' => $request->payment_date,
                 'payment_method' => $request->payment_method,
                 'cash_bank_account_id' => $request->cash_bank_account_id,
@@ -537,7 +565,7 @@ class InternetCustomerController extends Controller
             ]);
 
             // Update billing paid_amount and status
-            $billing->paid_amount += $payAmount;
+            $billing->paid_amount += $totalCleared;
             $billing->save();
             $billing->refreshStatus();
 

@@ -42,6 +42,19 @@
                     </select>
                 </div>
 
+                <div>
+                    <label class="block text-sm font-medium text-text-muted mb-2">Akun Potongan Penjualan (Diskon)</label>
+                    <p class="text-xs text-text-muted mb-3">Akun yang akan didebit saat diskon tagihan diberikan saat pembayaran (e.g. Potongan Penjualan)</p>
+                    <select id="discountCoa" class="w-full px-4 py-3 rounded-xl bg-surface-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                        <option value="">Pilih Akun Potongan</option>
+                        @foreach($accounts as $acc)
+                            <option value="{{ $acc->id }}" {{ $company->internet_discount_coa_id == $acc->id ? 'selected' : '' }}>
+                                {{ $acc->code }} - {{ $acc->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="pt-4 border-t border-border-dark">
                     <x-btn type="primary" type="submit" id="saveBtn">
                         <span class="material-symbols-outlined">save</span> Simpan Perubahan
@@ -80,6 +93,7 @@
                     body: JSON.stringify({
                         internet_receivable_module_coa_id: document.getElementById('receivableCoa').value,
                         internet_revenue_module_coa_id: document.getElementById('revenueCoa').value,
+                        internet_discount_coa_id: document.getElementById('discountCoa').value || null,
                     })
                 });
 
