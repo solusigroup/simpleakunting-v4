@@ -277,9 +277,12 @@ class InternetCustomerController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('customer', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('customer_id', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('billing_number', 'like', "%{$search}%")
+                  ->orWhereHas('customer', function ($sub) use ($search) {
+                      $sub->where('name', 'like', "%{$search}%")
+                          ->orWhere('customer_id', 'like', "%{$search}%");
+                  });
             });
         }
 
