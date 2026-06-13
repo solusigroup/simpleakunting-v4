@@ -317,21 +317,41 @@ Route::middleware([
             Route::get('/financial-analysis', [ReportController::class, 'financialAnalysis'])->name('financial-analysis');
             
             Route::get('/balance-sheet/export-pdf', [ReportController::class, 'exportBalanceSheetPDF'])->name('balance-sheet.export-pdf');
+            Route::get('/balance-sheet/export-excel', [ReportController::class, 'exportBalanceSheetExcel'])->name('balance-sheet.export-excel');
             Route::post('/balance-sheet/comparative', [ReportController::class, 'balanceSheetComparative'])->name('balance-sheet.comparative');
             Route::get('/balance-sheet/comparative/export-pdf', [ReportController::class, 'exportBalanceSheetComparativePDF'])->name('balance-sheet.comparative.export-pdf');
+            Route::get('/balance-sheet/comparative/export-excel', [ReportController::class, 'exportBalanceSheetComparativeExcel'])->name('balance-sheet.comparative.export-excel');
             
             Route::get('/profit-loss/export-pdf', [ReportController::class, 'exportProfitLossPDF'])->name('profit-loss.export-pdf');
+            Route::get('/profit-loss/export-excel', [ReportController::class, 'exportProfitLossExcel'])->name('profit-loss.export-excel');
             Route::post('/profit-loss/comparative', [ReportController::class, 'profitLossComparative'])->name('profit-loss.comparative');
             Route::get('/profit-loss/comparative/export-pdf', [ReportController::class, 'exportProfitLossComparativePDF'])->name('profit-loss.comparative.export-pdf');
+            Route::get('/profit-loss/comparative/export-excel', [ReportController::class, 'exportProfitLossComparativeExcel'])->name('profit-loss.comparative.export-excel');
             
             Route::get('/cash-flow/export-pdf', [ReportController::class, 'exportCashFlowPDF'])->name('cash-flow.export-pdf');
+            Route::get('/cash-flow/export-excel', [ReportController::class, 'exportCashFlowExcel'])->name('cash-flow.export-excel');
             
             Route::get('/equity-changes', [ReportController::class, 'equityChanges'])->name('equity-changes');
             Route::get('/equity-changes/export-pdf', [ReportController::class, 'exportEquityChangesPDF'])->name('equity-changes.export-pdf');
+            Route::get('/equity-changes/export-excel', [ReportController::class, 'exportEquityChangesExcel'])->name('equity-changes.export-excel');
             
+            Route::get('/trial-balance/export-pdf', [ReportController::class, 'exportTrialBalancePDF'])->name('trial-balance.export-pdf');
+            Route::get('/trial-balance/export-excel', [ReportController::class, 'exportTrialBalanceExcel'])->name('trial-balance.export-excel');
+
+            Route::get('/ledger/export-pdf/{account_id}', [ReportController::class, 'exportLedgerPDF'])->name('ledger.export-pdf');
+            Route::get('/ledger/export-excel/{account_id}', [ReportController::class, 'exportLedgerExcel'])->name('ledger.export-excel');
+
             Route::get('/journal-list', [ReportController::class, 'journalList'])->name('journal-list');
+            Route::get('/journal-list/export-pdf', [ReportController::class, 'exportJournalListPDF'])->name('journal-list.export-pdf');
+            Route::get('/journal-list/export-excel', [ReportController::class, 'exportJournalListExcel'])->name('journal-list.export-excel');
+
             Route::get('/sales', [ReportController::class, 'salesReport'])->name('sales');
+            Route::get('/sales/export-pdf', [ReportController::class, 'exportSalesReportPDF'])->name('sales.export-pdf');
+            Route::get('/sales/export-excel', [ReportController::class, 'exportSalesReportExcel'])->name('sales.export-excel');
+
             Route::get('/purchases', [ReportController::class, 'purchaseReport'])->name('purchases');
+            Route::get('/purchases/export-pdf', [ReportController::class, 'exportPurchaseReportPDF'])->name('purchases.export-pdf');
+            Route::get('/purchases/export-excel', [ReportController::class, 'exportPurchaseReportExcel'])->name('purchases.export-excel');
             
             Route::get('/biological-reconciliation', [BiologicalReportController::class, 'reconciliation'])->name('biological-reconciliation');
             Route::get('/biological-fair-value', [BiologicalReportController::class, 'fairValueChanges'])->name('biological-fair-value');

@@ -76,6 +76,11 @@
                             <span class="material-symbols-outlined text-accent-red">picture_as_pdf</span>
                             <span class="text-white">Export PDF</span>
                         </a>
+                        <a href="#" @click.prevent="exportExcel(); exportOpen = false" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight border-t border-border-dark transition">
+                            <span class="material-symbols-outlined text-green-500">description</span>
+                            <span class="text-white">Export Excel</span>
+                        </a>
                         <a href="#" @click.prevent="printReport(); exportOpen = false" 
                            class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-b-xl border-t border-border-dark transition">
                             <span class="material-symbols-outlined text-text-muted">print</span>
@@ -430,6 +435,35 @@
 
                 const periodsParam = encodeURIComponent(JSON.stringify(periods));
                 window.location.href = `/reports/balance-sheet/comparative/export-pdf?periods=${periodsParam}`;
+            }
+        }
+
+        function exportExcel() {
+            if (currentMode === 'single') {
+                const endDate = document.getElementById('endDate').value;
+                const unitId = document.getElementById('unitFilter')?.value || '';
+                let url = `/reports/balance-sheet/export-excel?end_date=${endDate}`;
+                if (unitId) url += `&unit_id=${unitId}`;
+                window.location.href = url;
+            } else {
+                // Comparative Excel export
+                const p1Start = document.getElementById('period1Start').value || null;
+                const p1End = document.getElementById('period1End').value;
+                const p2Start = document.getElementById('period2Start').value || null;
+                const p2End = document.getElementById('period2End').value;
+
+                if (!p1End || !p2End) {
+                    alert('Mohon lengkapi periode terlebih dahulu');
+                    return;
+                }
+
+                const periods = [
+                    {start_date: p1Start, end_date: p1End, label: 'Periode 1'},
+                    {start_date: p2Start, end_date: p2End, label: 'Periode 2'}
+                ];
+
+                const periodsParam = encodeURIComponent(JSON.stringify(periods));
+                window.location.href = `/reports/balance-sheet/comparative/export-excel?periods=${periodsParam}`;
             }
         }
 

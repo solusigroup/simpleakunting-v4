@@ -17,11 +17,16 @@
                     <div x-show="exportOpen" @click.away="exportOpen = false"
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:leave="transition ease-in duration-150"
-                            class="absolute right-0 mt-2 w-48 rounded-xl border border-border-dark bg-surface-dark shadow-xl z-10">
+                             class="absolute right-0 mt-2 w-48 rounded-xl border border-border-dark bg-surface-dark shadow-xl z-10">
                         <a href="{{ route('reports.cash-flow.export-pdf', ['start_date' => $period['start_date'], 'end_date' => $period['end_date']]) }}" 
                            class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-t-xl transition">
                             <span class="material-symbols-outlined text-accent-red">picture_as_pdf</span>
                             <span class="text-white">Export PDF</span>
+                        </a>
+                        <a href="{{ route('reports.cash-flow.export-excel', ['start_date' => $period['start_date'], 'end_date' => $period['end_date']]) }}" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight border-t border-border-dark transition">
+                            <span class="material-symbols-outlined text-green-500">description</span>
+                            <span class="text-white">Export Excel</span>
                         </a>
                         <a href="#" onclick="window.print(); return false;" 
                            class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-b-xl border-t border-border-dark transition">

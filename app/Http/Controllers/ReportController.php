@@ -9,6 +9,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\FinancialReportExport;
 
 class ReportController extends Controller
 {
@@ -1659,6 +1661,651 @@ class ReportController extends Controller
         }
 
         return view('reports.purchases', $data);
+    }
+
+    public function exportBalanceSheetExcel(Request $request)
+    {
+        $view = $this->balanceSheet($request);
+        $data = $view->getData();
+        $user = $request->user();
+        $company = $user->company;
+        $endDate = $data['report_date'] ?? now()->format('Y-m-d');
+        $unit = null;
+        if (isset($data['unit_id']) && $data['unit_id']) {
+            $unit = \App\Models\BusinessUnit::find($data['unit_id']);
+        }
+
+        $exportData = [
+            'company' => $company,
+            'endDate' => $endDate,
+            'data' => $data,
+            'unit' => $unit,
+        ];
+
+        $filename = sprintf('Neraca_%s_%s.xlsx', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($endDate))
+        );
+
+        return Excel::download(new FinancialReportExport('reports.excel.balance-sheet', $exportData, 'Neraca'), $filename);
+    }
+
+    public function exportBalanceSheetComparativeExcel(Request $request)
+    {
+        $periodsJson = $request->query('periods');
+        $periods = json_decode($periodsJson, true);
+
+        if (!$periods || !is_array($periods) || count($periods) < 2) {
+            return back()->withErrors(['periods' => 'At least 2 periods required for comparison']);
+        }
+
+        $user = $request->user();
+        $company = $user->company;
+        $unitId = $request->query('unit_id');
+
+        $comparativeData = $this->buildComparativeData($company, $periods, 'NERACA', $unitId);
+
+        $viewData = [
+            'company' => $company,
+            'periods' => $periods,
+            'data' => $comparativeData,
+        ];
+
+        $filename = sprintf('Neraca_Komparatif_%s_%s.xlsx', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d')
+        );
+
+        return Excel::download(new FinancialReportExport('reports.excel.balance-sheet-comparative', $viewData, 'Neraca Komparatif'), $filename);
+    }
+
+    public function exportProfitLossExcel(Request $request)
+    {
+        $view = $this->profitLoss($request);
+        $data = $view->getData();
+        $user = $request->user();
+        $company = $user->company;
+        $endDate = $data['end_date'] ?? now()->format('Y-m-d');
+        $startDate = $data['start_date'] ?? null;
+        $unit = null;
+        if (isset($data['unit_id']) && $data['unit_id']) {
+            $unit = \App\Models\BusinessUnit::find($data['unit_id']);
+        }
+
+        $exportData = [
+            'company' => $company,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'sections' => $data['sections'] ?? [],
+            'totalRevenue' => $data['total_revenue'] ?? 0,
+            'totalExpense' => $data['total_expense'] ?? 0,
+            'netProfit' => $data['net_profit'] ?? 0,
+            'unit' => $unit,
+        ];
+
+        $filename = sprintf('LabaRugi_%s_%s.xlsx', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($endDate))
+        );
+
+        return Excel::download(new FinancialReportExport('reports.excel.profit-loss', $exportData, 'Laba Rugi'), $filename);
+    }
+
+    public function exportProfitLossComparativeExcel(Request $request)
+    {
+        $periodsJson = $request->query('periods');
+        $periods = json_decode($periodsJson, true);
+
+        if (!$periods || !is_array($periods) || count($periods) < 2) {
+            return back()->withErrors(['periods' => 'At least 2 periods required for comparison']);
+        }
+
+        $user = $request->user();
+        $company = $user->company;
+        $unitId = $request->query('unit_id');
+
+        $comparativeData = $this->buildComparativeData($company, $periods, 'LABARUGI', $unitId);
+
+        $viewData = [
+            'company' => $company,
+            'periods' => $periods,
+            'data' => $comparativeData,
+        ];
+
+        $filename = sprintf('LabaRugi_Komparatif_%s_%s.xlsx', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d')
+        );
+
+        return Excel::download(new FinancialReportExport('reports.excel.profit-loss-comparative', $viewData, 'Laba Rugi Komparatif'), $filename);
+    }
+
+    public function exportCashFlowExcel(Request $request)
+    {
+        $view = $this->cashFlow($request);
+        $data = $view->getData();
+        $user = $request->user();
+        $company = $user->company;
+        
+        $filename = sprintf('ArusKas_%s_%s.xlsx', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($data['period']['end_date'] ?? now()))
+        );
+
+        return Excel::download(new FinancialReportExport('reports.excel.cash-flow', $data, 'Arus Kas'), $filename);
+    }
+
+    public function exportEquityChangesExcel(Request $request)
+    {
+        $view = $this->equityChanges($request);
+        $data = $view->getData();
+        $user = $request->user();
+        $company = $user->company;
+        
+        $filename = sprintf('PerubahanEkuitas_%s_%s.xlsx', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($data['period']['end_date'] ?? now()))
+        );
+
+        return Excel::download(new FinancialReportExport('reports.excel.equity-changes', $data, 'Perubahan Ekuitas'), $filename);
+    }
+
+    public function exportTrialBalancePDF(Request $request)
+    {
+        $view = $this->trialBalance($request);
+        $data = $view->getData();
+        $user = $request->user();
+        $company = $user->company;
+        
+        $endDate = $data['report_date'] ?? now()->format('Y-m-d');
+
+        $viewData = [
+            'company' => $company,
+            'endDate' => $endDate,
+            'accounts' => $data['accounts'] ?? [],
+            'total_debit' => $data['total_debit'] ?? 0,
+            'total_credit' => $data['total_credit'] ?? 0,
+            'is_balanced' => $data['is_balanced'] ?? true,
+            'timestamp' => now()->format('d M Y H:i'),
+            'city' => ReportHelper::extractCity($company->address ?? ''),
+            'date' => now()->format('Y-m-d')
+        ];
+
+        $pdf = Pdf::loadView('reports.pdf.trial-balance', $viewData);
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = sprintf('NeracaSaldo_%s_%s.pdf', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($endDate))
+        );
+
+        return $pdf->download($filename);
+    }
+
+    public function exportTrialBalanceExcel(Request $request)
+    {
+        $view = $this->trialBalance($request);
+        $data = $view->getData();
+        $user = $request->user();
+        $company = $user->company;
+        $endDate = $data['report_date'] ?? now()->format('Y-m-d');
+
+        $rows = [];
+        foreach ($data['accounts'] ?? [] as $acc) {
+            $rows[] = [
+                'code' => $acc['account_code'],
+                'name' => $acc['account_name'],
+                'debit' => $acc['debit'],
+                'credit' => $acc['credit'],
+            ];
+        }
+
+        $headers = [
+            ['key' => 'code', 'label' => 'Kode Akun', 'align' => 'left'],
+            ['key' => 'name', 'label' => 'Nama Akun', 'align' => 'left'],
+            ['key' => 'debit', 'label' => 'Debit (Rp)', 'align' => 'right'],
+            ['key' => 'credit', 'label' => 'Kredit (Rp)', 'align' => 'right'],
+        ];
+
+        $totals = [
+            'code' => 'TOTAL',
+            'name' => '',
+            'debit' => $data['total_debit'] ?? 0,
+            'credit' => $data['total_credit'] ?? 0,
+        ];
+
+        $exportData = [
+            'company' => $company,
+            'title' => 'Neraca Saldo',
+            'subtitle' => 'Per ' . \App\Helpers\ReportHelper::formatDate($endDate),
+            'headers' => $headers,
+            'rows' => $rows,
+            'totals' => $totals,
+        ];
+
+        $filename = sprintf('NeracaSaldo_%s_%s.xlsx', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($endDate))
+        );
+
+        return Excel::download(new FinancialReportExport('reports.excel.generic', $exportData, 'Neraca Saldo'), $filename);
+    }
+
+    public function exportLedgerPDF(Request $request, int $accountId)
+    {
+        $response = $this->ledger($request, $accountId);
+        if ($response instanceof JsonResponse) {
+            $responseData = json_decode($response->getContent(), true);
+            if (!$responseData['success']) {
+                return back()->withErrors(['error' => $responseData['message']]);
+            }
+            $data = $responseData['data'];
+        } else {
+            return back()->withErrors(['error' => 'Gagal mengambil data buku besar']);
+        }
+
+        $user = $request->user();
+        $company = $user->company;
+
+        $viewData = [
+            'company' => $company,
+            'account' => $data['account'],
+            'period' => $data['period'],
+            'beginning_balance' => $data['beginning_balance'],
+            'transactions' => $data['transactions'],
+            'ending_balance' => $data['ending_balance'],
+            'timestamp' => now()->format('d M Y H:i'),
+            'city' => ReportHelper::extractCity($company->address ?? ''),
+            'date' => now()->format('Y-m-d')
+        ];
+
+        $pdf = Pdf::loadView('reports.pdf.ledger', $viewData);
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = sprintf('BukuBesar_%s_%s_%s.pdf', 
+            str_replace(' ', '_', $data['account']['code']), 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($data['period']['end_date']))
+        );
+
+        return $pdf->download($filename);
+    }
+
+    public function exportLedgerExcel(Request $request, int $accountId)
+    {
+        $response = $this->ledger($request, $accountId);
+        if ($response instanceof JsonResponse) {
+            $responseData = json_decode($response->getContent(), true);
+            if (!$responseData['success']) {
+                return back()->withErrors(['error' => $responseData['message']]);
+            }
+            $data = $responseData['data'];
+        } else {
+            return back()->withErrors(['error' => 'Gagal mengambil data buku besar']);
+        }
+
+        $user = $request->user();
+        $company = $user->company;
+
+        $rows = [];
+        $rows[] = [
+            'date' => $data['period']['start_date'],
+            'reference' => '-',
+            'description' => 'Saldo Awal',
+            'debit' => '-',
+            'credit' => '-',
+            'balance' => $data['beginning_balance'],
+            '_style' => 'font-style: italic;',
+        ];
+
+        foreach ($data['transactions'] as $tx) {
+            $rows[] = [
+                'date' => $tx['date'],
+                'reference' => $tx['reference'],
+                'description' => $tx['description'] . ($tx['memo'] ? ' ('.$tx['memo'].')' : ''),
+                'debit' => $tx['debit'] != 0 ? $tx['debit'] : '-',
+                'credit' => $tx['credit'] != 0 ? $tx['credit'] : '-',
+                'balance' => $tx['balance'],
+            ];
+        }
+
+        $rows[] = [
+            'date' => $data['period']['end_date'],
+            'reference' => '-',
+            'description' => 'Saldo Akhir',
+            'debit' => '-',
+            'credit' => '-',
+            'balance' => $data['ending_balance'],
+            '_style' => 'font-weight: bold; background-color: #cbd5e1;',
+        ];
+
+        $headers = [
+            ['key' => 'date', 'label' => 'Tanggal', 'align' => 'left'],
+            ['key' => 'reference', 'label' => 'Referensi', 'align' => 'left'],
+            ['key' => 'description', 'label' => 'Keterangan / Memo', 'align' => 'left'],
+            ['key' => 'debit', 'label' => 'Debit (Rp)', 'align' => 'right'],
+            ['key' => 'credit', 'label' => 'Kredit (Rp)', 'align' => 'right'],
+            ['key' => 'balance', 'label' => 'Saldo (Rp)', 'align' => 'right'],
+        ];
+
+        $exportData = [
+            'company' => $company,
+            'title' => 'Buku Besar - ' . $data['account']['code'] . ' ' . $data['account']['name'],
+            'subtitle' => 'Periode: ' . \App\Helpers\ReportHelper::formatDate($data['period']['start_date']) . ' s/d ' . \App\Helpers\ReportHelper::formatDate($data['period']['end_date']),
+            'headers' => $headers,
+            'rows' => $rows,
+            'totals' => null,
+        ];
+
+        $filename = sprintf('BukuBesar_%s_%s_%s.xlsx', 
+            str_replace(' ', '_', $data['account']['code']), 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($data['period']['end_date']))
+        );
+
+        return Excel::download(new FinancialReportExport('reports.excel.generic', $exportData, 'Buku Besar'), $filename);
+    }
+
+    public function exportJournalListPDF(Request $request)
+    {
+        $user = $request->user();
+        $company = $user->company;
+
+        $startDate = $request->query('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->query('end_date', now()->format('Y-m-d'));
+        $source = $request->query('source');
+        $unitId = $request->query('unit_id');
+
+        $query = \App\Models\Journal::where('company_id', $company->id)
+            ->where('is_posted', true)
+            ->whereDate('date', '>=', $startDate)
+            ->whereDate('date', '<=', $endDate)
+            ->with(['items.account:id,code,name', 'businessUnit:id,name'])
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc');
+
+        if ($source) {
+            $query->where('source', $source);
+        }
+        if ($unitId) {
+            $query->where('business_unit_id', $unitId);
+        }
+
+        $journals = $query->get();
+
+        $totalDebit = 0;
+        $totalCredit = 0;
+        foreach ($journals as $journal) {
+            foreach ($journal->items as $item) {
+                $totalDebit += $item->debit;
+                $totalCredit += $item->credit;
+            }
+        }
+
+        $viewData = [
+            'company' => $company,
+            'period' => [
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ],
+            'journals' => $journals,
+            'total_debit' => $totalDebit,
+            'total_credit' => $totalCredit,
+            'timestamp' => now()->format('d M Y H:i'),
+            'city' => ReportHelper::extractCity($company->address ?? ''),
+            'date' => now()->format('Y-m-d')
+        ];
+
+        $pdf = Pdf::loadView('reports.pdf.journal-list', $viewData);
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = sprintf('LaporanJurnal_%s_%s.pdf', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($endDate))
+        );
+
+        return $pdf->download($filename);
+    }
+
+    public function exportJournalListExcel(Request $request)
+    {
+        $user = $request->user();
+        $company = $user->company;
+
+        $startDate = $request->query('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->query('end_date', now()->format('Y-m-d'));
+        $source = $request->query('source');
+        $unitId = $request->query('unit_id');
+
+        $query = \App\Models\Journal::where('company_id', $company->id)
+            ->where('is_posted', true)
+            ->whereDate('date', '>=', $startDate)
+            ->whereDate('date', '<=', $endDate)
+            ->with(['items.account:id,code,name', 'businessUnit:id,name'])
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc');
+
+        if ($source) {
+            $query->where('source', $source);
+        }
+        if ($unitId) {
+            $query->where('business_unit_id', $unitId);
+        }
+
+        $journals = $query->get();
+
+        $rows = [];
+        $totalDebit = 0;
+        $totalCredit = 0;
+
+        foreach ($journals as $journal) {
+            $rows[] = [
+                'date' => $journal->date->format('Y-m-d'),
+                'reference' => $journal->reference,
+                'description' => $journal->description . ($journal->businessUnit ? ' (Unit: ' . $journal->businessUnit->name . ')' : ''),
+                'debit' => '',
+                'credit' => '',
+                '_style' => 'font-weight: bold; background-color: #f3f4f6;',
+            ];
+
+            foreach ($journal->items as $item) {
+                $rows[] = [
+                    'date' => '',
+                    'reference' => '',
+                    'description' => ($item->credit > 0 ? '     ' : '') . $item->account->code . ' - ' . $item->account->name . ($item->memo ? ' (' . $item->memo . ')' : ''),
+                    'debit' => $item->debit != 0 ? $item->debit : '-',
+                    'credit' => $item->credit != 0 ? $item->credit : '-',
+                ];
+                $totalDebit += $item->debit;
+                $totalCredit += $item->credit;
+            }
+        }
+
+        $headers = [
+            ['key' => 'date', 'label' => 'Tanggal', 'align' => 'left'],
+            ['key' => 'reference', 'label' => 'No. Jurnal', 'align' => 'left'],
+            ['key' => 'description', 'label' => 'Akun & Keterangan', 'align' => 'left'],
+            ['key' => 'debit', 'label' => 'Debit (Rp)', 'align' => 'right'],
+            ['key' => 'credit', 'label' => 'Kredit (Rp)', 'align' => 'right'],
+        ];
+
+        $totals = [
+            'date' => 'TOTAL',
+            'reference' => '',
+            'description' => '',
+            'debit' => $totalDebit,
+            'credit' => $totalCredit,
+        ];
+
+        $exportData = [
+            'company' => $company,
+            'title' => 'Laporan Jurnal',
+            'subtitle' => 'Periode: ' . \App\Helpers\ReportHelper::formatDate($startDate) . ' s/d ' . \App\Helpers\ReportHelper::formatDate($endDate),
+            'headers' => $headers,
+            'rows' => $rows,
+            'totals' => $totals,
+        ];
+
+        $filename = sprintf('LaporanJurnal_%s_%s.xlsx', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($endDate))
+        );
+
+        return Excel::download(new FinancialReportExport('reports.excel.generic', $exportData, 'Laporan Jurnal'), $filename);
+    }
+
+    public function exportSalesReportPDF(Request $request)
+    {
+        $view = $this->salesReport($request);
+        $data = $view->getData();
+        $user = $request->user();
+        $company = $user->company;
+
+        $pdf = Pdf::loadView('reports.pdf.sales', [
+            'company' => $company,
+            'period' => $data['period'],
+            'invoices' => $data['invoices'],
+            'summary' => $data['summary'],
+            'timestamp' => now()->format('d M Y H:i'),
+            'city' => ReportHelper::extractCity($company->address ?? ''),
+            'date' => now()->format('Y-m-d')
+        ]);
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = sprintf('LaporanPenjualan_%s_%s.pdf', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($data['period']['end_date']))
+        );
+
+        return $pdf->download($filename);
+    }
+
+    public function exportSalesReportExcel(Request $request)
+    {
+        $view = $this->salesReport($request);
+        $data = $view->getData();
+        $user = $request->user();
+        $company = $user->company;
+
+        $rows = [];
+        foreach ($data['invoices'] as $inv) {
+            $rows[] = [
+                'date' => $inv->date->format('Y-m-d'),
+                'number' => $inv->number,
+                'contact' => $inv->contact ? $inv->contact->name : '-',
+                'tax' => $inv->tax,
+                'total' => $inv->total,
+            ];
+        }
+
+        $headers = [
+            ['key' => 'date', 'label' => 'Tanggal', 'align' => 'left'],
+            ['key' => 'number', 'label' => 'No. Transaksi', 'align' => 'left'],
+            ['key' => 'contact', 'label' => 'Pelanggan', 'align' => 'left'],
+            ['key' => 'tax', 'label' => 'Pajak (Rp)', 'align' => 'right'],
+            ['key' => 'total', 'label' => 'Total (Rp)', 'align' => 'right'],
+        ];
+
+        $totals = [
+            'date' => 'TOTAL',
+            'number' => '',
+            'contact' => '',
+            'tax' => $data['summary']['total_tax'],
+            'total' => $data['summary']['total_sales'],
+        ];
+
+        $exportData = [
+            'company' => $company,
+            'title' => 'Laporan Penjualan',
+            'subtitle' => 'Periode: ' . \App\Helpers\ReportHelper::formatDate($data['period']['start_date']) . ' s/d ' . \App\Helpers\ReportHelper::formatDate($data['period']['end_date']),
+            'headers' => $headers,
+            'rows' => $rows,
+            'totals' => $totals,
+        ];
+
+        $filename = sprintf('LaporanPenjualan_%s_%s.xlsx', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($data['period']['end_date']))
+        );
+
+        return Excel::download(new FinancialReportExport('reports.excel.generic', $exportData, 'Laporan Penjualan'), $filename);
+    }
+
+    public function exportPurchaseReportPDF(Request $request)
+    {
+        $view = $this->purchaseReport($request);
+        $data = $view->getData();
+        $user = $request->user();
+        $company = $user->company;
+
+        $pdf = Pdf::loadView('reports.pdf.purchases', [
+            'company' => $company,
+            'period' => $data['period'],
+            'invoices' => $data['invoices'],
+            'summary' => $data['summary'],
+            'timestamp' => now()->format('d M Y H:i'),
+            'city' => ReportHelper::extractCity($company->address ?? ''),
+            'date' => now()->format('Y-m-d')
+        ]);
+        $pdf->setPaper('A4', 'portrait');
+
+        $filename = sprintf('LaporanPembelian_%s_%s.pdf', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($data['period']['end_date']))
+        );
+
+        return $pdf->download($filename);
+    }
+
+    public function exportPurchaseReportExcel(Request $request)
+    {
+        $view = $this->purchaseReport($request);
+        $data = $view->getData();
+        $user = $request->user();
+        $company = $user->company;
+
+        $rows = [];
+        foreach ($data['invoices'] as $inv) {
+            $rows[] = [
+                'date' => $inv->date->format('Y-m-d'),
+                'number' => $inv->number,
+                'contact' => $inv->contact ? $inv->contact->name : '-',
+                'tax' => $inv->tax,
+                'total' => $inv->total,
+            ];
+        }
+
+        $headers = [
+            ['key' => 'date', 'label' => 'Tanggal', 'align' => 'left'],
+            ['key' => 'number', 'label' => 'No. Transaksi', 'align' => 'left'],
+            ['key' => 'contact', 'label' => 'Pemasok', 'align' => 'left'],
+            ['key' => 'tax', 'label' => 'Pajak (Rp)', 'align' => 'right'],
+            ['key' => 'total', 'label' => 'Total (Rp)', 'align' => 'right'],
+        ];
+
+        $totals = [
+            'date' => 'TOTAL',
+            'number' => '',
+            'contact' => '',
+            'tax' => $data['summary']['total_tax'],
+            'total' => $data['summary']['total_purchases'],
+        ];
+
+        $exportData = [
+            'company' => $company,
+            'title' => 'Laporan Pembelian',
+            'subtitle' => 'Periode: ' . \App\Helpers\ReportHelper::formatDate($data['period']['start_date']) . ' s/d ' . \App\Helpers\ReportHelper::formatDate($data['period']['end_date']),
+            'headers' => $headers,
+            'rows' => $rows,
+            'totals' => $totals,
+        ];
+
+        $filename = sprintf('LaporanPembelian_%s_%s.xlsx', 
+            str_replace(' ', '_', $company->name), 
+            date('Y-m-d', strtotime($data['period']['end_date']))
+        );
+
+        return Excel::download(new FinancialReportExport('reports.excel.generic', $exportData, 'Laporan Pembelian'), $filename);
     }
 }
 

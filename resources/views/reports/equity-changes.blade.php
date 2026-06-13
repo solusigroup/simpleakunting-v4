@@ -35,6 +35,11 @@
                             <span class="material-symbols-outlined text-accent-red">picture_as_pdf</span>
                             <span class="text-white">Export PDF</span>
                         </a>
+                        <a href="#" onclick="exportExcel(); return false;" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight border-t border-border-dark transition">
+                            <span class="material-symbols-outlined text-green-500">description</span>
+                            <span class="text-white">Export Excel</span>
+                        </a>
                         <a href="#" onclick="window.print(); return false;" 
                            class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-b-xl border-t border-border-dark transition">
                             <span class="material-symbols-outlined text-text-muted">print</span>
@@ -198,6 +203,12 @@
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             window.location.href = `/reports/equity-changes/export-pdf?start_date=${startDate}&end_date=${endDate}`;
+        }
+
+        function exportExcel() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            window.location.href = `/reports/equity-changes/export-excel?start_date=${startDate}&end_date=${endDate}`;
         }
 
         function initializeDates() {

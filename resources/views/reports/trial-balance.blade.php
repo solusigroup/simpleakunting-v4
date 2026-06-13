@@ -5,7 +5,7 @@
                 <h2 class="text-2xl font-bold text-white font-display">Neraca Saldo</h2>
                 <p class="text-text-muted text-sm mt-1">Trial Balance - Daftar Saldo Akun</p>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3" x-data="{ exportOpen: false }">
                 <div class="flex items-center gap-2 px-4 py-2 rounded-full border border-border-dark bg-surface-dark/30">
                     <span class="text-text-muted text-sm">Per Tanggal:</span>
                     <input type="date" id="endDate" class="bg-transparent border-0 text-white text-sm focus:ring-0">
@@ -14,9 +14,34 @@
                     <span class="material-symbols-outlined align-middle mr-1">refresh</span>
                     Muat
                 </button>
-                <button onclick="window.print()" class="px-4 py-2 rounded-full border border-border-dark text-text-muted hover:bg-surface-highlight hover:text-white transition">
-                    <span class="material-symbols-outlined">print</span>
-                </button>
+                <!-- Export Dropdown -->
+                <div class="relative">
+                    <button @click="exportOpen = !exportOpen" 
+                            class="px-4 py-2 rounded-full border border-border-dark text-text-muted hover:bg-surface-highlight hover:text-white transition flex items-center gap-2">
+                        <span class="material-symbols-outlined">download</span>
+                        <span class="hidden sm:inline">Export</span>
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </button>
+                    <div x-show="exportOpen" @click.away="exportOpen = false"
+                         x-transition
+                         class="absolute right-0 mt-2 w-48 rounded-xl border border-border-dark bg-surface-dark shadow-xl z-10">
+                        <a href="#" onclick="exportPDF(); return false;" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-t-xl transition">
+                            <span class="material-symbols-outlined text-accent-red">picture_as_pdf</span>
+                            <span class="text-white">Export PDF</span>
+                        </a>
+                        <a href="#" onclick="exportExcel(); return false;" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight border-t border-border-dark transition">
+                            <span class="material-symbols-outlined text-green-500">description</span>
+                            <span class="text-white">Export Excel</span>
+                        </a>
+                        <a href="#" onclick="window.print(); return false;" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-b-xl border-t border-border-dark transition">
+                            <span class="material-symbols-outlined text-text-muted">print</span>
+                            <span class="text-white">Print</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </x-slot>
@@ -68,6 +93,16 @@
         function loadReport() {
             const endDate = document.getElementById('endDate').value;
             window.location.href = `/reports/trial-balance?end_date=${endDate}`;
+        }
+
+        function exportPDF() {
+            const endDate = document.getElementById('endDate').value;
+            window.location.href = `/reports/trial-balance/export-pdf?end_date=${endDate}`;
+        }
+
+        function exportExcel() {
+            const endDate = document.getElementById('endDate').value;
+            window.location.href = `/reports/trial-balance/export-excel?end_date=${endDate}`;
         }
 
         function initializeWithServerData() {

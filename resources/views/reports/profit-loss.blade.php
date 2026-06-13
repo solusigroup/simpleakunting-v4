@@ -74,6 +74,11 @@
                             <span class="material-symbols-outlined text-accent-red">picture_as_pdf</span>
                             <span class="text-white">Export PDF</span>
                         </a>
+                        <a href="#" @click.prevent="exportExcel(); exportOpen = false" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight border-t border-border-dark transition">
+                            <span class="material-symbols-outlined text-green-500">description</span>
+                            <span class="text-white">Export Excel</span>
+                        </a>
                         <a href="#" @click.prevent="window.print(); exportOpen = false" 
                            class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-b-xl border-t border-border-dark transition">
                             <span class="material-symbols-outlined text-text-muted">print</span>
@@ -401,6 +406,32 @@
                 ];
                 const periodsParam = encodeURIComponent(JSON.stringify(periods));
                 window.location.href = `/reports/profit-loss/comparative/export-pdf?periods=${periodsParam}`;
+            }
+        }
+
+        function exportExcel() {
+            if (currentMode === 'single') {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const unitId = document.getElementById('unitFilter')?.value || '';
+                let url = `/reports/profit-loss/export-excel?start_date=${startDate}&end_date=${endDate}`;
+                if (unitId) url += `&unit_id=${unitId}`;
+                window.location.href = url;
+            } else {
+                const periods = [
+                    {
+                        start_date: document.getElementById('period1Start').value,
+                        end_date: document.getElementById('period1End').value,
+                        label: 'Periode 1'
+                    },
+                    {
+                        start_date: document.getElementById('period2Start').value,
+                        end_date: document.getElementById('period2End').value,
+                        label: 'Periode 2'
+                    }
+                ];
+                const periodsParam = encodeURIComponent(JSON.stringify(periods));
+                window.location.href = `/reports/profit-loss/comparative/export-excel?periods=${periodsParam}`;
             }
         }
 

@@ -5,11 +5,35 @@
                 <h2 class="text-2xl font-bold text-white font-display">Daftar Jurnal</h2>
                 <p class="text-text-muted text-sm mt-1">Periode {{ \Carbon\Carbon::parse($period['start_date'])->format('d M Y') }} - {{ \Carbon\Carbon::parse($period['end_date'])->format('d M Y') }}</p>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="#" onclick="window.print(); return false;" class="px-4 py-2 rounded-full border border-border-dark text-text-muted hover:bg-surface-highlight hover:text-white transition flex items-center gap-2">
-                    <span class="material-symbols-outlined">print</span>
-                    <span class="hidden sm:inline">Print</span>
-                </a>
+            <div class="flex items-center gap-3" x-data="{ exportOpen: false }">
+                <!-- Export Dropdown -->
+                <div class="relative">
+                    <button @click="exportOpen = !exportOpen" 
+                            class="px-4 py-2 rounded-full border border-border-dark text-text-muted hover:bg-surface-highlight hover:text-white transition flex items-center gap-2">
+                        <span class="material-symbols-outlined">download</span>
+                        <span class="hidden sm:inline">Export</span>
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </button>
+                    <div x-show="exportOpen" @click.away="exportOpen = false"
+                         x-transition
+                         class="absolute right-0 mt-2 w-48 rounded-xl border border-border-dark bg-surface-dark shadow-xl z-10">
+                        <a href="{{ route('reports.journal-list.export-pdf', ['start_date' => $period['start_date'], 'end_date' => $period['end_date'], 'source' => $source]) }}" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-t-xl transition">
+                            <span class="material-symbols-outlined text-accent-red">picture_as_pdf</span>
+                            <span class="text-white">Export PDF</span>
+                        </a>
+                        <a href="{{ route('reports.journal-list.export-excel', ['start_date' => $period['start_date'], 'end_date' => $period['end_date'], 'source' => $source]) }}" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight border-t border-border-dark transition">
+                            <span class="material-symbols-outlined text-green-500">description</span>
+                            <span class="text-white">Export Excel</span>
+                        </a>
+                        <a href="#" onclick="window.print(); return false;" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-b-xl border-t border-border-dark transition">
+                            <span class="material-symbols-outlined text-text-muted">print</span>
+                            <span class="text-white">Print</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </x-slot>

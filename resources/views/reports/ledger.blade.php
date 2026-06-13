@@ -5,7 +5,7 @@
                 <h2 class="text-2xl font-bold text-white font-display">Buku Besar</h2>
                 <p class="text-text-muted text-sm mt-1" id="accountTitle">Pilih akun untuk melihat rincian</p>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3" x-data="{ exportOpen: false }">
                 <select id="accountSelect" class="px-4 py-2 rounded-full border border-border-dark bg-surface-dark text-white text-sm focus:ring-primary min-w-[200px]">
                     <option value="">Pilih Akun...</option>
                 </select>
@@ -17,6 +17,34 @@
                 <button onclick="loadLedger()" class="px-6 py-2 rounded-full bg-primary text-background-dark font-bold hover:bg-[#2ec56a] transition">
                     Tampilkan
                 </button>
+                <!-- Export Dropdown -->
+                <div class="relative">
+                    <button @click="exportOpen = !exportOpen" 
+                            class="px-4 py-2 rounded-full border border-border-dark text-text-muted hover:bg-surface-highlight hover:text-white transition flex items-center gap-2">
+                        <span class="material-symbols-outlined">download</span>
+                        <span class="hidden sm:inline">Export</span>
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                    </button>
+                    <div x-show="exportOpen" @click.away="exportOpen = false"
+                         x-transition
+                         class="absolute right-0 mt-2 w-48 rounded-xl border border-border-dark bg-surface-dark shadow-xl z-10">
+                        <a href="#" onclick="exportPDF(); return false;" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-t-xl transition">
+                            <span class="material-symbols-outlined text-accent-red">picture_as_pdf</span>
+                            <span class="text-white">Export PDF</span>
+                        </a>
+                        <a href="#" onclick="exportExcel(); return false;" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight border-t border-border-dark transition">
+                            <span class="material-symbols-outlined text-green-500">description</span>
+                            <span class="text-white">Export Excel</span>
+                        </a>
+                        <a href="#" onclick="window.print(); return false;" 
+                           class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-b-xl border-t border-border-dark transition">
+                            <span class="material-symbols-outlined text-text-muted">print</span>
+                            <span class="text-white">Print</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </x-slot>
@@ -149,6 +177,28 @@
                     tbody.innerHTML = rows;
                 }
             }
+        }
+
+        function exportPDF() {
+            const accountId = document.getElementById('accountSelect').value;
+            if (!accountId) {
+                alert('Pilih akun terlebih dahulu');
+                return;
+            }
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            window.location.href = `/reports/ledger/export-pdf/${accountId}?start_date=${startDate}&end_date=${endDate}`;
+        }
+
+        function exportExcel() {
+            const accountId = document.getElementById('accountSelect').value;
+            if (!accountId) {
+                alert('Pilih akun terlebih dahulu');
+                return;
+            }
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            window.location.href = `/reports/ledger/export-excel/${accountId}?start_date=${startDate}&end_date=${endDate}`;
         }
 
         // Init
