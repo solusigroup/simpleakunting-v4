@@ -91,4 +91,48 @@ class OpeningBalanceTest extends TestCase
         // Assert total Assets also includes it
         $this->assertEquals(750000, $response->json('data.totals.Aset'));
     }
+
+    public function test_cash_spend_validation_with_opening_balance(): void
+    {
+        // 1. Create a cash account with code 1.1.1
+        $cashAccount = ChartOfAccount::create([
+            'company_id' => $this->company->id,
+            'code' => '1.1.1',
+            'name' => 'Kas dan Setara Kas',
+            'type' => 'Asset',
+            'report_type' => 'NERACA',
+            'normal_balance' => 'DEBIT',
+            'is_parent' => false,
+            'opening_balance' => 5000000.00, // 5 million opening balance
+        ]);
+
+        // 2. Get another account for expense/spend target
+        $targetAccount = ChartOfAccount::where('company_id', $this->company->id)
+            ->where('id', '!=', $cashAccount->id)
+            ->where('is_parent', false)
+            ->first();
+
+        // 3. Try to spend 2,000,000 (which is less than the 5M opening balance but more than 0)
+        $response = $this->actingAs($this->user)
+            ->withoutMiddleware([
+                \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
+                \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            ])
+            ->postJson('/cash/spend', [
+                'from_account_id' => $cashAccount->id,
+                'date' => now()->format('Y-m-d'),
+                'description' => 'Test Cash Spend',
+                'items' => [
+                    [
+                        'to_account_id' => $targetAccount->id,
+                        'amount' => 2000000.00,
+                        'memo' => 'Test Item',
+                    ]
+                ]
+            ]);
+
+        // 4. Assert that the request succeeded (status 201)
+        $response->assertStatus(201);
+        $response->assertJsonPath('success', true);
+    }
 }

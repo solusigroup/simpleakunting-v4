@@ -46,8 +46,14 @@ trait ValidatesCashBalance
         $totalDebit = $items->total_debit ?? 0;
         $totalCredit = $items->total_credit ?? 0;
 
-        // Cash is a DEBIT account: Balance = Debit - Credit
-        return $totalDebit - $totalCredit;
+        $openingBalance = (float) ($cashAccount->opening_balance ?? 0);
+
+        // Cash is a DEBIT account: Balance = Opening Balance + Debit - Credit
+        if ($cashAccount->normal_balance === 'KREDIT') {
+            return $openingBalance + $totalCredit - $totalDebit;
+        }
+
+        return $openingBalance + $totalDebit - $totalCredit;
     }
 
     /**
