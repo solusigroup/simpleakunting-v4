@@ -310,7 +310,7 @@
                                 ${journal.is_posted ? 'Unpost' : 'Post'}
                             </button>
 
-                            ${!journal.is_posted && journal.source === 'manual' ? `
+                            ${!journal.is_posted && (journal.source === 'manual' || journal.source === 'cash_bank') ? `
                                 <button onclick="editJournal(${journal.id})" class="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 hover:bg-blue-500/20 transition" title="Edit Jurnal">
                                     <span class="material-symbols-outlined text-sm">edit</span>
                                 </button>

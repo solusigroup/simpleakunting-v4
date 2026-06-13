@@ -290,10 +290,10 @@ class JournalController extends Controller
             ], 422);
         }
 
-        if ($journal->source !== 'manual') {
+        if ($journal->source !== 'manual' && $journal->source !== 'cash_bank') {
             return response()->json([
                 'success' => false,
-                'message' => 'Hanya jurnal manual yang dapat diedit langsung. Jurnal otomatis dari modul lain harus diedit melalui modul asalnya.',
+                'message' => 'Hanya jurnal manual atau kas & bank yang dapat diedit langsung. Jurnal otomatis dari modul lain harus diedit melalui modul asalnya.',
             ], 422);
         }
 
