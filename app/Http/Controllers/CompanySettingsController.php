@@ -16,6 +16,7 @@ class CompanySettingsController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'entity_type' => 'required|string|in:UMKM,BUMDesa',
             'phone' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
             'npwp' => 'nullable|string|max:50',

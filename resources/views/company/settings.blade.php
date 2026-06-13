@@ -48,11 +48,23 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-span-2">
+                    <div>
                         <label class="block text-sm font-medium text-text-muted mb-2">Nama Perusahaan</label>
                         <input type="text" name="name" value="{{ old('name', $company->name) }}" required
                                class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
                         @error('name')
+                        <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-text-muted mb-2">Tipe Badan Usaha / Entitas</label>
+                        <select name="entity_type" required
+                                class="w-full px-4 py-3 rounded-xl bg-background-dark border border-border-dark text-white focus:border-primary focus:ring-primary">
+                            <option value="UMKM" {{ old('entity_type', $company->entity_type) == 'UMKM' ? 'selected' : '' }}>UMKM (Usaha Mikro Kecil Menengah)</option>
+                            <option value="BUMDesa" {{ old('entity_type', $company->entity_type) == 'BUMDesa' ? 'selected' : '' }}>BUMDesa (Badan Usaha Milik Desa)</option>
+                        </select>
+                        @error('entity_type')
                         <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
