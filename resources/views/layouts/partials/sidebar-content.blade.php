@@ -300,6 +300,11 @@
         <x-sidebar-item href="{{ route('company.settings') }}" icon="business" :active="request()->routeIs('company.settings')">
             Perusahaan
         </x-sidebar-item>
+        @if(auth()->user()->company?->isBumdesa())
+        <x-sidebar-item href="{{ route('units.index') }}" icon="store" :active="request()->routeIs('units.*')">
+            Unit Usaha
+        </x-sidebar-item>
+        @endif
         <x-sidebar-item href="{{ route('users.index') }}" icon="group" :active="request()->routeIs('users.*')">
             Kelola Pengguna
         </x-sidebar-item>
