@@ -277,6 +277,7 @@ Route::middleware([
         });
         Route::put('/journals/{id}', [JournalController::class, 'updateManual'])->name('journals.update-manual')->where('id', '[0-9]+');
         Route::patch('/journals/{id}/toggle-post', [JournalController::class, 'togglePost'])->name('journals.toggle-post');
+        Route::post('/journals/bulk-post', [JournalController::class, 'bulkPost'])->name('journals.bulk-post');
         Route::delete('/journals/{id}', [JournalController::class, 'destroy'])->name('journals.destroy');
         
         // Closing & Adjustment (MUST be before /journals/{id} to avoid route conflict)
@@ -311,6 +312,7 @@ Route::middleware([
         
         Route::prefix('reports')->name('reports.')->group(function () {
             Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])->name('balance-sheet');
+            Route::get('/balance-sheet-analysis', [ReportController::class, 'balanceSheetAnalysis'])->name('balance-sheet-analysis');
             Route::get('/profit-loss', [ReportController::class, 'profitLoss'])->name('profit-loss');
             Route::get('/trial-balance', [ReportController::class, 'trialBalance'])->name('trial-balance');
             Route::get('/ledger/{account_id?}', [ReportController::class, 'ledger'])->name('ledger');

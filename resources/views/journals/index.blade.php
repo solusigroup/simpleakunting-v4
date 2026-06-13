@@ -35,6 +35,27 @@
             <span class="text-text-muted">-</span>
             <input type="date" id="dateEnd" class="bg-transparent border-0 text-white text-sm focus:ring-0">
         </div>
+        <div class="flex items-center gap-2 px-4 py-2 rounded-full border border-border-dark bg-surface-dark/30 select-none">
+            <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllDrafts(this)" class="w-4 h-4 rounded border-border-dark bg-surface-dark text-primary focus:ring-primary cursor-pointer">
+            <label for="selectAllCheckbox" class="text-white text-sm cursor-pointer select-none">Pilih Semua Draft</label>
+        </div>
+    </div>
+
+    <!-- Bulk Actions Toolbar -->
+    <div id="bulkActionsToolbar" class="hidden flex items-center justify-between p-4 mb-6 rounded-2xl border border-primary/30 bg-primary/5 transition duration-300">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary">check_box</span>
+            <span class="text-white text-sm font-semibold" id="selectedCountText">0 jurnal terpilih</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="bulkPostJournals()" class="px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/80 transition flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">lock</span>
+                Posting Masal
+            </button>
+            <button onclick="clearSelection()" class="px-5 py-2.5 rounded-xl bg-white/5 border border-border-dark text-text-muted text-xs font-bold hover:bg-white/10 hover:text-white transition">
+                Batal
+            </button>
+        </div>
     </div>
 
     <!-- Journals List -->
@@ -263,6 +284,12 @@
         function renderJournals(journals) {
             const container = document.getElementById('journalsList');
             
+            // Reset select-all checkbox and hide bulk toolbar on new render
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (selectAllCheckbox) selectAllCheckbox.checked = false;
+            const toolbar = document.getElementById('bulkActionsToolbar');
+            if (toolbar) toolbar.classList.add('hidden');
+            
             if (journals.length === 0) {
                 container.innerHTML = `
                     <div class="p-12 text-center text-text-muted rounded-2xl border border-border-dark bg-surface-dark/30">
@@ -277,6 +304,14 @@
                 <div class="group rounded-2xl border border-border-dark bg-surface-dark/30 overflow-hidden hover:border-primary/50 transition duration-300">
                     <div class="px-6 py-5 flex items-center justify-between">
                         <div class="flex items-center gap-5">
+                            ${!journal.is_posted ? `
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="journal_select" value="${journal.id}" onchange="updateBulkActionsToolbar()"
+                                           class="w-5 h-5 rounded border-border-dark bg-background-dark text-primary focus:ring-primary focus:ring-offset-background-dark transition cursor-pointer">
+                                </div>
+                            ` : `
+                                <div class="w-5 h-5 flex-shrink-0"></div>
+                            `}
                             <div class="w-12 h-12 rounded-2xl ${getSourceColor(journal.source)} flex items-center justify-center shadow-lg">
                                 <span class="material-symbols-outlined text-2xl">${getSourceIcon(journal.source)}</span>
                             </div>
@@ -615,6 +650,73 @@
                 loadJournals();
             } else {
                 alert(result.message);
+            }
+        }
+
+        function updateBulkActionsToolbar() {
+            const checkboxes = document.querySelectorAll('input[name="journal_select"]:checked');
+            const totalCheckboxes = document.querySelectorAll('input[name="journal_select"]');
+            const toolbar = document.getElementById('bulkActionsToolbar');
+            const countText = document.getElementById('selectedCountText');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            
+            if (checkboxes.length > 0) {
+                toolbar.classList.remove('hidden');
+                countText.textContent = `${checkboxes.length} jurnal terpilih`;
+            } else {
+                toolbar.classList.add('hidden');
+            }
+
+            // Sync the selectAll checkbox state
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = totalCheckboxes.length > 0 && checkboxes.length === totalCheckboxes.length;
+            }
+        }
+
+        function toggleSelectAllDrafts(masterCheckbox) {
+            const checkboxes = document.querySelectorAll('input[name="journal_select"]');
+            checkboxes.forEach(cb => {
+                cb.checked = masterCheckbox.checked;
+            });
+            updateBulkActionsToolbar();
+        }
+
+        function clearSelection() {
+            const checkboxes = document.querySelectorAll('input[name="journal_select"]');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+            });
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+            }
+            updateBulkActionsToolbar();
+        }
+
+        async function bulkPostJournals() {
+            const checkboxes = document.querySelectorAll('input[name="journal_select"]:checked');
+            const ids = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            
+            if (ids.length === 0) return;
+            if (!confirm(`Apakah Anda yakin ingin memposting ${ids.length} jurnal ini secara masal?`)) return;
+            
+            const response = await fetch('/journals/bulk-post', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ ids })
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+                if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                loadJournals();
+            } else {
+                alert(result.message || 'Terjadi kesalahan');
             }
         }
 

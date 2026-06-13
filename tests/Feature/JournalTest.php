@@ -48,14 +48,19 @@ class JournalTest extends TestCase
             ->get();
 
         // Unbalanced journal should fail
-        $response = $this->actingAs($this->user)->postJson('/journals/manual', [
-            'date' => now()->format('Y-m-d'),
-            'description' => 'Test Journal',
-            'lines' => [
-                ['account_id' => $accounts[0]->id, 'debit' => 100000, 'credit' => 0],
-                ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => 50000], // Not balanced!
-            ],
-        ]);
+        $response = $this->actingAs($this->user)
+            ->withoutMiddleware([
+                \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
+                \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            ])
+            ->postJson('/journals/manual', [
+                'date' => now()->format('Y-m-d'),
+                'description' => 'Test Journal',
+                'lines' => [
+                    ['account_id' => $accounts[0]->id, 'debit' => 100000, 'credit' => 0],
+                    ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => 50000], // Not balanced!
+                ],
+            ]);
 
         $response->assertStatus(422);
         $response->assertJsonPath('success', false);
@@ -69,14 +74,19 @@ class JournalTest extends TestCase
             ->get();
 
         // Balanced journal should succeed
-        $response = $this->actingAs($this->user)->postJson('/journals/manual', [
-            'date' => now()->format('Y-m-d'),
-            'description' => 'Test Balanced Journal',
-            'lines' => [
-                ['account_id' => $accounts[0]->id, 'debit' => 100000, 'credit' => 0],
-                ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => 100000],
-            ],
-        ]);
+        $response = $this->actingAs($this->user)
+            ->withoutMiddleware([
+                \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
+                \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            ])
+            ->postJson('/journals/manual', [
+                'date' => now()->format('Y-m-d'),
+                'description' => 'Test Balanced Journal',
+                'lines' => [
+                    ['account_id' => $accounts[0]->id, 'debit' => 100000, 'credit' => 0],
+                    ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => 100000],
+                ],
+            ]);
 
         $response->assertStatus(201);
         $response->assertJsonPath('success', true);
@@ -86,7 +96,7 @@ class JournalTest extends TestCase
             'company_id' => $this->company->id,
             'description' => 'Test Balanced Journal',
             'source' => 'manual',
-            'is_posted' => true,
+            'is_posted' => false,
         ]);
     }
 
@@ -99,15 +109,145 @@ class JournalTest extends TestCase
             ->take(2)
             ->get();
 
-        $response = $this->actingAs($this->user)->postJson('/journals/manual', [
-            'date' => now()->format('Y-m-d'),
-            'description' => 'Test Journal',
-            'lines' => [
-                ['account_id' => $accounts[0]->id, 'debit' => 100000, 'credit' => 0],
-                ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => 100000],
-            ],
-        ]);
+        $response = $this->actingAs($this->user)
+            ->withoutMiddleware([
+                \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
+                \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            ])
+            ->postJson('/journals/manual', [
+                'date' => now()->format('Y-m-d'),
+                'description' => 'Test Journal',
+                'lines' => [
+                    ['account_id' => $accounts[0]->id, 'debit' => 100000, 'credit' => 0],
+                    ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => 100000],
+                ],
+            ]);
 
         $response->assertStatus(403);
+    }
+
+    public function test_admin_or_manager_can_bulk_post_journals(): void
+    {
+        $accounts = ChartOfAccount::where('company_id', $this->company->id)
+            ->where('is_parent', false)
+            ->take(2)
+            ->get();
+
+        // Create 2 draft journals
+        $journal1 = Journal::create([
+            'company_id' => $this->company->id,
+            'date' => now()->format('Y-m-d'),
+            'reference' => 'TEST-001',
+            'description' => 'Draft Journal 1',
+            'source' => 'manual',
+            'is_posted' => false,
+        ]);
+        JournalItem::create([
+            'journal_id' => $journal1->id,
+            'coa_id' => $accounts[0]->id,
+            'debit' => 100000,
+            'credit' => 0,
+        ]);
+        JournalItem::create([
+            'journal_id' => $journal1->id,
+            'coa_id' => $accounts[1]->id,
+            'debit' => 0,
+            'credit' => 100000,
+        ]);
+
+        $journal2 = Journal::create([
+            'company_id' => $this->company->id,
+            'date' => now()->format('Y-m-d'),
+            'reference' => 'TEST-002',
+            'description' => 'Draft Journal 2',
+            'source' => 'manual',
+            'is_posted' => false,
+        ]);
+        JournalItem::create([
+            'journal_id' => $journal2->id,
+            'coa_id' => $accounts[0]->id,
+            'debit' => 50000,
+            'credit' => 0,
+        ]);
+        JournalItem::create([
+            'journal_id' => $journal2->id,
+            'coa_id' => $accounts[1]->id,
+            'debit' => 0,
+            'credit' => 50000,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withoutMiddleware([
+                \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
+                \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            ])
+            ->postJson('/journals/bulk-post', [
+                'ids' => [$journal1->id, $journal2->id],
+            ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('success', true);
+
+        $this->assertTrue($journal1->fresh()->is_posted);
+        $this->assertTrue($journal2->fresh()->is_posted);
+    }
+
+    public function test_operator_cannot_bulk_post_journals(): void
+    {
+        $this->user->update(['role' => 'Operator']);
+
+        $response = $this->actingAs($this->user)
+            ->withoutMiddleware([
+                \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
+                \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            ])
+            ->postJson('/journals/bulk-post', [
+                'ids' => [1, 2],
+            ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_unbalanced_journals_failed_bulk_post(): void
+    {
+        $accounts = ChartOfAccount::where('company_id', $this->company->id)
+            ->where('is_parent', false)
+            ->take(2)
+            ->get();
+
+        // Create unbalanced draft journal
+        $journal = Journal::create([
+            'company_id' => $this->company->id,
+            'date' => now()->format('Y-m-d'),
+            'reference' => 'TEST-UNB',
+            'description' => 'Unbalanced Draft Journal',
+            'source' => 'manual',
+            'is_posted' => false,
+        ]);
+        JournalItem::create([
+            'journal_id' => $journal->id,
+            'coa_id' => $accounts[0]->id,
+            'debit' => 100000,
+            'credit' => 0,
+        ]);
+        JournalItem::create([
+            'journal_id' => $journal->id,
+            'coa_id' => $accounts[1]->id,
+            'debit' => 0,
+            'credit' => 50000, // Unbalanced
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withoutMiddleware([
+                \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
+                \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            ])
+            ->postJson('/journals/bulk-post', [
+                'ids' => [$journal->id],
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('success', false);
+        $this->assertFalse($journal->fresh()->is_posted);
     }
 }

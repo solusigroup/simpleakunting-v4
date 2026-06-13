@@ -233,6 +233,61 @@ class JournalController extends Controller
     }
 
     /**
+     * POST /journals/bulk-post
+     * Bulk post selected journals.
+     */
+    public function bulkPost(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        if (!$user->canApprove()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya Manajer atau Administrator yang dapat memposting jurnal.',
+            ], 403);
+        }
+
+        $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:journals,id'],
+        ]);
+
+        $journals = Journal::where('company_id', $user->company->id)
+            ->whereIn('id', $request->ids)
+            ->where('is_posted', false)
+            ->get();
+
+        $successCount = 0;
+        $failedCount = 0;
+
+        DB::transaction(function () use ($journals, &$successCount, &$failedCount) {
+            foreach ($journals as $journal) {
+                if ($journal->post()) {
+                    $successCount++;
+                } else {
+                    $failedCount++;
+                }
+            }
+        });
+
+        if ($successCount === 0 && $failedCount > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memposting jurnal. Pastikan jurnal seimbang.',
+            ], 422);
+        }
+
+        $message = "Berhasil memposting {$successCount} jurnal.";
+        if ($failedCount > 0) {
+            $message .= " ({$failedCount} jurnal gagal diposting karena tidak seimbang)";
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+        ]);
+    }
+
+    /**
      * DELETE /journals/{id}
      * Hapus jurnal jika belum diposting.
      */
