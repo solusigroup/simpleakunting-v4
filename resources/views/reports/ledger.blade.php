@@ -9,6 +9,11 @@
                 <select id="accountSelect" class="px-4 py-2 rounded-full border border-border-dark bg-surface-dark text-white text-sm focus:ring-primary min-w-[200px]">
                     <option value="">Pilih Akun...</option>
                 </select>
+                @if(auth()->user()->company?->isBumdesa())
+                <select id="unitFilter" class="px-4 py-2 rounded-full border border-border-dark bg-surface-dark text-white text-sm focus:ring-primary">
+                    <option value="">Konsolidasi (Semua Unit)</option>
+                </select>
+                @endif
                 <div class="flex items-center gap-2 px-4 py-2 rounded-full border border-border-dark bg-surface-dark/30">
                     <input type="date" id="startDate" class="bg-transparent border-0 text-white text-sm focus:ring-0 w-32">
                     <span class="text-text-muted">-</span>
@@ -125,7 +130,9 @@
 
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
-            const url = `/reports/ledger/${accountId}?start_date=${startDate}&end_date=${endDate}`;
+            const unitId = document.getElementById('unitFilter')?.value || '';
+            let url = `/reports/ledger/${accountId}?start_date=${startDate}&end_date=${endDate}`;
+            if (unitId) url += `&unit_id=${unitId}`;
 
             const response = await fetch(url, {
                 headers: { 'Accept': 'application/json' }
@@ -187,7 +194,10 @@
             }
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
-            window.location.href = `/reports/ledger/export-pdf/${accountId}?start_date=${startDate}&end_date=${endDate}`;
+            const unitId = document.getElementById('unitFilter')?.value || '';
+            let url = `/reports/ledger/export-pdf/${accountId}?start_date=${startDate}&end_date=${endDate}`;
+            if (unitId) url += `&unit_id=${unitId}`;
+            window.location.href = url;
         }
 
         function exportExcel() {
@@ -198,7 +208,26 @@
             }
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
-            window.location.href = `/reports/ledger/export-excel/${accountId}?start_date=${startDate}&end_date=${endDate}`;
+            const unitId = document.getElementById('unitFilter')?.value || '';
+            let url = `/reports/ledger/export-excel/${accountId}?start_date=${startDate}&end_date=${endDate}`;
+            if (unitId) url += `&unit_id=${unitId}`;
+            window.location.href = url;
+        }
+
+        async function loadUnits() {
+            const unitFilter = document.getElementById('unitFilter');
+            if (!unitFilter) return;
+            
+            const response = await fetch('/units', { headers: { 'Accept': 'application/json' } });
+            const result = await response.json();
+            if (result.success && result.data) {
+                result.data.forEach(unit => {
+                    const option = document.createElement('option');
+                    option.value = unit.id;
+                    option.textContent = unit.name;
+                    unitFilter.appendChild(option);
+                });
+            }
         }
 
         // Init
@@ -206,6 +235,7 @@
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
         document.getElementById('startDate').value = firstDay.toISOString().split('T')[0];
         document.getElementById('endDate').value = today.toISOString().split('T')[0];
+        loadUnits();
         loadAccounts();
     </script>
     @endpush

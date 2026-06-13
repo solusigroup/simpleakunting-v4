@@ -1189,6 +1189,7 @@ class ReportController extends Controller
         $validated = $request->validate([
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
+            'unit_id' => 'nullable|exists:business_units,id',
         ]);
 
         $user = $request->user();
@@ -1196,6 +1197,7 @@ class ReportController extends Controller
         
         $endDate = $validated['end_date'] ?? date('Y-m-d');
         $startDate = $validated['start_date'] ?? date('Y-01-01');
+        $unitId = $validated['unit_id'] ?? null;
 
         // Get equity accounts (code 3.x.x)
         $equityAccounts = ChartOfAccount::where('company_id', $company->id)
@@ -1211,7 +1213,7 @@ class ReportController extends Controller
         $beginningRetained = 0;
         
         foreach ($equityAccounts as $account) {
-            $balance = $this->getAccountBalance($account, null, $startDate, null);
+            $balance = $this->getAccountBalance($account, null, $startDate, $unitId);
             if (str_contains(strtolower($account->name), 'modal') || str_contains(strtolower($account->name), 'capital')) {
                 $beginningCapital += $balance;
             } else {
@@ -1221,7 +1223,7 @@ class ReportController extends Controller
         $beginningEquity = $beginningCapital + $beginningRetained;
 
         // Calculate net income for the period
-        $netIncome = $this->calculateNetIncome($company, $startDate, $endDate);
+        $netIncome = $this->calculateNetIncome($company, $startDate, $endDate, $unitId);
 
         // Calculate capital changes during period
         $capitalChanges = [];
@@ -1230,10 +1232,13 @@ class ReportController extends Controller
 
         // Get equity transactions in period
         $equityTransactions = JournalItem::whereIn('coa_id', $equityAccounts->pluck('id'))
-            ->whereHas('journal', function($q) use ($company, $startDate, $endDate) {
+            ->whereHas('journal', function($q) use ($company, $startDate, $endDate, $unitId) {
                 $q->where('company_id', $company->id)
                   ->where('is_posted', true)
                   ->whereBetween('date', [$startDate, $endDate]);
+                if ($unitId) {
+                    $q->where('business_unit_id', $unitId);
+                }
             })
             ->with(['journal', 'account'])
             ->get();
@@ -1284,6 +1289,8 @@ class ReportController extends Controller
             'ending_capital' => $endingCapital,
             'ending_retained' => $endingRetained,
             'ending_equity' => $endingEquity,
+            'period' => ['start_date' => $startDate, 'end_date' => $endDate],
+            'unit_id' => $unitId,
         ];
 
         if ($request->wantsJson()) {
@@ -1292,67 +1299,71 @@ class ReportController extends Controller
 
         return view('reports.equity-changes', [
             'data' => $data,
-            'period' => ['start_date' => $startDate, 'end_date' => $endDate]
+            'period' => ['start_date' => $startDate, 'end_date' => $endDate],
+            'unit_id' => $unitId,
         ]);
     }
 
     /**
      * Get account balance for a specific period (between start and end date)
      */
-    private function getAccountBalanceForPeriod($account, $startDate, $endDate)
-    {
-        $query = JournalItem::where('coa_id', $account->id)
-            ->whereHas('journal', function($q) use ($startDate, $endDate) {
-                $q->where('is_posted', true)
-                  ->whereBetween('date', [$startDate, $endDate]);
-            });
-
-        $totalDebit = (clone $query)->sum('debit');
-        $totalCredit = (clone $query)->sum('credit');
-
-        // For revenue accounts (4.x.x), balance is credit - debit
-        // For expense accounts (5.x.x, 6.x.x), balance is debit - credit
-        $accountType = substr($account->code, 0, 1);
-        
-        if (in_array($accountType, ['4'])) { // Revenue
-            return $totalCredit - $totalDebit;
-        } else { // Expense
-            return $totalDebit - $totalCredit;
-        }
-    }
-
-    /**
-     * Calculate net income for period
-     */
-    private function calculateNetIncome($company, $startDate, $endDate)
-    {
-        // Revenue accounts (4.x.x)
-        $revenueAccounts = ChartOfAccount::where('company_id', $company->id)
-            ->where('code', 'LIKE', '4%')
-            ->where('is_parent', false)
-            ->get();
-
-        // Expense accounts (5.x.x, 6.x.x)
-        $expenseAccounts = ChartOfAccount::where('company_id', $company->id)
-            ->where(function($q) {
-                $q->where('code', 'LIKE', '5%')
-                  ->orWhere('code', 'LIKE', '6%');
-            })
-            ->where('is_parent', false)
-            ->get();
-
-        $totalRevenue = 0;
-        foreach ($revenueAccounts as $account) {
-            $totalRevenue += $this->getAccountBalanceForPeriod($account, $startDate, $endDate);
-        }
-
-        $totalExpense = 0;
-        foreach ($expenseAccounts as $account) {
-            $totalExpense += $this->getAccountBalanceForPeriod($account, $startDate, $endDate);
-        }
-
-        return $totalRevenue - $totalExpense;
-    }
+     private function getAccountBalanceForPeriod($account, $startDate, $endDate, $unitId = null)
+     {
+         $query = JournalItem::where('coa_id', $account->id)
+             ->whereHas('journal', function($q) use ($startDate, $endDate, $unitId) {
+                 $q->where('is_posted', true)
+                   ->whereBetween('date', [$startDate, $endDate]);
+                 if ($unitId) {
+                     $q->where('business_unit_id', $unitId);
+                 }
+             });
+ 
+         $totalDebit = (clone $query)->sum('debit');
+         $totalCredit = (clone $query)->sum('credit');
+ 
+         // For revenue accounts (4.x.x), balance is credit - debit
+         // For expense accounts (5.x.x, 6.x.x), balance is debit - credit
+         $accountType = substr($account->code, 0, 1);
+         
+         if (in_array($accountType, ['4'])) { // Revenue
+             return $totalCredit - $totalDebit;
+         } else { // Expense
+             return $totalDebit - $totalCredit;
+         }
+     }
+ 
+     /**
+      * Calculate net income for period
+      */
+     private function calculateNetIncome($company, $startDate, $endDate, $unitId = null)
+     {
+         // Revenue accounts (4.x.x)
+         $revenueAccounts = ChartOfAccount::where('company_id', $company->id)
+             ->where('code', 'LIKE', '4%')
+             ->where('is_parent', false)
+             ->get();
+ 
+         // Expense accounts (5.x.x, 6.x.x)
+         $expenseAccounts = ChartOfAccount::where('company_id', $company->id)
+             ->where(function($q) {
+                 $q->where('code', 'LIKE', '5%')
+                   ->orWhere('code', 'LIKE', '6%');
+             })
+             ->where('is_parent', false)
+             ->get();
+ 
+         $totalRevenue = 0;
+         foreach ($revenueAccounts as $account) {
+             $totalRevenue += $this->getAccountBalanceForPeriod($account, $startDate, $endDate, $unitId);
+         }
+ 
+         $totalExpense = 0;
+         foreach ($expenseAccounts as $account) {
+             $totalExpense += $this->getAccountBalanceForPeriod($account, $startDate, $endDate, $unitId);
+         }
+ 
+         return $totalRevenue - $totalExpense;
+     }
 
     /**
      * GET /reports/equity-changes/export-pdf
@@ -1363,6 +1374,7 @@ class ReportController extends Controller
         $validated = $request->validate([
             'start_date' => 'nullable|date',
             'end_date' => 'required|date',
+            'unit_id' => 'nullable|exists:business_units,id',
         ]);
 
         $user = $request->user();
@@ -1370,9 +1382,10 @@ class ReportController extends Controller
         
         $endDate = $validated['end_date'];
         $startDate = $validated['start_date'] ?? date('Y-01-01');
+        $unitId = $validated['unit_id'] ?? null;
 
         // Reuse data calculation from equityChanges
-        $request->merge(['start_date' => $startDate, 'end_date' => $endDate]);
+        $request->merge(['start_date' => $startDate, 'end_date' => $endDate, 'unit_id' => $unitId]);
         
         // Get equity data
         $equityAccounts = ChartOfAccount::where('company_id', $company->id)
@@ -1384,7 +1397,7 @@ class ReportController extends Controller
         $beginningRetained = 0;
         
         foreach ($equityAccounts as $account) {
-            $balance = $this->getAccountBalance($account, null, $startDate, null);
+            $balance = $this->getAccountBalance($account, null, $startDate, $unitId);
             if (str_contains(strtolower($account->name), 'modal') || str_contains(strtolower($account->name), 'capital')) {
                 $beginningCapital += $balance;
             } else {
@@ -1393,14 +1406,17 @@ class ReportController extends Controller
         }
         $beginningEquity = $beginningCapital + $beginningRetained;
 
-        $netIncome = $this->calculateNetIncome($company, $startDate, $endDate);
+        $netIncome = $this->calculateNetIncome($company, $startDate, $endDate, $unitId);
 
         $capitalChanges = [];
         $equityTransactions = JournalItem::whereIn('coa_id', $equityAccounts->pluck('id'))
-            ->whereHas('journal', function($q) use ($company, $startDate, $endDate) {
+            ->whereHas('journal', function($q) use ($company, $startDate, $endDate, $unitId) {
                 $q->where('company_id', $company->id)
                   ->where('is_posted', true)
                   ->whereBetween('date', [$startDate, $endDate]);
+                if ($unitId) {
+                    $q->where('business_unit_id', $unitId);
+                }
             })
             ->with(['journal', 'account'])
             ->get();

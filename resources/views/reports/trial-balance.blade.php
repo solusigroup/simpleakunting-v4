@@ -10,6 +10,11 @@
                     <span class="text-text-muted text-sm">Per Tanggal:</span>
                     <input type="date" id="endDate" class="bg-transparent border-0 text-white text-sm focus:ring-0">
                 </div>
+                @if(auth()->user()->company?->isBumdesa())
+                <select id="unitFilter" class="px-4 py-2 rounded-full border border-border-dark bg-surface-dark/30 text-white text-sm focus:ring-primary">
+                    <option value="">Konsolidasi (Semua Unit)</option>
+                </select>
+                @endif
                 <button onclick="loadReport()" class="px-6 py-2 rounded-full bg-primary text-background-dark font-bold hover:bg-[#2ec56a] transition">
                     <span class="material-symbols-outlined align-middle mr-1">refresh</span>
                     Muat
@@ -92,17 +97,46 @@
 
         function loadReport() {
             const endDate = document.getElementById('endDate').value;
-            window.location.href = `/reports/trial-balance?end_date=${endDate}`;
+            const unitId = document.getElementById('unitFilter')?.value || '';
+            let url = `/reports/trial-balance?end_date=${endDate}`;
+            if (unitId) url += `&unit_id=${unitId}`;
+            window.location.href = url;
         }
 
         function exportPDF() {
             const endDate = document.getElementById('endDate').value;
-            window.location.href = `/reports/trial-balance/export-pdf?end_date=${endDate}`;
+            const unitId = document.getElementById('unitFilter')?.value || '';
+            let url = `/reports/trial-balance/export-pdf?end_date=${endDate}`;
+            if (unitId) url += `&unit_id=${unitId}`;
+            window.location.href = url;
         }
 
         function exportExcel() {
             const endDate = document.getElementById('endDate').value;
-            window.location.href = `/reports/trial-balance/export-excel?end_date=${endDate}`;
+            const unitId = document.getElementById('unitFilter')?.value || '';
+            let url = `/reports/trial-balance/export-excel?end_date=${endDate}`;
+            if (unitId) url += `&unit_id=${unitId}`;
+            window.location.href = url;
+        }
+
+        async function loadUnits() {
+            const unitFilter = document.getElementById('unitFilter');
+            if (!unitFilter) return;
+            
+            const response = await fetch('/units', { headers: { 'Accept': 'application/json' } });
+            const result = await response.json();
+            if (result.success && result.data) {
+                const currentUnitId = '{{ $unit_id ?? "" }}';
+                result.data.forEach(unit => {
+                    const option = document.createElement('option');
+                    option.value = unit.id;
+                    option.textContent = unit.name;
+                    if (unit.id == currentUnitId) {
+                        option.selected = true;
+                    }
+                    unitFilter.appendChild(option);
+                });
+            }
         }
 
         function initializeWithServerData() {
@@ -148,6 +182,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const endDate = '{{ $end_date ?? now()->format("Y-m-d") }}';
             document.getElementById('endDate').value = endDate;
+            loadUnits();
             initializeWithServerData();
         });
     </script>

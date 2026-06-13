@@ -478,10 +478,14 @@
             const response = await fetch('/units', { headers: { 'Accept': 'application/json' } });
             const result = await response.json();
             if (result.success && result.data) {
+                const currentUnitId = '{{ $unit_id ?? "" }}';
                 result.data.forEach(unit => {
                     const option = document.createElement('option');
                     option.value = unit.id;
                     option.textContent = unit.name;
+                    if (unit.id == currentUnitId) {
+                        option.selected = true;
+                    }
                     unitFilter.appendChild(option);
                 });
             }

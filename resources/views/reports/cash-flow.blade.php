@@ -18,12 +18,12 @@
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:leave="transition ease-in duration-150"
                              class="absolute right-0 mt-2 w-48 rounded-xl border border-border-dark bg-surface-dark shadow-xl z-10">
-                        <a href="{{ route('reports.cash-flow.export-pdf', ['start_date' => $period['start_date'], 'end_date' => $period['end_date']]) }}" 
+                        <a href="{{ route('reports.cash-flow.export-pdf', ['start_date' => $period['start_date'], 'end_date' => $period['end_date'], 'unit_id' => request('unit_id')]) }}" 
                            class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight rounded-t-xl transition">
                             <span class="material-symbols-outlined text-accent-red">picture_as_pdf</span>
                             <span class="text-white">Export PDF</span>
                         </a>
-                        <a href="{{ route('reports.cash-flow.export-excel', ['start_date' => $period['start_date'], 'end_date' => $period['end_date']]) }}" 
+                        <a href="{{ route('reports.cash-flow.export-excel', ['start_date' => $period['start_date'], 'end_date' => $period['end_date'], 'unit_id' => request('unit_id')]) }}" 
                            class="flex items-center gap-3 px-4 py-3 hover:bg-surface-highlight border-t border-border-dark transition">
                             <span class="material-symbols-outlined text-green-500">description</span>
                             <span class="text-white">Export Excel</span>
@@ -52,6 +52,19 @@
                 <input type="date" name="end_date" value="{{ $period['end_date'] }}" 
                        class="w-full bg-surface-highlight border border-border-dark rounded-xl px-4 py-2 text-white focus:border-primary focus:outline-none">
             </div>
+            @if(auth()->user()->company?->isBumdesa())
+            <div class="flex-1">
+                <label class="block text-sm text-text-muted mb-2">Unit Usaha</label>
+                <select name="unit_id" class="w-full bg-surface-highlight border border-border-dark rounded-xl px-4 py-2 text-white focus:border-primary focus:outline-none">
+                    <option value="">Konsolidasi (Semua Unit)</option>
+                    @foreach(auth()->user()->company->businessUnits as $unit)
+                    <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
+                        {{ $unit->name }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
             <button type="submit" class="px-6 h-12 rounded-full font-medium bg-primary hover:bg-primary-dark text-background-dark transition flex items-center gap-2">
                 <span class="material-symbols-outlined">filter_list</span>
                 Filter

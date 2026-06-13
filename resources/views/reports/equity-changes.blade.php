@@ -13,6 +13,11 @@
                     <span class="text-text-muted">-</span>
                     <input type="date" id="endDate" class="bg-transparent border-0 text-white text-sm focus:ring-0 w-32">
                 </div>
+                @if(auth()->user()->company?->isBumdesa())
+                <select id="unitFilter" class="px-4 py-2 rounded-full border border-border-dark bg-surface-dark/30 text-white text-sm focus:ring-primary">
+                    <option value="">Konsolidasi (Semua Unit)</option>
+                </select>
+                @endif
 
                 <button onclick="loadReport()" class="px-6 py-2 rounded-full bg-primary text-background-dark font-bold hover:bg-[#2ec56a] transition">
                     <span class="material-symbols-outlined align-middle mr-1">refresh</span>
@@ -199,16 +204,51 @@
             tbody.innerHTML = rows;
         }
 
+        function loadReport() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const unitId = document.getElementById('unitFilter')?.value || '';
+            let url = `/reports/equity-changes?start_date=${startDate}&end_date=${endDate}`;
+            if (unitId) url += `&unit_id=${unitId}`;
+            window.location.href = url;
+        }
+
         function exportPDF() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
-            window.location.href = `/reports/equity-changes/export-pdf?start_date=${startDate}&end_date=${endDate}`;
+            const unitId = document.getElementById('unitFilter')?.value || '';
+            let url = `/reports/equity-changes/export-pdf?start_date=${startDate}&end_date=${endDate}`;
+            if (unitId) url += `&unit_id=${unitId}`;
+            window.location.href = url;
         }
 
         function exportExcel() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
-            window.location.href = `/reports/equity-changes/export-excel?start_date=${startDate}&end_date=${endDate}`;
+            const unitId = document.getElementById('unitFilter')?.value || '';
+            let url = `/reports/equity-changes/export-excel?start_date=${startDate}&end_date=${endDate}`;
+            if (unitId) url += `&unit_id=${unitId}`;
+            window.location.href = url;
+        }
+
+        async function loadUnits() {
+            const unitFilter = document.getElementById('unitFilter');
+            if (!unitFilter) return;
+            
+            const response = await fetch('/units', { headers: { 'Accept': 'application/json' } });
+            const result = await response.json();
+            if (result.success && result.data) {
+                const currentUnitId = '{{ $unit_id ?? "" }}';
+                result.data.forEach(unit => {
+                    const option = document.createElement('option');
+                    option.value = unit.id;
+                    option.textContent = unit.name;
+                    if (unit.id == currentUnitId) {
+                        option.selected = true;
+                    }
+                    unitFilter.appendChild(option);
+                });
+            }
         }
 
         function initializeDates() {
@@ -220,6 +260,7 @@
         // Initialize with server data
         document.addEventListener('DOMContentLoaded', function() {
             initializeDates();
+            loadUnits();
             updateUI(initialData);
         });
     </script>
