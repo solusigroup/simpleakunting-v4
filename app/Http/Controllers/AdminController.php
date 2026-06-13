@@ -45,6 +45,7 @@ class AdminController extends Controller
             'email' => 'required|email|max:255',
             'subdomain' => 'required|string|max:63|alpha_dash|unique:domains,domain',
             'plan' => 'required|in:free,starter,pro',
+            'accounting_standard' => 'required|in:SAK_EP,KEPMENDESA',
         ]);
 
         $tenantId = strtolower(str_replace(' ', '-', $request->name));
@@ -54,6 +55,7 @@ class AdminController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'plan' => $request->plan,
+            'accounting_standard' => $request->accounting_standard,
         ]);
 
         $tenant->domains()->create([

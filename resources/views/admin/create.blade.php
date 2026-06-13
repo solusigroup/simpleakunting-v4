@@ -54,6 +54,15 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label for="accounting_standard">Standar Akuntansi (COA)</label>
+                    <select id="accounting_standard" name="accounting_standard" class="form-control">
+                        <option value="SAK_EP" {{ old('accounting_standard') === 'SAK_EP' ? 'selected' : '' }}>UMKM (SAK EP)</option>
+                        <option value="KEPMENDESA" {{ old('accounting_standard') === 'KEPMENDESA' ? 'selected' : '' }}>BUMDesa (Kepmendesa)</option>
+                    </select>
+                    @error('accounting_standard') <div class="form-error">{{ $message }}</div> @enderror
+                </div>
+
                 <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
                     🚀 Buat Tenant
                 </button>

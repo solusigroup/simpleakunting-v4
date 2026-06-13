@@ -58,6 +58,16 @@
                     </div>
                 </div>
                 <div class="detail-item">
+                    <div class="label">Standar Akuntansi</div>
+                    <div class="value">
+                        @if(($tenant->accounting_standard ?? 'SAK_EP') === 'KEPMENDESA')
+                            <span style="color: #60a5fa; font-weight: 600;">BUMDesa (Kepmendesa)</span>
+                        @else
+                            <span style="color: #fca5a5; font-weight: 600;">UMKM (SAK EP)</span>
+                        @endif
+                    </div>
+                </div>
+                <div class="detail-item">
                     <div class="label">Tanggal Dibuat</div>
                     <div class="value">{{ $tenant->created_at?->format('d F Y, H:i') ?? '-' }}</div>
                 </div>

@@ -23,6 +23,10 @@ class TenantDatabaseSeeder extends Seeder
             // company_id is nullable, will update below
         ]);
 
+        // Get accounting standard from tenant config
+        $standard = tenant('accounting_standard') ?? 'SAK_EP';
+        $entityType = $standard === 'KEPMENDESA' ? 'BUMDesa' : 'UMKM';
+
         // Create default company for this tenant
         $company = Company::create([
             'user_id' => $user->id,
@@ -30,11 +34,18 @@ class TenantDatabaseSeeder extends Seeder
             'address' => '-',
             'phone' => '-',
             'email' => tenant('email') ?? '-',
-            'entity_type' => 'UMKM',
+            'entity_type' => $entityType,
             'fiscal_start' => date('Y-01-01'),
         ]);
 
         // Update user with company_id
         $user->update(['company_id' => $company->id]);
+
+        // Seed Chart of Accounts (COA) based on standard
+        if ($standard === 'KEPMENDESA') {
+            (new CoaBumdesaSeeder())->run($company);
+        } else {
+            (new CoaUmkmSeeder())->run($company);
+        }
     }
 }
