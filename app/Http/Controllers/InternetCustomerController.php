@@ -636,4 +636,267 @@ class InternetCustomerController extends Controller
         ];
         return $months[$month] ?? '';
     }
+
+    // ==========================================
+    // IMPOR PELANGGAN INTERNET (EXCEL)
+    // ==========================================
+
+    /**
+     * GET /internet/import
+     */
+    public function showImportForm(Request $request)
+    {
+        return view('internet.import');
+    }
+
+    /**
+     * GET /internet/import/template
+     */
+    public function downloadTemplate()
+    {
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Internet Customers');
+        
+        // Headers
+        $headers = [
+            'Customer ID', 'Nama Pelanggan', 'Alamat', 'No. Telepon', 'Email', 
+            'Paket Internet', 'Tarif Bulanan', 'Tanggal Tagih', 'Status', 'Catatan'
+        ];
+        $sheet->fromArray($headers, null, 'A1');
+        
+        // Style headers
+        $headerStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => 'e86c25']], // primary theme color
+            'alignment' => ['horizontal' => 'center'],
+        ];
+        $sheet->getStyle('A1:J1')->applyFromArray($headerStyle);
+        
+        // Sample data
+        $sampleData = [
+            ['PLG-001', 'Budi Santoso', 'Jl. Merdeka No. 10', '081234567890', 'budi@example.com', '10 Mbps', 150000, 1, 'active', 'Pelanggan baru'],
+            ['PLG-002', 'Siti Rahma', 'Jl. Mawar No. 4', '085678901234', 'siti@example.com', '20 Mbps', 250000, 5, 'active', ''],
+            ['', 'Toko Berkah', 'Pasar Baru Blok A/5', '081122334455', '', '50 Mbps', 500000, 10, 'active', 'Gunakan IP Statis'],
+        ];
+        $sheet->fromArray($sampleData, null, 'A2');
+        
+        // Auto-size columns
+        foreach (range('A', 'J') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        
+        // Instructions sheet
+        $instructionsSheet = $spreadsheet->createSheet();
+        $instructionsSheet->setTitle('Instructions');
+        
+        $instructions = [
+            ['Kolom', 'Wajib?', 'Tipe Data', 'Nilai Valid', 'Keterangan'],
+            ['Customer ID', 'Tidak', 'Teks', 'Maks 20 karakter, unik', 'Kode pelanggan. Kosongkan untuk generate otomatis (misal PLG-001)'],
+            ['Nama Pelanggan', 'Ya', 'Teks', 'Maks 255 karakter', 'Nama lengkap pelanggan'],
+            ['Alamat', 'Tidak', 'Teks', '-', 'Alamat instalasi/rumah'],
+            ['No. Telepon', 'Tidak', 'Teks', 'Maks 20 karakter', 'Nomor HP/Telepon aktif'],
+            ['Email', 'Tidak', 'Email', '-', 'Alamat email valid'],
+            ['Paket Internet', 'Ya', 'Teks', 'Maks 255 karakter', 'Nama paket (misal: 10 Mbps, 20 Mbps)'],
+            ['Tarif Bulanan', 'Ya', 'Angka', 'Min 0', 'Tarif tagihan bulanan (tanpa Rp atau titik)'],
+            ['Tanggal Tagih', 'Ya', 'Angka', '1 s/d 28', 'Tanggal tagih bulanan (default 1)'],
+            ['Status', 'Tidak', 'Pilihan', 'active, suspended, terminated', 'Status langganan (default: active)'],
+            ['Catatan', 'Tidak', 'Teks', '-', 'Catatan tambahan'],
+        ];
+        $instructionsSheet->fromArray($instructions, null, 'A1');
+        $instructionsSheet->getStyle('A1:E1')->applyFromArray($headerStyle);
+        foreach (range('A', 'E') as $col) {
+            $instructionsSheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        
+        $spreadsheet->setActiveSheetIndex(0);
+        
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $filename = 'internet_customers_template_' . date('Ymd') . '.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * POST /internet/import
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls|max:5120',
+        ]);
+
+        $user = $request->user();
+        $company = $user->company;
+
+        if (!$company) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Perusahaan tidak ditemukan.',
+            ], 400);
+        }
+
+        if (!$user->canEdit()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk import pelanggan.',
+            ], 403);
+        }
+
+        try {
+            $file = $request->file('file');
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+
+            array_shift($rows); // Remove header row
+
+            $successCount = 0;
+            $errorCount = 0;
+            $errors = [];
+            $imported = [];
+
+            DB::beginTransaction();
+
+            foreach ($rows as $index => $row) {
+                $rowNumber = $index + 2;
+
+                try {
+                    // Check if row is empty
+                    if (empty(array_filter($row, function ($val) { return $val !== null && $val !== ''; }))) {
+                        continue;
+                    }
+
+                    $customerId = trim($row[0] ?? '');
+                    $name = trim($row[1] ?? '');
+                    $address = trim($row[2] ?? '');
+                    $phone = trim($row[3] ?? '');
+                    $email = trim($row[4] ?? '');
+                    $packageName = trim($row[5] ?? '');
+                    $monthlyRate = $row[6];
+                    $billingDate = $row[7];
+                    $status = strtolower(trim($row[8] ?? 'active'));
+                    $notes = trim($row[9] ?? '');
+
+                    // Validation
+                    if (empty($name)) {
+                        throw new \Exception('Nama Pelanggan wajib diisi');
+                    }
+                    if (empty($packageName)) {
+                        throw new \Exception('Paket Internet wajib diisi');
+                    }
+                    if ($monthlyRate === null || $monthlyRate === '') {
+                        throw new \Exception('Tarif Bulanan wajib diisi');
+                    }
+                    if (!is_numeric($monthlyRate) || $monthlyRate < 0) {
+                        throw new \Exception('Tarif Bulanan harus berupa angka positif');
+                    }
+                    if ($billingDate === null || $billingDate === '') {
+                        $billingDate = 1; // Default
+                    }
+                    if (!is_numeric($billingDate) || $billingDate < 1 || $billingDate > 28) {
+                        throw new \Exception('Tanggal Tagih harus berupa angka antara 1 s/d 28');
+                    }
+                    if (!in_array($status, ['active', 'suspended', 'terminated'])) {
+                        $status = 'active'; // Default
+                    }
+                    if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        throw new \Exception('Format email tidak valid');
+                    }
+
+                    // Check duplicate customer ID if provided
+                    if (!empty($customerId)) {
+                        $exists = InternetCustomer::where('company_id', $company->id)
+                            ->where('customer_id', $customerId)
+                            ->exists();
+
+                        if ($exists) {
+                            throw new \Exception("ID Pelanggan '{$customerId}' sudah digunakan");
+                        }
+                    } else {
+                        // Generate dynamic unique ID taking local imports transaction into account
+                        $generatedId = InternetCustomer::generateCustomerId($company->id);
+                        $counter = 0;
+                        while (true) {
+                            $match = false;
+                            foreach ($imported as $item) {
+                                if ($item['customer_id'] === $generatedId) {
+                                    $match = true;
+                                    break;
+                                }
+                            }
+                            if (!$match) {
+                                break;
+                            }
+                            preg_match('/(\d+)$/', $generatedId, $matches);
+                            $next = isset($matches[1]) ? (int)$matches[1] + 1 : 1;
+                            $generatedId = 'PLG-' . str_pad($next, 3, '0', STR_PAD_LEFT);
+                            $counter++;
+                            if ($counter > 1000) break;
+                        }
+                        $customerId = $generatedId;
+                    }
+
+                    $customer = InternetCustomer::create([
+                        'company_id' => $company->id,
+                        'customer_id' => $customerId,
+                        'name' => $name,
+                        'address' => $address ?: null,
+                        'phone' => $phone ?: null,
+                        'email' => $email ?: null,
+                        'package_name' => $packageName,
+                        'monthly_rate' => (float)$monthlyRate,
+                        'billing_date' => (int)$billingDate,
+                        'status' => $status,
+                        'activated_at' => now(),
+                        'notes' => $notes ?: null,
+                    ]);
+
+                    $successCount++;
+                    $imported[] = [
+                        'row' => $rowNumber,
+                        'customer_id' => $customer->customer_id,
+                        'name' => $name,
+                    ];
+
+                } catch (\Exception $e) {
+                    $errorCount++;
+                    $errors[] = [
+                        'row' => $rowNumber,
+                        'customer_id' => $customerId ?? '',
+                        'name' => $name ?? '',
+                        'error' => $e->getMessage(),
+                    ];
+                }
+            }
+
+            if ($errorCount > 0 && $successCount == 0) {
+                DB::rollBack();
+            } else {
+                DB::commit();
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Import selesai: {$successCount} berhasil, {$errorCount} gagal.",
+                'data' => [
+                    'success_count' => $successCount,
+                    'error_count' => $errorCount,
+                    'imported' => $imported,
+                    'errors' => $errors,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memproses file Excel: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

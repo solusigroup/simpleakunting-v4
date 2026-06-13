@@ -377,6 +377,9 @@ Route::middleware([
             Route::post('/billing/generate', [InternetCustomerController::class, 'generateBilling'])->name('billing.generate');
             Route::post('/billing/{id}/pay', [InternetCustomerController::class, 'recordPayment'])->name('billing.pay')->where('id', '[0-9]+');
             Route::get('/ledger', [InternetCustomerController::class, 'subsidiaryLedger'])->name('ledger');
+            Route::get('/import', [InternetCustomerController::class, 'showImportForm'])->name('import.form');
+            Route::get('/import/template', [InternetCustomerController::class, 'downloadTemplate'])->name('import.template');
+            Route::post('/import', [InternetCustomerController::class, 'import'])->name('import');
             Route::get('/{id}', [InternetCustomerController::class, 'customerDetail'])->name('show')->where('id', '[0-9]+');
             Route::put('/{id}', [InternetCustomerController::class, 'update'])->name('update')->where('id', '[0-9]+');
             Route::delete('/{id}', [InternetCustomerController::class, 'destroy'])->name('destroy')->where('id', '[0-9]+');

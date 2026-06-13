@@ -10,6 +10,10 @@
                     <span class="material-symbols-outlined text-xl">settings</span>
                     Pengaturan
                 </x-btn>
+                <x-btn type="secondary" onclick="window.location.href='{{ route('internet.import.form') }}'">
+                    <span class="material-symbols-outlined text-xl">upload</span>
+                    Import Excel
+                </x-btn>
                 <x-btn type="primary" onclick="openCreateModal()">
                     <span class="material-symbols-outlined text-xl">person_add</span>
                     Tambah Pelanggan
