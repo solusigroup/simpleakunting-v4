@@ -508,7 +508,7 @@ class InternetCustomerController extends Controller
         $discountAccount = $company->internetDiscountAccount;
 
         $payment = DB::transaction(function () use ($request, $company, $billing, $payAmount, $discount, $totalCleared, $receivableAccount, $discountAccount) {
-            $paymentNumber = InternetPayment::generatePaymentNumber($company->id);
+            $paymentNumber = InternetPayment::generatePaymentNumber($company->id, $request->payment_date);
             $customer = $billing->customer;
 
             // Create Journal: Debit Kas/Bank, Debit Potongan Penjualan (if > 0), Credit Piutang

@@ -61,13 +61,14 @@ class InternetPayment extends Model
     /**
      * Generate payment number.
      */
-    public static function generatePaymentNumber(int $companyId): string
+    public static function generatePaymentNumber(int $companyId, $paymentDate = null): string
     {
+        $date = $paymentDate ? \Illuminate\Support\Carbon::parse($paymentDate) : now();
         $count = static::where('company_id', $companyId)
-            ->whereYear('payment_date', now()->year)
-            ->whereMonth('payment_date', now()->month)
+            ->whereYear('payment_date', $date->year)
+            ->whereMonth('payment_date', $date->month)
             ->count();
 
-        return sprintf('PAY-%s-%04d', now()->format('Ymd'), $count + 1);
+        return sprintf('PAY-%s-%04d', $date->format('Ymd'), $count + 1);
     }
 }
