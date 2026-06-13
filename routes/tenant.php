@@ -275,6 +275,7 @@ Route::middleware([
         Route::middleware('throttle:60,1')->group(function () {
             Route::post('/journals/manual', [JournalController::class, 'storeManual'])->name('journals.manual');
         });
+        Route::put('/journals/{id}', [JournalController::class, 'updateManual'])->name('journals.update-manual')->where('id', '[0-9]+');
         Route::patch('/journals/{id}/toggle-post', [JournalController::class, 'togglePost'])->name('journals.toggle-post');
         Route::delete('/journals/{id}', [JournalController::class, 'destroy'])->name('journals.destroy');
         

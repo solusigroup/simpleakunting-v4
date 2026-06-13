@@ -262,4 +262,136 @@ class JournalController extends Controller
             'message' => 'Jurnal berhasil dihapus.',
         ]);
     }
+
+    /**
+     * PUT /journals/{id}
+     * Update Jurnal Manual.
+     */
+    public function updateManual(Request $request, int $id): JsonResponse
+    {
+        $user = $request->user();
+        
+        // Only Manajer and above can edit manual journals
+        if (!$user->canApprove()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya Manajer atau Administrator yang dapat mengubah jurnal manual.',
+            ], 403);
+        }
+
+        $company = $user->company;
+
+        $journal = Journal::where('company_id', $company->id)->findOrFail($id);
+
+        if ($journal->is_posted) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Jurnal yang sudah diposting tidak dapat diubah. Silakan batalkan posting terlebih dahulu jika ingin mengedit.',
+            ], 422);
+        }
+
+        if ($journal->source !== 'manual') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya jurnal manual yang dapat diedit langsung. Jurnal otomatis dari modul lain harus diedit melalui modul asalnya.',
+            ], 422);
+        }
+
+        $request->validate([
+            'date' => ['required', 'date'],
+            'description' => ['required', 'string', 'max:255'],
+            'unit_id' => ['nullable', 'exists:business_units,id'],
+            'contact_id' => ['nullable', 'exists:contacts,id'],
+            'lines' => ['required', 'array', 'min:2'],
+            'lines.*.account_id' => [
+                'required', 
+                Rule::exists('chart_of_accounts', 'id')->where('company_id', $company->id)
+            ],
+            'lines.*.debit' => ['required', 'numeric', 'min:0'],
+            'lines.*.credit' => ['required', 'numeric', 'min:0'],
+            'lines.*.memo' => ['nullable', 'string'],
+        ]);
+
+        // =============================================
+        // DOUBLE-ENTRY VALIDATION
+        // =============================================
+        $totalDebit = collect($request->lines)->sum('debit');
+        $totalCredit = collect($request->lines)->sum('credit');
+
+        if (abs($totalDebit - $totalCredit) > 0.01) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Jurnal tidak seimbang! Total Debit (' . number_format($totalDebit, 2) . ') harus sama dengan Total Kredit (' . number_format($totalCredit, 2) . ').',
+                'errors' => [
+                    'total_debit' => $totalDebit,
+                    'total_credit' => $totalCredit,
+                    'difference' => abs($totalDebit - $totalCredit),
+                ],
+            ], 422);
+        }
+
+        // Validate each line has either debit or credit (not both zero)
+        foreach ($request->lines as $index => $line) {
+            if ($line['debit'] == 0 && $line['credit'] == 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Baris ke-" . ($index + 1) . " harus memiliki nilai Debit atau Kredit.",
+                ], 422);
+            }
+        }
+
+        // =============================================
+        // CASH BALANCE VALIDATION
+        // =============================================
+        $cashValidation = $this->validateCashBalance($company, $request->lines);
+        
+        if (!$cashValidation['valid']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Transaksi ditolak: Saldo kas tidak mencukupi',
+                'errors' => [
+                    'current_cash_balance' => $cashValidation['current_balance'],
+                    'transaction_impact' => $cashValidation['impact'],
+                    'new_balance' => $cashValidation['new_balance'],
+                    'required_amount' => $cashValidation['required_amount'],
+                ],
+                'user_message' => sprintf(
+                    "Saldo kas saat ini: Rp %s. Transaksi ini memerlukan: Rp %s.",
+                    number_format($cashValidation['current_balance'], 0, ',', '.'),
+                    number_format($cashValidation['required_amount'], 0, ',', '.')
+                ),
+            ], 422);
+        }
+
+        $updatedJournal = DB::transaction(function () use ($request, $journal) {
+            // Update Journal
+            $journal->update([
+                'business_unit_id' => $request->unit_id,
+                'contact_id' => $request->contact_id,
+                'date' => $request->date,
+                'description' => $request->description,
+            ]);
+
+            // Re-create Journal Items: delete old ones first
+            $journal->items()->delete();
+
+            foreach ($request->lines as $line) {
+                JournalItem::create([
+                    'journal_id' => $journal->id,
+                    'coa_id' => $line['account_id'],
+                    'debit' => $line['debit'],
+                    'credit' => $line['credit'],
+                    'memo' => $line['memo'] ?? null,
+                ]);
+            }
+
+            return $journal;
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jurnal manual berhasil diperbarui.',
+            'data' => $updatedJournal->load('items.account'),
+        ]);
+    }
 }

@@ -52,7 +52,7 @@
         <div class="absolute inset-0 flex items-center justify-center p-4">
             <div class="bg-background-dark rounded-2xl border border-border-dark w-full max-w-6xl max-h-[90vh] overflow-hidden">
                 <div class="px-6 py-4 border-b border-border-dark flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-white">Jurnal Manual</h3>
+                    <h3 class="text-lg font-bold text-white" id="modalTitle">Jurnal Manual</h3>
                     <button onclick="closeModal()" class="text-text-muted hover:text-white">
                         <span class="material-symbols-outlined">close</span>
                     </button>
@@ -200,6 +200,7 @@
         let businessUnits = [];
         let contacts = [];
         let lineCount = 0;
+        let editingJournalId = null;
 
         async function loadAccounts() {
             const response = await fetch('/accounts?detail_only=1', {
@@ -309,6 +310,12 @@
                                 ${journal.is_posted ? 'Unpost' : 'Post'}
                             </button>
 
+                            ${!journal.is_posted && journal.source === 'manual' ? `
+                                <button onclick="editJournal(${journal.id})" class="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 hover:bg-blue-500/20 transition" title="Edit Jurnal">
+                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                </button>
+                            ` : ''}
+
                             ${!journal.is_posted ? `
                                 <button onclick="deleteJournal(${journal.id})" class="p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 hover:bg-red-500/20 transition" title="Hapus Jurnal">
                                     <span class="material-symbols-outlined text-sm">delete</span>
@@ -354,7 +361,7 @@
             return labels[source] || source;
         }
 
-        function addLine() {
+        function addLine(accountId = null, debit = 0, credit = 0) {
             lineCount++;
             const tbody = document.getElementById('linesBody');
             const tr = document.createElement('tr');
@@ -365,16 +372,16 @@
                     <select name="account_${lineCount}" required
                             class="account-select w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm focus:border-primary focus:ring-primary">
                         <option value="">Pilih Akun</option>
-                        ${accounts.map(a => `<option value="${a.id}">${a.code} - ${a.name}</option>`).join('')}
+                        ${accounts.map(a => `<option value="${a.id}" ${accountId == a.id ? 'selected' : ''}>${a.code} - ${a.name}</option>`).join('')}
                     </select>
                 </td>
                 <td class="p-2">
-                    <input type="number" name="debit_${lineCount}" value="0" min="0" step="0.01"
+                    <input type="number" name="debit_${lineCount}" value="${debit}" min="0" step="0.01"
                            onchange="updateTotals()"
                            class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm text-right focus:border-primary focus:ring-primary">
                 </td>
                 <td class="p-2">
-                    <input type="number" name="credit_${lineCount}" value="0" min="0" step="0.01"
+                    <input type="number" name="credit_${lineCount}" value="${credit}" min="0" step="0.01"
                            onchange="updateTotals()"
                            class="w-full px-3 py-2 rounded-lg bg-background-dark border border-border-dark text-white text-sm text-right focus:border-primary focus:ring-primary">
                 </td>
@@ -418,6 +425,8 @@
         }
 
         function openCreateModal() {
+            editingJournalId = null;
+            document.getElementById('modalTitle').textContent = 'Jurnal Manual';
             document.getElementById('journalForm').reset();
             document.getElementById('date').value = new Date().toISOString().split('T')[0];
             document.getElementById('linesBody').innerHTML = '';
@@ -430,6 +439,38 @@
 
         function closeModal() {
             document.getElementById('journalModal').classList.add('hidden');
+            editingJournalId = null;
+        }
+
+        async function editJournal(id) {
+            const response = await fetch(`/journals/${id}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                const journal = result.data;
+                editingJournalId = journal.id;
+                document.getElementById('modalTitle').textContent = 'Edit Jurnal Manual';
+                
+                document.getElementById('date').value = journal.date;
+                document.getElementById('description').value = journal.description;
+                document.getElementById('unitId').value = journal.business_unit_id || '';
+                document.getElementById('contactId').value = journal.contact_id || '';
+                
+                const tbody = document.getElementById('linesBody');
+                tbody.innerHTML = '';
+                lineCount = 0;
+                
+                journal.items.forEach(item => {
+                    addLine(item.coa_id, parseFloat(item.debit), parseFloat(item.credit));
+                });
+                
+                updateTotals();
+                document.getElementById('journalModal').classList.remove('hidden');
+            } else {
+                alert(result.message || 'Gagal memuat detail jurnal');
+            }
         }
 
         document.getElementById('journalForm').addEventListener('submit', async function(e) {
@@ -448,8 +489,12 @@
             
             const unitId = document.getElementById('unitId').value;
             const contactId = document.getElementById('contactId').value;
-            const response = await fetch('/journals/manual', {
-                method: 'POST',
+            
+            const url = editingJournalId ? `/journals/${editingJournalId}` : '/journals/manual';
+            const method = editingJournalId ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
