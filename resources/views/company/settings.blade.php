@@ -269,8 +269,44 @@
                     </label>
                     @endforeach
                 </div>
+            <!-- Module-Specific Mapping Settings -->
+            <div class="pt-6 border-t border-border-dark space-y-4">
+                <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-400 font-bold">settings_input_component</span>
+                    Pengaturan Pemetaan Akun Modul
+                </h3>
+                <p class="text-sm text-text-muted font-normal">
+                    Untuk pemetaan akun (COA) khusus modul Internet atau Bank Sampah, silakan akses halaman pengaturan masing-masing modul berikut:
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @if(in_array('internet', $currentSettings))
+                    <a href="{{ route('internet.settings') }}" class="flex items-center justify-between p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-blue-500/50 hover:bg-surface-highlight/25 transition group">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-blue-400">router</span>
+                            <div>
+                                <span class="text-white font-bold text-sm group-hover:text-blue-400 transition">Pengaturan Akun Internet</span>
+                                <p class="text-[10px] text-text-muted">Atur COA Piutang & Pendapatan Internet</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-text-muted group-hover:text-white transition">arrow_forward</span>
+                    </a>
+                    @endif
+
+                    @if(in_array('waste', $currentSettings))
+                    <a href="{{ route('waste.settings.edit') }}" class="flex items-center justify-between p-4 rounded-xl bg-surface-dark border border-border-dark hover:border-blue-500/50 hover:bg-surface-highlight/25 transition group">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-green-400">recycling</span>
+                            <div>
+                                <span class="text-white font-bold text-sm group-hover:text-green-400 transition">Pengaturan Akun Bank Sampah</span>
+                                <p class="text-[10px] text-text-muted">Atur COA Persediaan, Kas, Penjualan Sampah, dll</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-text-muted group-hover:text-white transition">arrow_forward</span>
+                    </a>
+                    @endif
+                </div>
             </div>
-            
+
             <!-- Submit Button -->
             <div class="flex justify-end gap-3 pt-6 border-t border-border-dark">
                 <a href="{{ route('dashboard') }}" 
