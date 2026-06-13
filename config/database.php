@@ -31,7 +31,13 @@ return [
 
     'connections' => [
 
-        'central' => [
+        'central' => env('DB_CONNECTION') === 'sqlite' ? [
+            'driver' => 'sqlite',
+            'url' => env('DB_URL'),
+            'database' => env('DB_DATABASE', ':memory:'),
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ] : [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),

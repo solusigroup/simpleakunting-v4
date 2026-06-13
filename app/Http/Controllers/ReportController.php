@@ -386,11 +386,14 @@ class ReportController extends Controller
         $totalDebit = (clone $query)->sum('debit');
         $totalCredit = (clone $query)->sum('credit');
 
+        // Only include opening balance if startDate is null (meaning cumulative balance is requested)
+        $openingBalance = !$startDate ? (float) ($account->opening_balance ?? 0) : 0;
+
         if ($account->normal_balance === 'DEBIT') {
-            return $totalDebit - $totalCredit;
+            return ($openingBalance + $totalDebit) - $totalCredit;
         }
         
-        return $totalCredit - $totalDebit;
+        return ($openingBalance + $totalCredit) - $totalDebit;
     }
 
     /**

@@ -93,12 +93,15 @@ class ChartOfAccount extends Model
         $debit = (clone $query)->sum('debit');
         $credit = (clone $query)->sum('credit');
 
+        // Only include opening balance if startDate is null (meaning cumulative balance is requested)
+        $openingBalance = !$startDate ? (float) ($this->opening_balance ?? 0) : 0;
+
         // Use the normal_balance field to determine calculation
         if ($this->normal_balance === 'DEBIT') {
-            return $debit - $credit;
+            return ($openingBalance + $debit) - $credit;
         }
         
-        return $credit - $debit;
+        return ($openingBalance + $credit) - $debit;
     }
 
     /**

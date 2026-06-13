@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
         // Add more enum values to the source column
         // Note: For MySQL, we need to manually alter the column
         DB::statement("ALTER TABLE journals MODIFY COLUMN source ENUM('manual', 'sales', 'purchase', 'cash_bank', 'adjustment', 'internet_billing', 'internet_payment') DEFAULT 'manual'");
@@ -22,6 +25,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
         DB::statement("ALTER TABLE journals MODIFY COLUMN source ENUM('manual', 'sales', 'purchase', 'cash_bank', 'adjustment') DEFAULT 'manual'");
     }
 };
