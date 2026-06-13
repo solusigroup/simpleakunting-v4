@@ -57,6 +57,104 @@
         /* Dropdown option text fix */
         html:not(.dark) select option { background-color: #ffffff; color: #1a2e22; }
         html.dark select option { background-color: #1a2e22; color: #ffffff; }
+
+        /* Print Styles */
+        @media print {
+            /* Hide sidebar, navigation, controls, buttons, forms, scrollbars */
+            aside,
+            header button,
+            header select,
+            header input,
+            header .relative,
+            header .border-border-dark,
+            form,
+            .no-print,
+            .mb-6.p-4.rounded-xl.border,
+            .print\:hidden,
+            div.fixed,
+            button,
+            select,
+            input,
+            .export-dropdown,
+            [x-show="sidebarOpen"] {
+                display: none !important;
+            }
+            
+            body, main, html, .flex, .min-h-screen {
+                background: #ffffff !important;
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                display: block !important;
+                min-height: 0 !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+            
+            main {
+                border: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            header {
+                background: transparent !important;
+                border-bottom: none !important;
+                position: static !important;
+                padding: 0 0 10px 0 !important;
+                margin-bottom: 20px !important;
+            }
+            
+            .p-4, .sm:p-8, .p-6, .p-8 {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .rounded-2xl, .rounded-xl, .border, .bg-surface-dark\/30, .bg-surface-highlight\/30, .bg-surface-dark {
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+            }
+            
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                margin-top: 10px !important;
+            }
+            
+            th, td {
+                color: #000000 !important;
+                border-bottom: 1px solid #ddd !important;
+                padding: 8px !important;
+            }
+            
+            th {
+                border-top: 1px solid #000 !important;
+                border-bottom: 2px solid #000 !important;
+            }
+            
+            tfoot tr td {
+                border-top: 2px solid #000 !important;
+                border-bottom: 2px solid #000 !important;
+                font-weight: bold !important;
+                color: #000000 !important;
+            }
+            
+            h1, h2, h3, h4, h5, h6, p, span, td, th {
+                color: #000000 !important;
+            }
+            
+            /* Ensure multi-column grids display in a clean stacked format on A4 paper */
+            .grid {
+                display: block !important;
+            }
+            
+            .grid > div {
+                margin-bottom: 20px !important;
+                page-break-inside: avoid !important;
+            }
+        }
     </style>
 </head>
 <body class="font-body antialiased bg-background-dark dark:bg-background-dark text-white min-h-screen">
