@@ -103,14 +103,25 @@
                             @endif
                         </td>
                         <td class="p-4 text-center">
-                            @if(!$billing->isPaid())
-                            <button onclick="openPaymentModal({{ $billing->id }}, '{{ $billing->billing_number }}', '{{ $billing->customer->name ?? '' }}', {{ $billing->remaining_amount }})" 
-                                    class="px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-xs font-medium hover:bg-primary/30 transition">
-                                <span class="material-symbols-outlined text-sm align-middle">payments</span> Bayar
-                            </button>
-                            @else
-                            <span class="text-text-muted text-xs">✓ Lunas</span>
-                            @endif
+                            <div class="flex items-center justify-center gap-2">
+                                @if(!$billing->isPaid())
+                                <button onclick="openPaymentModal({{ $billing->id }}, '{{ $billing->billing_number }}', '{{ $billing->customer->name ?? '' }}', {{ $billing->remaining_amount }})" 
+                                        class="px-3 py-1.5 rounded-lg bg-primary/20 text-primary text-xs font-medium hover:bg-primary/30 transition">
+                                    <span class="material-symbols-outlined text-sm align-middle">payments</span> Bayar
+                                </button>
+                                @endif
+
+                                @if($billing->status === 'unpaid' && $billing->paid_amount == 0)
+                                <button onclick="deleteBilling({{ $billing->id }}, '{{ $billing->billing_number }}')" 
+                                        class="p-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 hover:bg-red-500/20 transition" title="Hapus Tagihan">
+                                    <span class="material-symbols-outlined text-sm align-middle">delete</span>
+                                </button>
+                                @endif
+
+                                @if($billing->isPaid())
+                                <span class="text-text-muted text-xs">✓ Lunas</span>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -306,6 +317,29 @@
                 });
             }
         });
+
+        async function deleteBilling(id, billingNumber) {
+            if (!confirm(`Apakah Anda yakin ingin menghapus tagihan ${billingNumber}? Tindakan ini juga akan menghapus jurnal terkait.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/internet/billing/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                const result = await response.json();
+                alert(result.message);
+                if (result.success) {
+                    location.reload();
+                }
+            } catch (err) {
+                alert('Gagal menghapus tagihan: ' + err.message);
+            }
+        }
     </script>
     @endpush
 </x-app-layout>

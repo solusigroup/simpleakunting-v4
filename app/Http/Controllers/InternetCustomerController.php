@@ -902,4 +902,49 @@ class InternetCustomerController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * DELETE /internet/billing/{id}
+     * Hapus tagihan bulanan.
+     */
+    public function destroyBilling(Request $request, int $id): JsonResponse
+    {
+        $user = $request->user();
+        if (!$user->canEdit()) {
+            return response()->json(['success' => false, 'message' => 'Tidak memiliki izin.'], 403);
+        }
+
+        $billing = InternetBilling::where('company_id', $user->company_id)->findOrFail($id);
+
+        // Check if billing is paid or partially paid
+        if ($billing->paid_amount > 0 || $billing->status !== 'unpaid') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tagihan yang sudah dibayar sebagian atau lunas tidak dapat dihapus.',
+            ], 422);
+        }
+
+        // If billing has a journal, check if it's posted
+        if ($billing->journal) {
+            if ($billing->journal->is_posted) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Jurnal untuk tagihan ini sudah diposting. Silakan batalkan posting jurnal terlebih dahulu jika ingin menghapus tagihan ini.',
+                ], 422);
+            }
+        }
+
+        DB::transaction(function () use ($billing) {
+            // Delete associated journal
+            if ($billing->journal) {
+                $billing->journal->delete(); // This will cascade delete journal items
+            }
+            $billing->delete();
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tagihan berhasil dihapus.',
+        ]);
+    }
 }
