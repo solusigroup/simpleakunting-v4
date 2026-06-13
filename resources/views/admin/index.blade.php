@@ -42,6 +42,7 @@
                         <th>Email</th>
                         <th>Subdomain</th>
                         <th>Plan</th>
+                        <th>Jurnal</th>
                         <th>Dibuat</th>
                         <th style="text-align:right;">Aksi</th>
                     </tr>
@@ -69,6 +70,11 @@
                             <td>
                                 <span class="plan-badge plan-{{ $tenant->plan ?? 'free' }}">
                                     {{ $tenant->plan ?? 'free' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span style="font-family: monospace; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; padding: 0.2rem 0.55rem; border-radius: 6px; font-weight: bold; font-size: 0.85rem;">
+                                    {{ $tenant->journal_count }}
                                 </span>
                             </td>
                             <td style="color:#64748b; font-size:0.8rem;">

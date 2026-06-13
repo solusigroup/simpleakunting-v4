@@ -18,6 +18,17 @@ class AdminController extends Controller
     public function index()
     {
         $tenants = Tenant::with('domains')->get();
+
+        foreach ($tenants as $tenant) {
+            try {
+                $tenant->journal_count = $tenant->run(function () {
+                    return \App\Models\Journal::count();
+                });
+            } catch (\Exception $e) {
+                $tenant->journal_count = 'Error';
+            }
+        }
+
         $centralDomains = config('tenancy.central_domains', []);
         $centralDomain = $centralDomains[0] ?? (env('CENTRAL_DOMAIN') ?: request()->getHost());
 
