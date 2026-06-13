@@ -283,7 +283,7 @@ class InternetCustomerController extends Controller
             });
         }
 
-        $billings = $query->paginate(30);
+        $billings = $query->paginate(30)->withQueryString();
 
         // Summary for this period
         $periodStats = InternetBilling::where('company_id', $company->id)

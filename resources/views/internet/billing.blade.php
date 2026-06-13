@@ -49,6 +49,11 @@
             <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Lunas</option>
             <option value="overdue" {{ request('status') == 'overdue' ? 'selected' : '' }}>Jatuh Tempo</option>
         </select>
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl border border-border-dark bg-surface-dark/30 min-w-[200px] flex-1 md:flex-initial">
+            <span class="material-symbols-outlined text-text-muted text-lg">search</span>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama / ID pelanggan..." 
+                   class="bg-transparent border-0 text-white text-sm p-0 focus:ring-0 placeholder-text-muted w-full">
+        </div>
         <x-btn type="primary">
             <span class="material-symbols-outlined text-xl">filter_alt</span> Filter
         </x-btn>
