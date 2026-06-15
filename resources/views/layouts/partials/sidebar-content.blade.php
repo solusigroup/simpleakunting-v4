@@ -230,6 +230,9 @@
         <x-sidebar-item href="{{ route('reports.balance-sheet') }}" icon="balance" :active="request()->routeIs('reports.balance-sheet')">
             Neraca
         </x-sidebar-item>
+        <x-sidebar-item href="{{ route('reports.balance-sheet-analysis') }}" icon="troubleshoot" :active="request()->routeIs('reports.balance-sheet-analysis')">
+            Analisa Balance Neraca
+        </x-sidebar-item>
         <x-sidebar-item href="{{ route('reports.profit-loss') }}" icon="trending_up" :active="request()->routeIs('reports.profit-loss')">
             Laba Rugi
         </x-sidebar-item>

@@ -94,9 +94,16 @@
 
     <!-- Balance Check -->
     <div id="balanceAlert" class="hidden mb-6 p-4 rounded-xl bg-accent-red/10 border border-accent-red/30">
-        <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-accent-red">warning</span>
-            <p class="text-accent-red font-medium">Neraca tidak seimbang! Periksa kembali jurnal Anda.</p>
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-accent-red">warning</span>
+                <p class="text-accent-red font-medium">Neraca tidak seimbang! Periksa kembali jurnal Anda.</p>
+            </div>
+            <a href="{{ route('reports.balance-sheet-analysis') }}" 
+               class="px-4 py-1.5 bg-accent-red text-white text-xs font-semibold rounded-lg hover:bg-accent-red/90 transition flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">troubleshoot</span>
+                Analisa Balance
+            </a>
         </div>
     </div>
 
@@ -493,13 +500,13 @@
 
         // Initialize dates
         function initializeDates() {
+            // Use server-provided date for single period
+            document.getElementById('endDate').value = '{{ $report_date }}';
+
             const today = new Date().toISOString().split('T')[0];
             const lastMonth = new Date();
             lastMonth.setMonth(lastMonth.getMonth() - 1);
             const lastMonthISO = lastMonth.toISOString().split('T')[0];
-
-            // Single period
-            document.getElementById('endDate').value = today;
 
             // Comparative periods (last month vs this month)
             const thisMonthStart = new Date();

@@ -456,13 +456,13 @@
         }
 
         function initializeDates() {
+            // Use server-provided dates for single period
+            document.getElementById('startDate').value = '{{ $period['start_date'] }}';
+            document.getElementById('endDate').value = '{{ $period['end_date'] }}';
+
             const today = new Date();
-            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
             const lastMonth = new Date(today);
             lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-            document.getElementById('startDate').value = firstDay.toISOString().split('T')[0];
-            document.getElementById('endDate').value = today.toISOString().split('T')[0];
 
             const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
             const lastMonthStart = new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1);

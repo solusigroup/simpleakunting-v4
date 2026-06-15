@@ -622,6 +622,155 @@ class ReportController extends Controller
     }
 
     /**
+     * GET /reports/balance-sheet-analysis
+     * Analisa Keseimbangan Neraca.
+     */
+    public function balanceSheetAnalysis(Request $request)
+    {
+        $user = $request->user();
+        $company = $user->company;
+
+        $endDate = $request->query('end_date', now()->format('Y-m-d'));
+        $unitId = $request->query('unit_id');
+
+        // Check 1: Calculate Current Balance Sheet Difference
+        $accounts = ChartOfAccount::where('company_id', $company->id)
+            ->where('report_type', 'NERACA')
+            ->where('is_parent', false)
+            ->get();
+
+        $totalAssets = 0;
+        $totalLiabilities = 0;
+        $totalEquity = 0;
+
+        foreach ($accounts as $account) {
+            $balance = $this->getAccountBalance($account, null, $endDate, $unitId);
+            if ($account->type === 'Asset' && $account->normal_balance === 'KREDIT') {
+                $balance = -$balance;
+            }
+
+            if ($account->type === 'Asset') {
+                $totalAssets += $balance;
+            } elseif ($account->type === 'Liability') {
+                $totalLiabilities += $balance;
+            } elseif ($account->type === 'Equity') {
+                $totalEquity += $balance;
+            }
+        }
+
+        // Net income
+        $startOfYear = date('Y-01-01', strtotime($endDate));
+        $labaRugiAccounts = ChartOfAccount::where('company_id', $company->id)
+            ->where('report_type', 'LABARUGI')
+            ->where('is_parent', false)
+            ->get();
+
+        $totalRevenue = 0;
+        $totalExpense = 0;
+        foreach ($labaRugiAccounts as $account) {
+            $balance = $this->getAccountBalance($account, $startOfYear, $endDate, $unitId);
+            if ($account->type === 'Revenue') {
+                $totalRevenue += abs($balance);
+            } elseif ($account->type === 'Expense') {
+                $totalExpense += abs($balance);
+            }
+        }
+        $netIncome = $totalRevenue - $totalExpense;
+        $totalEquity += $netIncome;
+
+        $difference = abs($totalAssets - ($totalLiabilities + $totalEquity));
+        $isBalanced = $difference < 0.01;
+
+        // Check 2: Unbalanced Journals (posted journals where sum(debit) != sum(credit))
+        $unbalancedJournals = DB::table('journals')
+            ->join('journal_items', 'journals.id', '=', 'journal_items.journal_id')
+            ->where('journals.company_id', $company->id)
+            ->where('journals.is_posted', true)
+            ->select(
+                'journals.id',
+                'journals.date',
+                'journals.reference',
+                'journals.description',
+                DB::raw("SUM(journal_items.debit) as total_debit"),
+                DB::raw("SUM(journal_items.credit) as total_credit"),
+                DB::raw("ABS(SUM(journal_items.debit) - SUM(journal_items.credit)) as difference")
+            )
+            ->groupBy('journals.id', 'journals.date', 'journals.reference', 'journals.description')
+            ->havingRaw("ABS(SUM(journal_items.debit) - SUM(journal_items.credit)) > 0.01")
+            ->get();
+
+        // Check 3: Opening Balances Check (sum(debit opening) vs sum(credit opening))
+        $coaOpening = ChartOfAccount::where('company_id', $company->id)
+            ->where('is_parent', false)
+            ->get();
+
+        $debitOpeningTotal = 0;
+        $creditOpeningTotal = 0;
+        $openingAccounts = [];
+
+        foreach ($coaOpening as $account) {
+            $opBal = (float) ($account->opening_balance ?? 0);
+            if ($opBal != 0) {
+                if ($account->normal_balance === 'DEBIT') {
+                    $debitOpeningTotal += $opBal;
+                } else {
+                    $creditOpeningTotal += $opBal;
+                }
+                $openingAccounts[] = [
+                    'code' => $account->code,
+                    'name' => $account->name,
+                    'normal_balance' => $account->normal_balance,
+                    'opening_balance' => $opBal
+                ];
+            }
+        }
+        $openingDifference = abs($debitOpeningTotal - $creditOpeningTotal);
+
+        // Check 4: Orphaned Journal Items (missing/invalid coa_id)
+        $orphanedJournalItems = JournalItem::whereHas('journal', function ($q) use ($company) {
+                $q->where('company_id', $company->id);
+            })
+            ->where(function ($q) use ($company) {
+                $q->whereNull('coa_id')
+                  ->orWhereNotExists(function ($sub) use ($company) {
+                      $sub->select(DB::raw(1))
+                          ->from('chart_of_accounts')
+                          ->whereColumn('chart_of_accounts.id', 'journal_items.coa_id')
+                          ->where('chart_of_accounts.company_id', $company->id);
+                  });
+            })
+            ->with(['journal:id,date,reference,description'])
+            ->get();
+
+        // Check 5: COA Report Type Misconfigurations
+        $invalidAccountTypes = ChartOfAccount::where('company_id', $company->id)
+            ->where(function ($q) {
+                $q->whereIn('type', ['Asset', 'Liability', 'Equity'])->where('report_type', '!=', 'NERACA')
+                  ->orWhereIn('type', ['Revenue', 'Expense'])->where('report_type', '!=', 'LABARUGI');
+            })
+            ->get();
+
+        $data = [
+            'report_date' => $endDate,
+            'unit_id' => $unitId,
+            'total_assets' => $totalAssets,
+            'total_liabilities' => $totalLiabilities,
+            'total_equity' => $totalEquity,
+            'difference' => $difference,
+            'is_balanced' => $isBalanced,
+            'unbalanced_journals' => $unbalancedJournals,
+            'debit_opening_total' => $debitOpeningTotal,
+            'credit_opening_total' => $creditOpeningTotal,
+            'opening_difference' => $openingDifference,
+            'opening_accounts' => $openingAccounts,
+            'orphaned_journal_items' => $orphanedJournalItems,
+            'invalid_account_types' => $invalidAccountTypes,
+        ];
+
+        return view('reports.balance-sheet-analysis', $data);
+    }
+
+    /**
      * GET /reports/balance-sheet/export-pdf
      * Export Balance Sheet to PDF
      */
